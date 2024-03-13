@@ -1,0 +1,74 @@
+version: "3"
+
+# 定义多个network，web和server通讯，server和mysql通讯，server和redis通讯，其他不能相互通讯
+networks:
+  api_network:
+  db_network:
+  cache_network:
+
+# 设置mysql，redis持久化保存
+volumes:
+  mysql:
+  redis:
+
+services:
+  web:
+    build:
+      context: ../../web
+      dockerfile: ./Dockerfile
+    container_name: gva-web
+    restart: always
+    ports:
+      - '8080:8080'
+    depends_on:
+      - server
+    command: [ 'nginx-debug', '-g', 'daemon off;' ]
+    networks:
+      - api_network
+
+  server:
+    build:
+      context: ../../server
+      dockerfile: ./Dockerfile
+    container_name: gva-server
+    restart: always
+    ports:
+      - '8888:8888'
+    depends_on:
+      - mysql
+      - redis
+    links:
+      - mysql
+      - redis
+    networks:
+      - api_network
+      - db_network
+      - cache_network
+
+  mysql:
+    image: mysql:8.0.21       # 如果您是 arm64 架构：如 MacOS 的 M1，请修改镜像为 image: mysql/mysql-server:8.0.21
+    container_name: gva-mysql
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci #设置utf8字符集
+    restart: always
+    ports:
+      - "13306:3306"  # host物理直接映射端口为13306
+    environment:
+      #MYSQL_ROOT_PASSWORD: 'Aa@6447985' # root管理员用户密码
+      MYSQL_DATABASE: 'qmPlus' # 初始化启动时要创建的数据库的名称
+      MYSQL_USER: 'gva'
+      MYSQL_PASSWORD: 'Aa@6447985'
+    volumes:
+      - mysql:/var/lib/mysql
+    networks:
+      - db_network
+
+  redis:
+    image: redis:6.0.6
+    container_name: gva-redis # 容器名
+    restart: always
+    ports:
+      - '16379:6379'
+    volumes:
+      - redis:/data
+    networks:
+      - cache_network

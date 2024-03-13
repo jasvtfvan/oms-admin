@@ -1,0 +1,16 @@
+{
+	"version": "0.2.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"label": "runShellCommand",
+			"command": "${workspaceFolder}/.vscode/prelaunch.sh",
+			"args": [],
+			"problemMatcher": [],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+		}
+	]
+}
