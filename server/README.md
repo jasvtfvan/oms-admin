@@ -3,7 +3,7 @@
 docker run --restart=always \
 -d --name gva-redis \
 -p 127.0.0.1:6379:6379 \
--v ~/Documents/data/redis/data:/var/opt/redis \
+-v ~/Documents/data/redis/data:/data \
 redis:6.2.14
 ```
 
