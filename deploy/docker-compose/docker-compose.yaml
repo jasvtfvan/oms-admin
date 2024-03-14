@@ -53,21 +53,21 @@ services:
     ports:
       - "13306:3306"  # host物理直接映射端口为13306
     environment:
-      #MYSQL_ROOT_PASSWORD: 'Aa@6447985' # root管理员用户密码
+      MYSQL_ROOT_PASSWORD: 'Aa@6447985' # root管理员用户密码
       MYSQL_DATABASE: 'qmPlus' # 初始化启动时要创建的数据库的名称
       MYSQL_USER: 'gva'
-      MYSQL_PASSWORD: 'Aa@6447985'
+      # MYSQL_PASSWORD: 'Aa@6447985'
     volumes:
       - mysql:/var/lib/mysql
     networks:
       - db_network
 
   redis:
-    image: redis:6.0.6
+    image: redis:6.2.14
     container_name: gva-redis # 容器名
     restart: always
     ports:
-      - '16379:6379'
+      - '127.0.0.1:6379:6379'
     volumes:
       - redis:/data
     networks:

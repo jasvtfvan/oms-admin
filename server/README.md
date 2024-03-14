@@ -1,3 +1,12 @@
+#### docker-redis启动
+```sh
+docker run --restart=always \
+-d --name gva-redis \
+-p 127.0.0.1:6379:6379 \
+-v ~/Documents/data/redis/data:/var/opt/redis \
+redis:6.2.14
+```
+
 #### docker-mysql启动
 ```sh
 docker run --name gva-mysql \
