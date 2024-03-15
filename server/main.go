@@ -13,7 +13,7 @@ func main() {
 	initialize.CreateDatabase()            // 创建数据库
 	global.OMS_DB = initialize.GormMysql() // gorm连接数据库
 	if global.OMS_DB != nil {
-		initialize.RegisterTables() // 初始化表
+		initialize.RegisterTables() // 初始化表结构
 		// 程序结束前关闭数据库链接
 		db, _ := global.OMS_DB.DB()
 		defer db.Close()

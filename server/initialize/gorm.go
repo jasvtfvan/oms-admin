@@ -44,7 +44,7 @@ func CreateDatabase() {
 		return
 	}
 	// 连接到MySQL服务器，注意这里并没有指定数据库名，因为我们只是想要执行创建数据库的命令
-	db, err := sql.Open("mysql", m.DsnAllDB())
+	db, err := sql.Open("mysql", m.EmptyDsn())
 	if err != nil {
 		panic(err)
 	}
@@ -57,7 +57,7 @@ func CreateDatabase() {
 	}
 
 	// 创建数据库的SQL语句
-	createDbSQL := "create database if not exists " + m.DbName
+	createDbSQL := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s` DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_general_ci;", m.DbName)
 
 	// 执行SQL语句
 	_, err = db.Exec(createDbSQL)

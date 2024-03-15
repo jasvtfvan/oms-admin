@@ -4,7 +4,7 @@ type Mysql struct {
 	GeneralDB `yaml:",inline" mapstructure:",squash"`
 }
 
-func (m *Mysql) DsnAllDB() string {
+func (m *Mysql) EmptyDsn() string {
 	return m.Username + ":" + m.Password + "@tcp(" + m.Path + ":" + m.Port + ")/"
 }
 
