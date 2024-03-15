@@ -20,10 +20,10 @@ cors:
 excel:
     dir: ./resource/excel/
 jwt:
-    signing-key: 5f86968a-9d49-4997-b6f4-d7febc367c1f
+    signing-key: j4vd6rzc-9ol8-tk3w-5n71-s60hme8up1y3
     expires-time: 7d
     buffer-time: 1d
-    issuer: qmPlus
+    issuer: FVan
 local:
     path: uploads/file
     store-path: uploads/file
@@ -47,6 +47,7 @@ redis:
     db: 0
 system:
     env: local
+    db-type: mysql
     router-prefix: ""
     addr: 8888
     iplimit-count: 15000

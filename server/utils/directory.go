@@ -6,6 +6,9 @@ import (
 	"path/filepath"
 	"reflect"
 	"strings"
+
+	"github.com/jasvtfvan/oms-admin/server/global"
+	"go.uber.org/zap"
 )
 
 //@author: [piexlmax](https://github.com/piexlmax)
@@ -35,19 +38,19 @@ func PathExists(path string) (bool, error) {
 //@return: err error
 
 func CreateDir(dirs ...string) (err error) {
-	// for _, v := range dirs {
-	// 	exist, err := PathExists(v)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	if !exist {
-	// 		global.GVA_LOG.Debug("create directory" + v)
-	// 		if err := os.MkdirAll(v, os.ModePerm); err != nil {
-	// 			global.GVA_LOG.Error("create directory"+v, zap.Any(" error:", err))
-	// 			return err
-	// 		}
-	// 	}
-	// }
+	for _, v := range dirs {
+		exist, err := PathExists(v)
+		if err != nil {
+			return err
+		}
+		if !exist {
+			global.OMS_LOG.Debug("create directory" + v)
+			if err := os.MkdirAll(v, os.ModePerm); err != nil {
+				global.OMS_LOG.Error("create directory"+v, zap.Any(" error:", err))
+				return err
+			}
+		}
+	}
 	return err
 }
 
