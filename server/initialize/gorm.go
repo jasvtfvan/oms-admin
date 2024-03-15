@@ -4,8 +4,7 @@ import (
 	"os"
 
 	"github.com/jasvtfvan/oms-admin/server/global"
-	"github.com/jasvtfvan/oms-admin/server/model/goods"
-	"github.com/jasvtfvan/oms-admin/server/model/system"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
@@ -18,17 +17,15 @@ func Gorm() *gorm.DB {
 	}
 }
 
+// 如果程序修改了，表结构也跟着更新
 func RegisterTables() {
 	db := global.OMS_DB
 	err := db.AutoMigrate(
-		&system.SysUser{},
-		&system.SysGroup{},
-		&system.SysRole{},
-		&goods.GoodsOrder{},
+		global.Tables...,
 	)
 	if err != nil {
-		// global.GVA_LOG.Error("register table failed", zap.Error(err))
+		global.OMS_LOG.Error("register table failed", zap.Error(err))
 		os.Exit(0)
 	}
-	// global.GVA_LOG.Info("register table success")
+	global.OMS_LOG.Info("register table success")
 }
