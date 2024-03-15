@@ -1,0 +1,63 @@
+captcha:
+    key-long: 6
+    img-width: 240
+    img-height: 80
+    open-captcha: 0
+    open-captcha-timeout: 3600
+cors:
+    mode: strict-whitelist
+    whitelist:
+        - allow-origin: example1.com
+          allow-methods: POST, GET
+          allow-headers: Content-Type,AccessToken,X-CSRF-Token, Authorization, Token,X-Token,X-User-Id
+          expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type
+          allow-credentials: true
+        - allow-origin: example2.com
+          allow-methods: GET, POST
+          allow-headers: content-type
+          expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type
+          allow-credentials: true
+excel:
+    dir: ./resource/excel/
+jwt:
+    signing-key: 5f86968a-9d49-4997-b6f4-d7febc367c1f
+    expires-time: 7d
+    buffer-time: 1d
+    issuer: qmPlus
+local:
+    path: uploads/file
+    store-path: uploads/file
+mysql:
+    prefix: ""
+    port: "3306"
+    config: charset=utf8mb4&parseTime=True&loc=Local
+    db-name: oms
+    username: root
+    password: Mysql123Admin456
+    path: 127.0.0.1
+    engine: ""
+    log-mode: error
+    max-idle-conns: 10
+    max-open-conns: 100
+    singular: false
+    log-zap: false
+redis:
+    addr: 127.0.0.1:6379
+    password: ""
+    db: 0
+system:
+    env: local
+    router-prefix: ""
+    addr: 8888
+    iplimit-count: 15000
+    iplimit-time: 3600
+zap:
+    level: info
+    prefix: '[github.com/jasvtfvan/oms-admin/server]'
+    format: console
+    director: log
+    encode-level: LowercaseColorLevelEncoder
+    stacktrace-key: stacktrace
+    max-age: 0
+    show-line: true
+    log-in-console: true

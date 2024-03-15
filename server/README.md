@@ -1,6 +1,6 @@
 #### docker-redis启动
 ```sh
-docker run --name gva-redis \
+docker run --name redis \
 -p 127.0.0.1:6379:6379 \
 -v ~/Documents/data/redis/data:/data \
 -d --restart=always redis:6.2.14
@@ -8,14 +8,11 @@ docker run --name gva-redis \
 
 #### docker-mysql启动
 ```sh
-docker run --name gva-mysql \
--e MYSQL_DATABASE=qmPlus \
--e MYSQL_USER=gva \
--e MYSQL_ROOT_PASSWORD=Aa@6447985 \
+docker run --name mysql \
+-e MYSQL_ROOT_PASSWORD=Mysql123Admin456 \
 -p 127.0.0.1:3306:3306 \
---restart always \
 -v ~/Documents/data/mysql:/var/lib/mysql \
--d mysql:8.0.36 \
+-d --restart always mysql:8.0.36 \
 mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
 ```
 
