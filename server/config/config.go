@@ -10,6 +10,8 @@ type Server struct {
 	// gorm
 	Mysql Mysql `mapstructure:"mysql" json:"mysql" yaml:"mysql"`
 
+	Local Local `mapstructure:"local" json:"local" yaml:"local"`
+
 	Excel Excel `mapstructure:"excel" json:"excel" yaml:"excel"`
 
 	// 跨域配置
