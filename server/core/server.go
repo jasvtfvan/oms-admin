@@ -3,6 +3,7 @@ package core
 import (
 	"fmt"
 
+	"github.com/gin-gonic/gin"
 	"github.com/jasvtfvan/oms-admin/server/global"
 	"github.com/jasvtfvan/oms-admin/server/initialize"
 	"go.uber.org/zap"
@@ -25,7 +26,14 @@ func RunWindowsServer() {
 	// 		system.LoadAll()
 	// 	}
 
-	router := initialize.Routers()
+	var router *gin.Engine
+	// 开启zap的debug，才打印请求信息
+	if global.OMS_CONFIG.Zap.Level == "debug" {
+		logger := ZapGin()
+		router = initialize.Routers(logger)
+	} else {
+		router = initialize.Routers(nil)
+	}
 	// 	Router.Static("/form-generator", "./resource/page")
 
 	address := fmt.Sprintf(":%d", global.OMS_CONFIG.System.Addr)

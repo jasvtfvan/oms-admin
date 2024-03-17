@@ -13,9 +13,9 @@ cors:
           expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type, New-Token, New-Expires-At
           allow-credentials: true
         - allow-origin: example2.com
-          allow-methods: GET, POST
-          allow-headers: content-type
-          expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type
+          allow-methods: POST, GET, OPTIONS, DELETE, PUT
+          allow-headers: Content-Type, AccessToken,X-CSRF-Token, Authorization, Token, X-Token, X-User-Id
+          expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type, New-Token, New-Expires-At
           allow-credentials: true
 excel:
     dir: ./resource/excel/
@@ -57,7 +57,7 @@ system:
     tls-cert: ./resource/cert/server.pem
     tls-key: ./resource/cert/server.key
 zap:
-    level: info
+    level: debug
     prefix: '[github.com/jasvtfvan/oms-admin/server]'
     format: console
     director: log
