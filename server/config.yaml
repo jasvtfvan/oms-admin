@@ -17,10 +17,18 @@ cors:
           allow-headers: Content-Type, AccessToken,X-CSRF-Token, Authorization, Token, X-Token, X-User-Id
           expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type, New-Token, New-Expires-At
           allow-credentials: true
+email:
+    to: ""
+    from: ""
+    host: ""
+    secret: ""
+    nickname: ""
+    port: 0
+    is-ssl: false
 excel:
     dir: ./resource/excel/
 jwt:
-    signing-key: j4vd6rzc-9ol8-tk3w-5n71-s60hme8up1y3
+    signing-key: 6a8c4ee6-0f99-4155-bd80-4e5839d5b79d
     expires-time: 7d
     buffer-time: 1d
     issuer: FVan
@@ -35,7 +43,7 @@ mysql:
     username: root
     password: Mysql123Admin456
     path: 127.0.0.1
-    engine: "InnoDB"
+    engine: InnoDB
     log-mode: error
     max-idle-conns: 10
     max-open-conns: 100
@@ -46,7 +54,6 @@ redis:
     password: ""
     db: 0
 system:
-    # debug release test
     env: debug
     db-type: mysql
     router-prefix: ""

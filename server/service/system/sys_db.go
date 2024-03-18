@@ -85,9 +85,23 @@ func RegisterInit(order int, i Initializer) {
 
 type DbService interface {
 	InitDB() error
+	CheckDB() error
 }
 
 type DbServiceImpl struct{}
+
+// 检查数据连接
+func (*DbServiceImpl) CheckDB() (err error) {
+	if global.OMS_DB == nil {
+		return errors.New("DB为空，数据库未创建")
+	} else {
+		db, _ := global.OMS_DB.DB()
+		if err = db.Ping(); err != nil {
+			return err
+		}
+	}
+	return err
+}
 
 // 初始化数据
 func (dbService *DbServiceImpl) InitDB() (err error) {
