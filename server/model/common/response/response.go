@@ -21,6 +21,7 @@ type Response struct {
 
 const (
 	SUCCESS = 200
+	WARN    = 302
 	ERROR   = 4001
 )
 
@@ -34,9 +35,13 @@ func Result(code int, data interface{}, msg string, c *gin.Context) {
 }
 
 func Success(data interface{}, message string, c *gin.Context) {
-	Result(SUCCESS, data, message, c)
+	Result(SUCCESS, data, message+"!", c)
+}
+
+func Warn(data interface{}, message string, c *gin.Context) {
+	Result(WARN, data, message+"!", c)
 }
 
 func Fail(data interface{}, message string, c *gin.Context) {
-	Result(ERROR, data, message, c)
+	Result(ERROR, data, message+"!", c)
 }

@@ -35,7 +35,13 @@ func (g *_gorm) Config(prefix string, singular bool) *gorm.Config {
 		LogLevel:      logger.Warn,
 		Colorful:      true,
 	})
-	var logMode DB_BASE = &global.OMS_CONFIG.Mysql
+	var logMode DB_BASE
+	switch global.OMS_CONFIG.System.DbType {
+	case "mysql":
+		logMode = &global.OMS_CONFIG.Mysql
+	default:
+		logMode = &global.OMS_CONFIG.Mysql
+	}
 
 	switch logMode.GetLogMode() {
 	case "silent", "Silent":

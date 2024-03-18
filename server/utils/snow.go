@@ -15,26 +15,26 @@ const (
 	epoch       int64 = 1710506330800           //起始常量时间戳（毫秒）,此处选取的时间是2024-03-15 20:38:50
 )
 
-type Worker struct {
+type worker struct {
 	mu        sync.Mutex
 	timeStamp int64
 	workerId  int64
 	number    int64
 }
 
-func NewWorker(workerId int64) *Worker {
+func NewSnowflakeWorker(workerId int64) *worker {
 	workerId = workerId % workerMax
 	if workerId < 0 {
 		workerId += workerMax
 	}
-	return &Worker{
+	return &worker{
 		timeStamp: 0,
 		workerId:  workerId,
 		number:    0,
 	}
 }
 
-func (w *Worker) NextId() int64 {
+func (w *worker) NextId() int64 {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 	//当前时间的毫秒时间戳

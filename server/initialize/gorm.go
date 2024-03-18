@@ -9,7 +9,8 @@ import (
 )
 
 func Gorm() *gorm.DB {
-	switch global.OMS_CONFIG.System.DbType {
+	config := global.OMS_CONFIG
+	switch config.System.DbType {
 	case "mysql":
 		return GormMysql()
 	default:

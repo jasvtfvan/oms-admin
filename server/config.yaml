@@ -35,7 +35,7 @@ mysql:
     username: root
     password: Mysql123Admin456
     path: 127.0.0.1
-    engine: ""
+    engine: "InnoDB"
     log-mode: error
     max-idle-conns: 10
     max-open-conns: 100
