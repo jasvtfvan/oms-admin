@@ -12,7 +12,7 @@ var FileRotateLogs = new(fileRotateLogs)
 type fileRotateLogs struct{}
 
 // GetWriteSyncer 获取 zapcore.WriteSyncer
-// Author [SliverHorn](https://github.com/SliverHorn)
+
 func (r *fileRotateLogs) GetWriteSyncer(level string) zapcore.WriteSyncer {
 	fileWriter := NewCutter(global.OMS_CONFIG.Zap.Director, level, WithCutterFormat("2006-01-02"))
 	if global.OMS_CONFIG.Zap.LogInConsole {

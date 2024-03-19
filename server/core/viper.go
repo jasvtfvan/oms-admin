@@ -12,7 +12,6 @@ import (
 )
 
 // Viper //
-// Author [SliverHorn](https://github.com/SliverHorn)
 func Viper() *viper.Viper {
 	var config string = internal.ConfigDefaultFile
 

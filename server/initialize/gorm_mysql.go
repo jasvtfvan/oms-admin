@@ -10,8 +10,6 @@ import (
 )
 
 // GormMysql 初始化Mysql数据库
-// Author [piexlmax](https://github.com/piexlmax)
-// Author [SliverHorn](https://github.com/SliverHorn)
 func GormMysql() *gorm.DB {
 	m := global.OMS_CONFIG.Mysql
 	if m.DbName == "" {

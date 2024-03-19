@@ -13,7 +13,7 @@ var Zap = new(_zap)
 type _zap struct{}
 
 // GetEncoder 获取 zapcore.Encoder
-// Author [SliverHorn](https://github.com/SliverHorn)
+
 func (z *_zap) GetEncoder(keys ...string) zapcore.Encoder {
 	if global.OMS_CONFIG.Zap.Format == "json" {
 		return zapcore.NewJSONEncoder(z.GetEncoderConfig(keys...))
@@ -22,7 +22,7 @@ func (z *_zap) GetEncoder(keys ...string) zapcore.Encoder {
 }
 
 // GetEncoderConfig 获取zapcore.EncoderConfig
-// Author [SliverHorn](https://github.com/SliverHorn)
+
 func (z *_zap) GetEncoderConfig(keys ...string) zapcore.EncoderConfig {
 	var config zapcore.EncoderConfig
 	if len(keys) <= 0 {
@@ -81,20 +81,20 @@ func (z *_zap) GetEncoderConfig(keys ...string) zapcore.EncoderConfig {
 }
 
 // GetEncoderCore 获取Encoder的 zapcore.Core
-// Author [SliverHorn](https://github.com/SliverHorn)
+
 func (z *_zap) GetEncoderCore(l zapcore.Level, level zap.LevelEnablerFunc, keys ...string) zapcore.Core {
 	writer := FileRotateLogs.GetWriteSyncer(l.String()) // 日志分割
 	return zapcore.NewCore(z.GetEncoder(keys...), writer, level)
 }
 
 // CustomTimeEncoder 自定义日志输出时间格式
-// Author [SliverHorn](https://github.com/SliverHorn)
+
 func (z *_zap) CustomTimeEncoder(t time.Time, encoder zapcore.PrimitiveArrayEncoder) {
 	encoder.AppendString(global.OMS_CONFIG.Zap.Prefix + " " + t.Format("2006/01/02 - 15:04:05.000"))
 }
 
 // GetZapCores 根据配置文件的Level获取 []zapcore.Core
-// Author [SliverHorn](https://github.com/SliverHorn)
+
 func (z *_zap) GetZapCores(keys ...string) []zapcore.Core {
 	cores := make([]zapcore.Core, 0, 7)
 	for level := global.OMS_CONFIG.Zap.TransportLevel(); level <= zapcore.FatalLevel; level++ {
@@ -104,7 +104,7 @@ func (z *_zap) GetZapCores(keys ...string) []zapcore.Core {
 }
 
 // GetLevelPriority 根据 zapcore.Level 获取 zap.LevelEnablerFunc
-// Author [SliverHorn](https://github.com/SliverHorn)
+
 func (z *_zap) GetLevelPriority(level zapcore.Level) zap.LevelEnablerFunc {
 	switch level {
 	case zapcore.DebugLevel:
