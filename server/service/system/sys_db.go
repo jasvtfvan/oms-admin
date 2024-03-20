@@ -13,10 +13,10 @@ import (
 
 const (
 	Mysql           = "mysql"
-	InitSuccess     = "\n[%v] --> 初始数据成功!\n"
-	InitDataExist   = "\n[%v] --> %v 的初始数据已存在!\n"
-	InitDataFailed  = "\n[%v] --> %v 初始数据失败! \nerr: %+v\n"
-	InitDataSuccess = "\n[%v] --> %v 初始数据成功!\n"
+	InitSuccess     = "\n[%v] --> 初始数据成功!"
+	InitDataExist   = "\n[%v] --> %v 的初始数据已存在!"
+	InitDataFailed  = "\n[%v] --> %v 初始数据失败! [err]: %+v"
+	InitDataSuccess = "\n[%v] --> %v 初始数据成功!"
 )
 
 const (
@@ -73,7 +73,7 @@ func RegisterInit(order int, i Initializer) {
 	name := i.InitializerName()
 	if _, existed := cache[name]; existed {
 		panicStr := fmt.Sprintf("InitializerName conflict on %s", name)
-		fmt.Println(panicStr)
+		global.OMS_LOG.Fatal(panicStr)
 		panic(panicStr)
 	}
 	oi := orderedInitializer{order, i}
@@ -137,12 +137,15 @@ func (dbService *DbServiceImpl) InitDB() (err error) {
 	if err = initHandler.WriteConfig(ctx); err != nil {
 		return err
 	}
+	global.OMS_LOG.Info("更新配置文件成功")
 	if err = initHandler.InitTables(ctx, initializers); err != nil {
 		return err
 	}
+	global.OMS_LOG.Info("初始化表成功")
 	if err = initHandler.InitData(ctx, initializers); err != nil {
 		return err
 	}
+	global.OMS_LOG.Info("初始化数据成功")
 
 	initializers = initSlice{}
 	cache = map[string]*orderedInitializer{}

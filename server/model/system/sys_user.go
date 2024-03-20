@@ -2,6 +2,8 @@ package system
 
 import (
 	"github.com/jasvtfvan/oms-admin/server/model/common"
+	"github.com/jasvtfvan/oms-admin/server/utils"
+	"gorm.io/gorm"
 )
 
 type SysUser struct {
@@ -19,4 +21,13 @@ type SysUser struct {
 
 func (*SysUser) TableName() string {
 	return "sys_user"
+}
+
+var sysUserWorkerId int64 = sysRoleWorkerId + 1
+
+// BeforeCreate 钩子，在创建记录前设置自定义的ID
+func (s *SysUser) BeforeCreate(db *gorm.DB) error {
+	snowflakeWorker := utils.NewSnowflakeWorker(sysUserWorkerId)
+	s.BaseModel.ID = uint(snowflakeWorker.NextId())
+	return nil
 }

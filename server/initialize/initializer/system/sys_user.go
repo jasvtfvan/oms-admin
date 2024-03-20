@@ -5,7 +5,6 @@ import (
 	"errors"
 
 	"github.com/jasvtfvan/oms-admin/server/initialize/initializer/system/internal"
-	"github.com/jasvtfvan/oms-admin/server/model/common"
 	systemModel "github.com/jasvtfvan/oms-admin/server/model/system"
 	systemService "github.com/jasvtfvan/oms-admin/server/service/system"
 	"github.com/jasvtfvan/oms-admin/server/utils"
@@ -18,7 +17,7 @@ type initSysUser struct{}
 
 // DataInserted implements system.Initializer.
 func (i *initSysUser) DataInserted(ctx context.Context) bool {
-	return internal.DataInserted(ctx, &systemModel.SysUser{}, "Username = ?", "admin")
+	return internal.DataInserted(ctx, &systemModel.SysUser{}, "username = ?", "admin")
 }
 
 // InitializeData implements system.Initializer.
@@ -28,14 +27,8 @@ func (i *initSysUser) InitializeData(ctx context.Context) (next context.Context,
 		return ctx, systemService.ErrMissingDBContext
 	}
 	password := utils.BcryptHash("Oms123Admin456")
-	snowflakeWorker := utils.NewSnowflakeWorker(2)
-	ID := snowflakeWorker.NextId()
-
 	slices := []systemModel.SysUser{
 		{
-			BaseModel: common.BaseModel{
-				ID: uint(ID),
-			},
 			Username: "admin",
 			Password: password,
 			NickName: "超级管理员",

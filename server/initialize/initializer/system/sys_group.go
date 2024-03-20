@@ -5,10 +5,8 @@ import (
 	"errors"
 
 	"github.com/jasvtfvan/oms-admin/server/initialize/initializer/system/internal"
-	"github.com/jasvtfvan/oms-admin/server/model/common"
 	systemModel "github.com/jasvtfvan/oms-admin/server/model/system"
 	systemService "github.com/jasvtfvan/oms-admin/server/service/system"
-	"github.com/jasvtfvan/oms-admin/server/utils"
 	"gorm.io/gorm"
 )
 
@@ -18,7 +16,7 @@ type initSysGroup struct{}
 
 // DataInserted implements system.Initializer.
 func (i *initSysGroup) DataInserted(ctx context.Context) bool {
-	return internal.DataInserted(ctx, &systemModel.SysGroup{}, "OrgCode = ?", "root")
+	return internal.DataInserted(ctx, &systemModel.SysGroup{}, "org_code = ?", "root")
 }
 
 // InitializeData implements system.Initializer.
@@ -27,14 +25,8 @@ func (i *initSysGroup) InitializeData(ctx context.Context) (next context.Context
 	if !ok {
 		return ctx, systemService.ErrMissingDBContext
 	}
-	snowflakeWorker := utils.NewSnowflakeWorker(0)
-	ID := snowflakeWorker.NextId()
-
 	slices := []systemModel.SysGroup{
 		{
-			BaseModel: common.BaseModel{
-				ID: uint(ID),
-			},
 			ShortName: "根组织",
 			OrgCode:   "root",
 			ParentID:  0,

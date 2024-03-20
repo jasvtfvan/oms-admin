@@ -5,10 +5,8 @@ import (
 	"errors"
 
 	"github.com/jasvtfvan/oms-admin/server/initialize/initializer/system/internal"
-	"github.com/jasvtfvan/oms-admin/server/model/common"
 	systemModel "github.com/jasvtfvan/oms-admin/server/model/system"
 	systemService "github.com/jasvtfvan/oms-admin/server/service/system"
-	"github.com/jasvtfvan/oms-admin/server/utils"
 	"gorm.io/gorm"
 )
 
@@ -18,7 +16,7 @@ type initSysRole struct{}
 
 // DataInserted implements system.Initializer.
 func (i *initSysRole) DataInserted(ctx context.Context) bool {
-	return internal.DataInserted(ctx, &systemModel.SysRole{}, "RoleCode = ?", "admin")
+	return internal.DataInserted(ctx, &systemModel.SysRole{}, "role_code = ?", "admin")
 }
 
 // InitializeData implements system.Initializer.
@@ -27,14 +25,8 @@ func (i *initSysRole) InitializeData(ctx context.Context) (next context.Context,
 	if !ok {
 		return ctx, systemService.ErrMissingDBContext
 	}
-	snowflakeWorker := utils.NewSnowflakeWorker(1)
-	ID := snowflakeWorker.NextId()
-
 	slices := []systemModel.SysRole{
 		{
-			BaseModel: common.BaseModel{
-				ID: uint(ID),
-			},
 			RoleName: "超级管理员",
 			RoleCode: "admin",
 			Sort:     0,

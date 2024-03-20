@@ -31,9 +31,11 @@ func (h *MysqlInitHandler) EnsureDB(ctx context.Context) (next context.Context, 
 	}
 	dsn := config.EmptyDsn()
 	createSql := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s` DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_general_ci;", config.DbName)
+	global.OMS_LOG.Info("创建数据库 " + config.DbName)
 	if err = createDatabase(dsn, "mysql", createSql); err != nil {
 		return ctx, err
 	}
+	global.OMS_LOG.Info("创建数据库 " + config.DbName + " 成功")
 
 	var db *gorm.DB
 	gormConfig := &gorm.Config{
@@ -50,6 +52,7 @@ func (h *MysqlInitHandler) EnsureDB(ctx context.Context) (next context.Context, 
 	}), gormConfig); err != nil {
 		return ctx, err
 	}
+	global.OMS_LOG.Info("db连接成功")
 
 	db.InstanceSet("gorm:table_options", "ENGINE="+config.Engine)
 	sqlDB, _ := db.DB()
