@@ -12,36 +12,33 @@ import (
 	"gorm.io/gorm"
 )
 
-const initOrderSysUser = initOrderSysRole + 1
+const initOrderSysRole = initOrderSysGroup + 1
 
-type initSysUser struct{}
+type initSysRole struct{}
 
 // DataInserted implements system.Initializer.
-func (i *initSysUser) DataInserted(ctx context.Context) bool {
-	return internal.DataInserted(ctx, &systemModel.SysUser{}, "Username = ?", "admin")
+func (i *initSysRole) DataInserted(ctx context.Context) bool {
+	return internal.DataInserted(ctx, &systemModel.SysRole{}, "RoleCode = ?", "admin")
 }
 
 // InitializeData implements system.Initializer.
-func (i *initSysUser) InitializeData(ctx context.Context) (next context.Context, err error) {
+func (i *initSysRole) InitializeData(ctx context.Context) (next context.Context, err error) {
 	db, ok := ctx.Value("db").(*gorm.DB)
 	if !ok {
 		return ctx, systemService.ErrMissingDBContext
 	}
-	password := utils.BcryptHash("Oms123Admin456")
-	snowflakeWorker := utils.NewSnowflakeWorker(2)
+	snowflakeWorker := utils.NewSnowflakeWorker(1)
 	ID := snowflakeWorker.NextId()
 
-	slices := []systemModel.SysUser{
+	slices := []systemModel.SysRole{
 		{
 			BaseModel: common.BaseModel{
 				ID: uint(ID),
 			},
-			Username: "admin",
-			Password: password,
-			NickName: "超级管理员",
-			Avatar:   "",
-			Phone:    "",
-			Email:    "",
+			RoleName: "超级管理员",
+			RoleCode: "admin",
+			Sort:     0,
+			Comment:  "超级管理员",
 			Enable:   true,
 		},
 	}
@@ -52,22 +49,22 @@ func (i *initSysUser) InitializeData(ctx context.Context) (next context.Context,
 	return next, err
 }
 
-// InitializerName implements systemService.Initializer.
-func (i *initSysUser) InitializerName() string {
-	return (&systemModel.SysUser{}).TableName()
+// InitializerName implements system.Initializer.
+func (i *initSysRole) InitializerName() string {
+	return (&systemModel.SysRole{}).TableName()
 }
 
 // MigrateTable implements system.Initializer.
-func (i *initSysUser) MigrateTable(ctx context.Context) (next context.Context, err error) {
-	return internal.MigrateTable(ctx, &systemModel.SysUser{})
+func (i *initSysRole) MigrateTable(ctx context.Context) (next context.Context, err error) {
+	return internal.MigrateTable(ctx, &systemModel.SysRole{})
 }
 
 // TableCreated implements system.Initializer.
-func (i *initSysUser) TableCreated(ctx context.Context) bool {
-	return internal.TableCreated(ctx, &systemModel.SysUser{})
+func (i *initSysRole) TableCreated(ctx context.Context) bool {
+	return internal.TableCreated(ctx, &systemModel.SysRole{})
 }
 
 // auto run
 func init() {
-	systemService.RegisterInit(initOrderSysUser, &initSysUser{})
+	systemService.RegisterInit(initOrderSysUser, &initSysRole{})
 }

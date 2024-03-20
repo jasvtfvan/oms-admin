@@ -2,7 +2,7 @@ package global
 
 import (
 	"github.com/jasvtfvan/oms-admin/server/config"
-	"github.com/jasvtfvan/oms-admin/server/model/goods"
+	"github.com/jasvtfvan/oms-admin/server/model/demo"
 	"github.com/jasvtfvan/oms-admin/server/model/system"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
@@ -21,6 +21,6 @@ var Tables = []interface{}{
 	&system.SysUser{},
 	&system.SysGroup{},
 	&system.SysRole{},
-	&goods.GoodsOrder{},
+	&demo.Demo{},
 	// 添加其他需要迁移的表结构
 }

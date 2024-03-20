@@ -15,6 +15,6 @@ type SysGroup struct {
 	SysRoles  []SysRole
 }
 
-func (SysGroup) TableName() string {
+func (s *SysGroup) TableName() string {
 	return "sys_group"
 }

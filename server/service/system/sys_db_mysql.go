@@ -2,6 +2,7 @@ package system
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/gofrs/uuid/v5"
@@ -26,7 +27,7 @@ func (h *MysqlInitHandler) EnsureDB(ctx context.Context) (next context.Context, 
 	}
 	config := global.OMS_CONFIG.Mysql
 	if config.DbName == "" {
-		return ctx, nil
+		return ctx, errors.New("数据库名不能为空")
 	}
 	dsn := config.EmptyDsn()
 	createSql := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s` DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_general_ci;", config.DbName)

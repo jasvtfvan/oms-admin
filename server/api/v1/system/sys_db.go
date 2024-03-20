@@ -21,7 +21,7 @@ func (*DbApi) InitDB(c *gin.Context) {
 	if err := systemDbService.CheckDB(); err != nil {
 		global.OMS_LOG.Error(err.Error()) // 打印检查失败的原因
 		if err := systemDbService.InitDB(); err != nil {
-			global.OMS_LOG.Error("初始化数据库失败")
+			global.OMS_LOG.Error("初始化数据库失败" + ": " + err.Error())
 			response.Fail(nil, "初始化数据库失败", c)
 		} else {
 			response.Success(nil, "初始化数据库成功", c)
