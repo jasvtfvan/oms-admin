@@ -10,6 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// 初始化顺序
 const initOrderSysRole = initOrderSysGroup + 1
 
 type initSysRole struct{}
@@ -25,13 +26,19 @@ func (i *initSysRole) InitializeData(ctx context.Context) (next context.Context,
 	if !ok {
 		return ctx, systemService.ErrMissingDBContext
 	}
+
+	// group表已经初始化完成
+	sysGroup := &systemModel.SysGroup{}
+	db.Where("org_code = ?", "root").First(sysGroup)
+
 	slices := []systemModel.SysRole{
 		{
-			RoleName: "超级管理员",
-			RoleCode: "admin",
-			Sort:     0,
-			Comment:  "超级管理员",
-			Enable:   true,
+			RoleName:   "超级管理员",
+			RoleCode:   "admin",
+			Sort:       0,
+			Comment:    "超级管理员",
+			Enable:     true,
+			SysGroupID: sysGroup.ID,
 		},
 	}
 	if err = db.Create(&slices).Error; err != nil {

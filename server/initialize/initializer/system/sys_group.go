@@ -10,6 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// 初始化顺序
 const initOrderSysGroup = systemService.InitOrderSystem + 1
 
 type initSysGroup struct{}
@@ -32,6 +33,15 @@ func (i *initSysGroup) InitializeData(ctx context.Context) (next context.Context
 			ParentID:  0,
 			Sort:      0,
 			Enable:    true,
+			// SysRoles: []systemModel.SysRole{
+			// 	{
+			// 		RoleName: "超级管理员",
+			// 		RoleCode: "admin",
+			// 		Sort:     0,
+			// 		Comment:  "超级管理员",
+			// 		Enable:   true,
+			// 	},
+			// },
 		},
 	}
 	if err = db.Create(&slices).Error; err != nil {

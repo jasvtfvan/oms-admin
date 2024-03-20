@@ -11,6 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// 初始化顺序
 const initOrderSysUser = initOrderSysRole + 1
 
 type initSysUser struct{}

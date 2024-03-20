@@ -13,7 +13,7 @@ func DataInserted[T any](ctx context.Context, instance T, query string, args ...
 
 	db, ok := ctx.Value("db").(*gorm.DB)
 	if !ok {
-		global.OMS_LOG.Fatal(systemService.ErrMissingDBContext.Error())
+		global.OMS_LOG.Error(systemService.ErrMissingDBContext.Error())
 		return false
 	}
 
@@ -36,7 +36,7 @@ func MigrateTable[T any](ctx context.Context, instance T) (next context.Context,
 func TableCreated[T any](ctx context.Context, instance T) bool {
 	db, ok := ctx.Value("db").(*gorm.DB)
 	if !ok {
-		global.OMS_LOG.Fatal(systemService.ErrMissingDBContext.Error())
+		global.OMS_LOG.Error(systemService.ErrMissingDBContext.Error())
 		return false
 	}
 	return db.Migrator().HasTable(instance)

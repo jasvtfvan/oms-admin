@@ -73,7 +73,7 @@ func RegisterInit(order int, i Initializer) {
 	name := i.InitializerName()
 	if _, existed := cache[name]; existed {
 		panicStr := fmt.Sprintf("InitializerName conflict on %s", name)
-		global.OMS_LOG.Fatal(panicStr)
+		global.OMS_LOG.Error(panicStr)
 		panic(panicStr)
 	}
 	oi := orderedInitializer{order, i}
@@ -163,7 +163,7 @@ func createDatabase(dsn string, driver string, createSql string) error {
 		err = db.Close()
 		if err != nil {
 			// 数据库链接没关闭成功，会导致内存泄漏，需要排查
-			global.OMS_LOG.Fatal(err.Error())
+			global.OMS_LOG.Error(err.Error())
 		}
 	}(db)
 	if err = db.Ping(); err != nil {
