@@ -1,4 +1,4 @@
-package goods
+package demo
 
 type ServiceGroup struct {
 	DemoService
