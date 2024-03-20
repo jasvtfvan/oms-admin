@@ -26,9 +26,11 @@ func (*DbApi) InitDB(c *gin.Context) {
 			global.OMS_LOG.Error("初始化数据库失败" + ": " + err.Error())
 			response.Fail(nil, "初始化数据库失败", c)
 		} else {
+			fmt.Println("初始化数据库成功")
 			response.Success(nil, "初始化数据库成功", c)
 		}
 	} else {
+		fmt.Println("数据库无需初始化")
 		response.Warn(nil, "数据库无需初始化", c)
 	}
 }

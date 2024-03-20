@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/gofrs/uuid/v5"
-	"github.com/gookit/color"
 	"github.com/jasvtfvan/oms-admin/server/global"
 	"github.com/jasvtfvan/oms-admin/server/utils"
 	"gorm.io/driver/mysql"
@@ -35,7 +34,7 @@ func (h *MysqlInitHandler) EnsureDB(ctx context.Context) (next context.Context, 
 	if err = createDatabase(dsn, "mysql", createSql); err != nil {
 		return ctx, err
 	}
-	global.OMS_LOG.Info("创建数据库 " + config.DbName + " 成功")
+	global.OMS_LOG.Info("创建数据库成功~")
 
 	var db *gorm.DB
 	gormConfig := &gorm.Config{
@@ -87,18 +86,15 @@ func (h *MysqlInitHandler) InitData(ctx context.Context, inits initSlice) error 
 		if in.DataInserted(next) {
 			// 已经插入过，写入warn日志
 			global.OMS_LOG.Warn(fmt.Sprintf(InitDataExist, Mysql, in.InitializerName()))
-			color.Info.Printf(InitDataExist, Mysql, in.InitializerName())
 			continue
 		}
 		if n, err := in.InitializeData(next); err != nil {
 			// 数据初始化失败，写入fatal日志，因为系统数据不全，会导致程序不能正确运行
 			global.OMS_LOG.Fatal(fmt.Sprintf(InitDataFailed, Mysql, in.InitializerName(), err.Error()))
-			color.Info.Printf(InitDataFailed, Mysql, in.InitializerName(), err.Error())
 			return err
 		} else {
 			// 数据初始化成功，写入info日志
 			global.OMS_LOG.Info(fmt.Sprintf(InitDataSuccess, Mysql, in.InitializerName()))
-			color.Info.Printf(InitDataSuccess, Mysql, in.InitializerName())
 			next = n
 		}
 	}
