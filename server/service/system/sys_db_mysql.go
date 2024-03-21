@@ -2,7 +2,6 @@ package system
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/gofrs/uuid/v5"
@@ -26,39 +25,34 @@ func (h *MysqlInitHandler) EnsureDB(ctx context.Context) (next context.Context, 
 	}
 	config := global.OMS_CONFIG.Mysql
 	if config.DbName == "" {
-		return ctx, errors.New("数据库名不能为空")
+		config.DbName = "default"
 	}
-	dsn := config.EmptyDsn()
-	createSql := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s` DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_general_ci;", config.DbName)
-	global.OMS_LOG.Info("创建数据库 " + config.DbName)
-	if err = createDatabase(dsn, "mysql", createSql); err != nil {
-		return ctx, err
-	}
-	global.OMS_LOG.Info("创建数据库成功~")
 
-	var db *gorm.DB
-	gormConfig := &gorm.Config{
-		NamingStrategy: schema.NamingStrategy{
-			TablePrefix:   config.Prefix,
-			SingularTable: config.Singular,
-		},
-		DisableForeignKeyConstraintWhenMigrating: true,
-	}
-	if db, err = gorm.Open(mysql.New(mysql.Config{
-		DSN:                       config.Dsn(), // DSN data source name
-		DefaultStringSize:         191,          // string 类型字段的默认长度
-		SkipInitializeWithVersion: true,         // 根据版本自动配置
-	}), gormConfig); err != nil {
-		return ctx, err
-	}
-	global.OMS_LOG.Info("db连接成功")
+	if global.OMS_DB == nil {
+		var db *gorm.DB
+		gormConfig := &gorm.Config{
+			NamingStrategy: schema.NamingStrategy{
+				TablePrefix:   config.Prefix,
+				SingularTable: config.Singular,
+			},
+			DisableForeignKeyConstraintWhenMigrating: true,
+		}
+		if db, err = gorm.Open(mysql.New(mysql.Config{
+			DSN:                       config.Dsn(), // DSN data source name
+			DefaultStringSize:         191,          // string 类型字段的默认长度
+			SkipInitializeWithVersion: true,         // 根据版本自动配置
+		}), gormConfig); err != nil {
+			global.OMS_LOG.Fatal("Gorm数据库连接失败")
+			return ctx, err
+		}
+		global.OMS_LOG.Info("db连接成功")
 
-	db.InstanceSet("gorm:table_options", "ENGINE="+config.Engine)
-	sqlDB, _ := db.DB()
-	sqlDB.SetMaxIdleConns(config.MaxIdleConns)
-	sqlDB.SetMaxOpenConns(config.MaxOpenConns)
-
-	next = context.WithValue(ctx, "db", db)
+		db.InstanceSet("gorm:table_options", "ENGINE="+config.Engine)
+		sqlDB, _ := db.DB()
+		sqlDB.SetMaxIdleConns(config.MaxIdleConns)
+		sqlDB.SetMaxOpenConns(config.MaxOpenConns)
+		next = context.WithValue(ctx, "db", db)
+	}
 
 	return next, err
 }

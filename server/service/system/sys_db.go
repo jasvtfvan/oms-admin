@@ -132,7 +132,9 @@ func (dbService *DbServiceImpl) InitDB() (err error) {
 		return err
 	}
 	db := ctx.Value("db").(*gorm.DB)
-	global.OMS_DB = db
+	if global.OMS_DB == nil && db != nil {
+		global.OMS_DB = db
+	}
 
 	if err = initHandler.WriteConfig(ctx); err != nil {
 		return err

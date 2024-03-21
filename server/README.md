@@ -11,7 +11,9 @@ docker run --name redis \
 docker run --name mysql \
 -e MYSQL_ROOT_PASSWORD=Mysql123Admin456 \
 -p 127.0.0.1:3306:3306 \
--v ~/Documents/data/mysql:/var/lib/mysql \
+-v ~/Documents/data/mysql/data:/var/lib/mysql \
+-v ~/Documents/data/mysql/log:/var/log/mysql \
+-v ~/Documents/data/mysql/init/init.sql:/docker-entrypoint-initdb.d/init.sql \
 -d --restart always mysql:8.0.36 \
 mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
 ```
