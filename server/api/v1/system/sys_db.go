@@ -11,7 +11,7 @@ import (
 type DbApi struct{}
 
 func (*DbApi) CheckDB(c *gin.Context) {
-	if err := systemDbService.CheckDB(); err != nil {
+	if err := systemDBService.CheckDB(); err != nil {
 		fmt.Println("[Golang] 数据库尚未初始化: " + err.Error())
 		response.Warn(gin.H{"needInit": true}, "数据库尚未初始化", c)
 	} else {
@@ -20,9 +20,9 @@ func (*DbApi) CheckDB(c *gin.Context) {
 }
 
 func (*DbApi) InitDB(c *gin.Context) {
-	if err := systemDbService.CheckDB(); err != nil {
+	if err := systemDBService.CheckDB(); err != nil {
 		fmt.Println("[Golang] 数据库需要初始化: " + err.Error())
-		if err := systemDbService.InitDB(); err != nil {
+		if err := initDBService.InitDB(); err != nil {
 			global.OMS_LOG.Error("[Golang] 初始化数据库失败" + ": " + err.Error())
 			response.Fail(nil, "初始化数据库失败", c)
 		} else {

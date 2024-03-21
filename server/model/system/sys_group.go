@@ -21,7 +21,7 @@ func (s *SysGroup) TableName() string {
 	return "sys_group"
 }
 
-var sysGroupWorkerId int64 = 0
+var sysGroupWorkerId int64 = sysVersionWorkerId + 1
 
 // BeforeCreate 钩子，在创建记录前设置自定义的ID
 func (s *SysGroup) BeforeCreate(db *gorm.DB) error {

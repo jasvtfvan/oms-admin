@@ -1,4 +1,4 @@
-package system
+package initialize
 
 import (
 	"context"
@@ -7,54 +7,12 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/jasvtfvan/oms-admin/server/global"
 	"github.com/jasvtfvan/oms-admin/server/utils"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
-	"gorm.io/gorm/schema"
 )
 
 type MysqlInitHandler struct{}
 
 func NewMysqlInitHandler() *MysqlInitHandler {
 	return &MysqlInitHandler{}
-}
-
-// EnsureDB implements system.TypedDbInitHandler.
-func (h *MysqlInitHandler) EnsureDB(ctx context.Context) (next context.Context, err error) {
-	if s, ok := ctx.Value("dbType").(string); !ok || s != "mysql" {
-		return ctx, ErrDBTypeMismatch
-	}
-	config := global.OMS_CONFIG.Mysql
-	if config.DbName == "" {
-		config.DbName = "oms"
-	}
-
-	if global.OMS_DB == nil {
-		var db *gorm.DB
-		gormConfig := &gorm.Config{
-			NamingStrategy: schema.NamingStrategy{
-				TablePrefix:   config.Prefix,
-				SingularTable: config.Singular,
-			},
-			DisableForeignKeyConstraintWhenMigrating: true,
-		}
-		if db, err = gorm.Open(mysql.New(mysql.Config{
-			DSN:                       config.Dsn(), // DSN data source name
-			DefaultStringSize:         191,          // string 类型字段的默认长度
-			SkipInitializeWithVersion: true,         // 根据版本自动配置
-		}), gormConfig); err != nil {
-			global.OMS_LOG.Fatal("Gorm数据库连接失败")
-			return ctx, err
-		}
-		global.OMS_LOG.Info("db连接成功")
-
-		db.InstanceSet("gorm:table_options", "ENGINE="+config.Engine)
-		sqlDB, _ := db.DB()
-		sqlDB.SetMaxIdleConns(config.MaxIdleConns)
-		sqlDB.SetMaxOpenConns(config.MaxOpenConns)
-		next = context.WithValue(ctx, "db", db)
-	}
-
-	return next, err
 }
 
 // WriteConfig implements TypedDbInitHandler.

@@ -4,28 +4,25 @@ import (
 	"context"
 	"errors"
 
-	"github.com/jasvtfvan/oms-admin/server/initialize/initializer/system/internal"
+	"github.com/jasvtfvan/oms-admin/server/global"
+	"github.com/jasvtfvan/oms-admin/server/initialize/initializer"
 	systemModel "github.com/jasvtfvan/oms-admin/server/model/system"
-	systemService "github.com/jasvtfvan/oms-admin/server/service/system"
-	"gorm.io/gorm"
+	initializeService "github.com/jasvtfvan/oms-admin/server/service/initialize"
 )
 
 // 初始化顺序
-const initOrderSysGroup = systemService.InitOrderSystem + 1
+const initOrderSysGroup = initOrderSysVersion + 1
 
 type initSysGroup struct{}
 
-// DataInserted implements system.Initializer.
+// DataInserted implements initialize.Initializer.
 func (i *initSysGroup) DataInserted(ctx context.Context) bool {
-	return internal.DataInserted(ctx, &systemModel.SysGroup{}, "org_code = ?", "root")
+	return initializer.DataInserted(ctx, &systemModel.SysGroup{}, "org_code = ?", "root")
 }
 
-// InitializeData implements system.Initializer.
+// InitializeData implements initialize.Initializer.
 func (i *initSysGroup) InitializeData(ctx context.Context) (next context.Context, err error) {
-	db, ok := ctx.Value("db").(*gorm.DB)
-	if !ok {
-		return ctx, systemService.ErrMissingDBContext
-	}
+	db := global.OMS_DB
 	slices := []systemModel.SysGroup{
 		{
 			ShortName: "根组织",
@@ -51,22 +48,22 @@ func (i *initSysGroup) InitializeData(ctx context.Context) (next context.Context
 	return next, err
 }
 
-// InitializerName implements system.Initializer.
+// InitializerName implements initialize.Initializer.
 func (i *initSysGroup) InitializerName() string {
 	return (&systemModel.SysGroup{}).TableName()
 }
 
-// MigrateTable implements system.Initializer.
+// MigrateTable implements initialize.Initializer.
 func (i *initSysGroup) MigrateTable(ctx context.Context) (next context.Context, err error) {
-	return internal.MigrateTable(ctx, &systemModel.SysGroup{})
+	return initializer.MigrateTable(ctx, &systemModel.SysGroup{})
 }
 
-// TableCreated implements system.Initializer.
+// TableCreated implements initialize.Initializer.
 func (i *initSysGroup) TableCreated(ctx context.Context) bool {
-	return internal.TableCreated(ctx, &systemModel.SysGroup{})
+	return initializer.TableCreated(ctx, &systemModel.SysGroup{})
 }
 
 // auto run
 func init() {
-	systemService.RegisterInit(initOrderSysGroup, &initSysGroup{})
+	initializeService.RegisterInit(initOrderSysGroup, &initSysGroup{})
 }

@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 
-	"github.com/jasvtfvan/oms-admin/server/initialize/initializer/system/internal"
+	"github.com/jasvtfvan/oms-admin/server/global"
+	"github.com/jasvtfvan/oms-admin/server/initialize/initializer"
 	systemModel "github.com/jasvtfvan/oms-admin/server/model/system"
-	systemService "github.com/jasvtfvan/oms-admin/server/service/system"
-	"gorm.io/gorm"
+	initializeService "github.com/jasvtfvan/oms-admin/server/service/initialize"
 )
 
 // 初始化顺序
@@ -15,17 +15,14 @@ const initOrderSysRole = initOrderSysGroup + 1
 
 type initSysRole struct{}
 
-// DataInserted implements system.Initializer.
+// DataInserted implements initialize.Initializer.
 func (i *initSysRole) DataInserted(ctx context.Context) bool {
-	return internal.DataInserted(ctx, &systemModel.SysRole{}, "role_code = ?", "admin")
+	return initializer.DataInserted(ctx, &systemModel.SysRole{}, "role_code = ?", "admin")
 }
 
-// InitializeData implements system.Initializer.
+// InitializeData implements initialize.Initializer.
 func (i *initSysRole) InitializeData(ctx context.Context) (next context.Context, err error) {
-	db, ok := ctx.Value("db").(*gorm.DB)
-	if !ok {
-		return ctx, systemService.ErrMissingDBContext
-	}
+	db := global.OMS_DB
 
 	// group表已经初始化完成
 	sysGroup := &systemModel.SysGroup{}
@@ -48,22 +45,22 @@ func (i *initSysRole) InitializeData(ctx context.Context) (next context.Context,
 	return next, err
 }
 
-// InitializerName implements system.Initializer.
+// InitializerName implements initialize.Initializer.
 func (i *initSysRole) InitializerName() string {
 	return (&systemModel.SysRole{}).TableName()
 }
 
-// MigrateTable implements system.Initializer.
+// MigrateTable implements initialize.Initializer.
 func (i *initSysRole) MigrateTable(ctx context.Context) (next context.Context, err error) {
-	return internal.MigrateTable(ctx, &systemModel.SysRole{})
+	return initializer.MigrateTable(ctx, &systemModel.SysRole{})
 }
 
-// TableCreated implements system.Initializer.
+// TableCreated implements initialize.Initializer.
 func (i *initSysRole) TableCreated(ctx context.Context) bool {
-	return internal.TableCreated(ctx, &systemModel.SysRole{})
+	return initializer.TableCreated(ctx, &systemModel.SysRole{})
 }
 
 // auto run
 func init() {
-	systemService.RegisterInit(initOrderSysUser, &initSysRole{})
+	initializeService.RegisterInit(initOrderSysUser, &initSysRole{})
 }

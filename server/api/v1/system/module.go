@@ -7,5 +7,6 @@ type ApiGroup struct {
 }
 
 var (
-	systemDbService = service.ServiceGroupApp.System.DbService
+	systemDBService = service.ServiceGroupApp.System.DBService
+	initDBService   = service.ServiceGroupApp.Initialize.InitDBService
 )

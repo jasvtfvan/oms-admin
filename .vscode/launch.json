@@ -11,10 +11,10 @@
       "mode": "auto",
       "program": "${workspaceFolder}/server/main.go",
       "args": [
-        "-action",
-        "run",
-        "-port",
-        "80"
+        // "-action",
+        // "run",
+        // "-port",
+        // "80"
       ],
       // "envFile": "${workspaceFolder}/.env",
       "buildFlags": "--tags dynamic",

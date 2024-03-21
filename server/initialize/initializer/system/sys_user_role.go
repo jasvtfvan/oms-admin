@@ -6,10 +6,8 @@ import (
 	"strconv"
 
 	"github.com/jasvtfvan/oms-admin/server/global"
-	"github.com/jasvtfvan/oms-admin/server/initialize/initializer/system/internal"
+	"github.com/jasvtfvan/oms-admin/server/initialize/initializer"
 	systemModel "github.com/jasvtfvan/oms-admin/server/model/system"
-	systemService "github.com/jasvtfvan/oms-admin/server/service/system"
-	"gorm.io/gorm"
 )
 
 // 初始化顺序
@@ -17,13 +15,9 @@ const initOrderSysUserRole = initOrderSysUserGroup + 1
 
 type initSysUserRole struct{}
 
-// DataInserted implements system.Initializer.
+// DataInserted implements initialize.Initializer.
 func (i *initSysUserRole) DataInserted(ctx context.Context) bool {
-	db, ok := ctx.Value("db").(*gorm.DB)
-	if !ok {
-		global.OMS_LOG.Error(systemService.ErrMissingDBContext.Error())
-		return false
-	}
+	db := global.OMS_DB
 
 	// user表已经初始化完成
 	sysUser := &systemModel.SysUser{}
@@ -32,7 +26,7 @@ func (i *initSysUserRole) DataInserted(ctx context.Context) bool {
 	sysRole := &systemModel.SysRole{}
 	db.Where("role_code = ?", "admin").First(sysRole)
 
-	return internal.DataInserted(
+	return initializer.DataInserted(
 		ctx, &systemModel.SysUserRole{},
 		"sys_user_id = ? and sys_role_id = ?",
 		strconv.Itoa(int(sysUser.ID)),
@@ -40,12 +34,9 @@ func (i *initSysUserRole) DataInserted(ctx context.Context) bool {
 	)
 }
 
-// InitializeData implements system.Initializer.
+// InitializeData implements initialize.Initializer.
 func (i *initSysUserRole) InitializeData(ctx context.Context) (next context.Context, err error) {
-	db, ok := ctx.Value("db").(*gorm.DB)
-	if !ok {
-		return ctx, systemService.ErrMissingDBContext
-	}
+	db := global.OMS_DB
 
 	// user表已经初始化完成
 	sysUser := &systemModel.SysUser{}
@@ -67,22 +58,22 @@ func (i *initSysUserRole) InitializeData(ctx context.Context) (next context.Cont
 	return next, err
 }
 
-// InitializerName implements system.Initializer.
+// InitializerName implements initialize.Initializer.
 func (i *initSysUserRole) InitializerName() string {
 	return (&systemModel.SysUserRole{}).TableName()
 }
 
-// MigrateTable implements system.Initializer.
+// MigrateTable implements initialize.Initializer.
 func (i *initSysUserRole) MigrateTable(ctx context.Context) (next context.Context, err error) {
-	return internal.MigrateTable(ctx, &systemModel.SysUserRole{})
+	return initializer.MigrateTable(ctx, &systemModel.SysUserRole{})
 }
 
-// TableCreated implements system.Initializer.
+// TableCreated implements initialize.Initializer.
 func (i *initSysUserRole) TableCreated(ctx context.Context) bool {
-	return internal.TableCreated(ctx, &systemModel.SysUserRole{})
+	return initializer.TableCreated(ctx, &systemModel.SysUserRole{})
 }
 
 // auto run
 func init() {
-	// systemService.RegisterInit(initOrderSysUserRole, &initSysUserRole{})
+	// initializeService.RegisterInit(initOrderSysUserRole, &initSysUserRole{})
 }

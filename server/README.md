@@ -37,6 +37,7 @@ tinyint vs int，float vs double，date vs datetime
 * 13、批量操作时最好是一条sql语句搞定；其次是打包成一个事务，一次性提交<br>
 （高并发情况下减少对共享资源的争用）
 * 14、不要使用连表操作，join逻辑在业务代码里完成
+* 15、查看数据库连接数 ```show processlist;```
 
 #### mysql防止sql注入
 * 1、检查select username from user where username='"+username+"'
