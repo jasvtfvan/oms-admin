@@ -25,7 +25,7 @@ func (h *MysqlInitHandler) EnsureDB(ctx context.Context) (next context.Context, 
 	}
 	config := global.OMS_CONFIG.Mysql
 	if config.DbName == "" {
-		config.DbName = "default"
+		config.DbName = "oms"
 	}
 
 	if global.OMS_DB == nil {

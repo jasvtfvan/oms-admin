@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/jasvtfvan/oms-admin/server/core"
 	"github.com/jasvtfvan/oms-admin/server/global"
 	"github.com/jasvtfvan/oms-admin/server/initialize"
@@ -27,7 +29,10 @@ func main() {
 		// 根据系统版本，决定是否AutoMigrate表结构 TODO
 		// 程序结束前关闭数据库链接
 		db, _ := global.OMS_DB.DB()
-		defer db.Close()
+		defer func() {
+			fmt.Println("====== [Golang] main.go 关闭数据库连接 ======")
+			db.Close()
+		}()
 	}
 	core.RunWindowsServer()
 }

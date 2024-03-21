@@ -12,7 +12,7 @@ import (
 func GormMysql() *gorm.DB {
 	m := global.OMS_CONFIG.Mysql
 	if m.DbName == "" {
-		m.DbName = "default"
+		m.DbName = "oms"
 	}
 	mysqlConfig := mysql.Config{
 		DSN:                       m.Dsn(), // DSN data source name
