@@ -9,6 +9,7 @@
 .env.*.local
 
 # Debug files
+.vscode/pid.txt
 *debug*
 !.vscode/*debug*
 !stop_debug.sh
