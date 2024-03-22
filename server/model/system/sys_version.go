@@ -9,7 +9,7 @@ import (
 
 type SysVersion struct {
 	ID          uint      `json:"ID" gorm:"primaryKey"` // 主键ID
-	VersionName string    `json:"versionName" gorm:"default:oms_server;comment:版本名称"`
+	VersionName string    `json:"versionName" gorm:"index;default:oms_server;comment:版本名称"`
 	Version     string    `json:"version" gorm:"default:0.0.1;comment:版本号"`
 	CreatedAt   time.Time // 创建时间
 	UpdatedAt   time.Time // 更新时间

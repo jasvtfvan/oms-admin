@@ -28,7 +28,7 @@ email:
 excel:
     dir: ./resource/excel/
 jwt:
-    signing-key: d9c2ff55-3477-45b0-bd42-85567c0d4f61
+    signing-key: 17730c76-e21a-4e2a-af87-c92aecb9324f
     expires-time: 7d
     buffer-time: 1d
     issuer: FVan
@@ -73,4 +73,4 @@ zap:
     max-age: 0
     show-line: true
     log-in-console: true
-version: "v0.0.1"
+version: v0.0.1

@@ -15,7 +15,7 @@ func initServer(address string, router *gin.Engine) server {
 		Addr:           address,
 		Handler:        router,
 		ReadTimeout:    20 * time.Second,
-		WriteTimeout:   20 * time.Second,
+		WriteTimeout:   60 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
 }
@@ -25,7 +25,7 @@ func initServerTLS(address string, router *gin.Engine) serverTLS {
 		Addr:           address,
 		Handler:        router,
 		ReadTimeout:    20 * time.Second,
-		WriteTimeout:   20 * time.Second,
+		WriteTimeout:   60 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
 }

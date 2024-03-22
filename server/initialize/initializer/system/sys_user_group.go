@@ -8,6 +8,7 @@ import (
 	"github.com/jasvtfvan/oms-admin/server/global"
 	"github.com/jasvtfvan/oms-admin/server/initialize/initializer"
 	systemModel "github.com/jasvtfvan/oms-admin/server/model/system"
+	initializeService "github.com/jasvtfvan/oms-admin/server/service/initialize"
 )
 
 // 初始化顺序
@@ -75,5 +76,5 @@ func (i *initSysUserGroup) TableCreated(ctx context.Context) bool {
 
 // auto run
 func init() {
-	// initializeService.RegisterInit(initOrderSysUserGroup, &initSysUserGroup{})
+	initializeService.RegisterInit(initOrderSysUserGroup, &initSysUserGroup{})
 }

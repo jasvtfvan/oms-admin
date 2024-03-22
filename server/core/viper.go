@@ -25,7 +25,7 @@ func Viper() *viper.Viper {
 	v.WatchConfig()
 
 	v.OnConfigChange(func(e fsnotify.Event) {
-		fmt.Println("config file changed:", e.Name)
+		fmt.Println("[Golang] config file changed:", e.Name)
 		if err = v.Unmarshal(&global.OMS_CONFIG); err != nil {
 			fmt.Println(err)
 		}
