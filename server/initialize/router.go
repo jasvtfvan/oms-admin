@@ -49,29 +49,28 @@ func Routers(logger *zap.Logger) *gin.Engine {
 
 	r := gin.New()
 	r.Use(gin.Recovery())
-	if global.OMS_CONFIG.System.Env != "release" {
+
+	if logger != nil {
+		// zap打印请求信息，同时打印到console和log文件
+		r.Use(middleware.ZapLogger(logger))
+	} else {
 		// gin.Logger默认控制台输出请求信息：时间、返回状态、响应时间、ip、请求方法（GET、POST等）、请求相对路径
 		// r.Use(gin.Logger())
-		if logger != nil {
-			// zap打印请求信息，同时打印到console和log文件
-			r.Use(middleware.ZapLogger(logger))
-		} else {
-			// 控制台打印请求信息
-			r.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
-				// 自定义格式
-				return fmt.Sprintf("[GIN] %s [%s] | \t %s %s [%s] | \t %d %s [%s] \n[GIN:UserAgent] %s \n",
-					param.TimeStamp.Format(time.DateTime),
-					param.ClientIP,
-					param.Request.Proto,
-					param.Method,
-					param.Path,
-					param.StatusCode,
-					param.ErrorMessage,
-					param.Latency.String(),
-					param.Request.UserAgent(),
-				)
-			}))
-		}
+		// 控制台打印请求信息
+		r.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
+			// 自定义格式
+			return fmt.Sprintf("[gin.LoggerWithFormatter] %s [%s] | \t %s %s [%s] | \t %d %s [%s] \n[gin.LoggerWithFormatter:UserAgent] %s \n",
+				param.TimeStamp.Format(time.DateTime),
+				param.ClientIP,
+				param.Request.Proto,
+				param.Method,
+				param.Path,
+				param.StatusCode,
+				param.ErrorMessage,
+				param.Latency.String(),
+				param.Request.UserAgent(),
+			)
+		}))
 	}
 
 	// 禁止访问文件目录，只保留单个文件的访问权限

@@ -11,14 +11,13 @@
       "mode": "auto",
       "program": "${workspaceFolder}/server/main.go",
       "args": [
-        // "-action",
-        // "run",
-        // "-port",
-        // "80"
+        "-env",
+        "debug",
       ],
+      // "postDebugTask": "do post debug task",
       // "envFile": "${workspaceFolder}/.env",
       "buildFlags": "--tags dynamic",
-      // "preLaunchTask": "runShellCommand"
+      // "preLaunchTask": "do pre launch task",
     },
   ],
 }

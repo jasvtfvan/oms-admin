@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"reflect"
 	"strings"
+	"time"
 )
 
 //@author: [piexlmax](https://github.com/piexlmax)
@@ -79,4 +80,10 @@ func RandomString(n int) string {
 
 func RandomInt(min, max int) int {
 	return min + rand.Intn(max-min)
+}
+
+func GetStringWithTime(src string) string {
+	now := time.Now()
+	formattedTime := now.Format(time.DateTime)
+	return formattedTime + " " + src
 }

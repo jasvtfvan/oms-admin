@@ -4,6 +4,8 @@ import (
 	"errors"
 
 	"github.com/jasvtfvan/oms-admin/server/global"
+	"github.com/jasvtfvan/oms-admin/server/model/system"
+	"gorm.io/gorm"
 )
 
 type DBService interface {
@@ -17,9 +19,14 @@ func (*DBServiceImpl) CheckDB() (err error) {
 	if global.OMS_DB == nil {
 		return errors.New("DB为空，数据库未创建")
 	} else {
-		db, _ := global.OMS_DB.DB()
-		if err = db.Ping(); err != nil {
-			return err
+		db := global.OMS_DB
+		tableCreated := db.Migrator().HasTable(&system.SysVersion{})
+		if !tableCreated {
+			return errors.New("表结构尚未创建")
+		}
+		err := db.Where("version_name = ?", "oms_server").First(&system.SysVersion{}).Error
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errors.New("表数据尚未插入")
 		}
 	}
 	return err

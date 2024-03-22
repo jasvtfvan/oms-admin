@@ -22,7 +22,7 @@ func ZapLogger(logger *zap.Logger) gin.HandlerFunc {
 			latency := time.Since(start)
 			userAgent := c.Request.UserAgent()
 
-			logStr := fmt.Sprintf("[GIN] %s [%s] | \t %s %s [%s] | \t %d %s [%s] \n[GIN:UserAgent] %s",
+			logStr := fmt.Sprintf("[zap.Logger] %s [%s] | \t %s %s [%s] | \t %d %s [%s] \n[zap.Logger:UserAgent] %s",
 				start.Format(time.DateTime),
 				clientIP,
 				proto,

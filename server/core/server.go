@@ -46,11 +46,12 @@ func RunWindowsServer() {
 
 	global.OMS_LOG.Info("Server run success on ", zap.String("address", address))
 
+	version := global.OMS_CONFIG.Version
 	fmt.Printf(`
 		欢迎使用 oms-admin
-		当前版本:v2.6.0
+		当前版本: %s
 		默认自动化文档地址:http://127.0.0.1%s/swagger/index.html
-	`, address)
+	`, version, address)
 
 	if global.OMS_CONFIG.System.UseTls { // 开启https验证
 		certFile, keyFile := global.OMS_CONFIG.System.TlsCert, global.OMS_CONFIG.System.TlsKey

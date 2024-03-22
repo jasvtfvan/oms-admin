@@ -73,4 +73,4 @@ zap:
     max-age: 0
     show-line: true
     log-in-console: true
-version: "0.0.1"
+version: "v0.0.1"

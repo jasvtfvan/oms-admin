@@ -12,26 +12,26 @@ type DbApi struct{}
 
 func (*DbApi) CheckDB(c *gin.Context) {
 	if err := systemDBService.CheckDB(); err != nil {
-		fmt.Println("[Golang] 数据库尚未初始化: " + err.Error())
-		response.Warn(gin.H{"needInit": true}, "数据库尚未初始化", c)
+		fmt.Println("[Golang] DB尚未初始化: " + err.Error())
+		response.Fail(gin.H{"ready": false}, "DB尚未初始化", c)
 	} else {
-		response.Success(gin.H{"needInit": false}, "数据库无需初始化", c)
+		response.Success(gin.H{"ready": true}, "DB已准备就绪", c)
 	}
 }
 
 func (*DbApi) InitDB(c *gin.Context) {
 	if err := systemDBService.CheckDB(); err != nil {
-		fmt.Println("[Golang] 数据库需要初始化: " + err.Error())
+		fmt.Println("[Golang] DB尚未初始化: " + err.Error())
 		if err := initDBService.InitDB(); err != nil {
-			global.OMS_LOG.Error("[Golang] 初始化数据库失败" + ": " + err.Error())
-			response.Fail(nil, "初始化数据库失败", c)
+			global.OMS_LOG.Error("[Golang] 初始化DB失败" + ": " + err.Error())
+			response.Fail(nil, "初始化DB失败", c)
 		} else {
-			fmt.Println("[Golang] 初始化数据库成功")
-			response.Success(nil, "初始化数据库成功", c)
+			fmt.Println("[Golang] 初始化DB成功")
+			response.Success(nil, "初始化DB成功", c)
 		}
 	} else {
-		fmt.Println("[Golang] 数据库无需初始化")
-		response.Warn(nil, "数据库无需初始化", c)
+		fmt.Println("[Golang] DB已准备就绪")
+		response.Success(nil, "DB已准备就绪", c)
 	}
 }
 

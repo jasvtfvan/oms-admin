@@ -1,16 +1,27 @@
 {
-	"version": "0.2.0",
+	"version": "2.0.0",
 	"tasks": [
 		{
 			"type": "shell",
-			"label": "runShellCommand",
-			"command": "${workspaceFolder}/.vscode/prelaunch.sh",
+			"label": "do pre launch task",
+			"command": "${workspaceFolder}/.vscode/pre_launch_task.sh",
 			"args": [],
 			"problemMatcher": [],
 			"group": {
 				"kind": "build",
 				"isDefault": true
 			},
-		}
+		},
+		{
+			"type": "shell",
+			"label": "do post debug task",
+			"command": "${workspaceFolder}/.vscode/post_debug_task.sh",
+			"args": [],
+			"problemMatcher": [],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+		},
 	]
 }

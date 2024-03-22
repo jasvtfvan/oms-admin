@@ -10,6 +10,8 @@
 
 # Debug files
 *debug*
+!.vscode/*debug*
+!stop_debug.sh
 
 # Log files
 npm-debug.log*

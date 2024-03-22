@@ -1,3 +1,43 @@
+
+### 生产环境
+
+#### config.yaml部分修改
+**不要全局直接复制，要每一行进行配置修改**
+```yaml
+cors:
+    mode: strict-whitelist
+    whitelist:
+        - allow-origin: example1.com
+        - allow-origin: example2.com
+mysql:
+    port: "3306"
+    db-name: oms
+    username: root
+    password: Mysql123Admin456
+    path: 127.0.0.1
+redis:
+    addr: 127.0.0.1:6379
+    password: ""
+    db: 0
+system:
+    env: release
+    addr: 8888
+    use-tls: false
+    tls-cert: ./resource/cert/server.pem
+    tls-key: ./resource/cert/server.key
+zap:
+    level: info
+version: "v0.0.1"
+```
+>cors: whitelist下保留添加真实域名，删掉多余域名，注意格式
+>mysql: 数据库主要配置
+>redis: 缓存主要配置
+>system: env(debug/release)[debug允许所有跨域] tls[相关开启https中间件]
+>zap: level(debug/info/warn/...)[请求信息输出到log/debug.log]
+
+
+### 开发环境
+
 #### docker-redis启动
 ```sh
 docker run --name redis \
@@ -37,7 +77,9 @@ tinyint vs int，float vs double，date vs datetime
 * 13、批量操作时最好是一条sql语句搞定；其次是打包成一个事务，一次性提交<br>
 （高并发情况下减少对共享资源的争用）
 * 14、不要使用连表操作，join逻辑在业务代码里完成
-* 15、查看数据库连接数 ```show processlist;```
+* 15、查看连接数 ```show processlist;```
+* 16、查看连接超时时间 ```show global variables like 'wait_timeout'; -- 单位秒```
+* 17、设置连接超时是时间 ```set global wait_timeout = 28800; -- 设置为28800秒，即8小时```
 
 #### mysql防止sql注入
 * 1、检查select username from user where username='"+username+"'
