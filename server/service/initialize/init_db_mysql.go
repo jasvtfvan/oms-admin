@@ -37,16 +37,16 @@ func (h *MysqlInitHandler) InitData(ctx context.Context, inits initSlice) error 
 	for _, in := range inits {
 		if in.DataInserted(next) {
 			// 已经插入过，写入warn日志
-			global.OMS_LOG.Warn(fmt.Sprintf(InitDataExist, Mysql, in.InitializerName()))
+			global.OMS_LOG.Warn(fmt.Sprintf(InitDataExist, InitMysql, in.InitializerName()))
 			continue
 		}
 		if n, err := in.InitializeData(next); err != nil {
 			// 数据初始化失败，写入fatal日志，因为系统数据不全，会导致程序不能正确运行
-			global.OMS_LOG.Fatal(fmt.Sprintf(InitDataFailed, Mysql, in.InitializerName(), err.Error()))
+			global.OMS_LOG.Fatal(fmt.Sprintf(InitDataFailed, InitMysql, in.InitializerName(), err.Error()))
 			return err
 		} else {
 			// 数据初始化成功，写入info日志
-			global.OMS_LOG.Info(fmt.Sprintf(InitDataSuccess, Mysql, in.InitializerName()))
+			global.OMS_LOG.Info(fmt.Sprintf(InitDataSuccess, InitMysql, in.InitializerName()))
 			next = n
 		}
 	}

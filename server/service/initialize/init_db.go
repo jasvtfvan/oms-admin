@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	Mysql           = "mysql"
+	InitMysql       = "mysql"
 	InitDataExist   = "\n[%v] --> %v 的初始数据已存在!"
 	InitDataFailed  = "\n[%v] --> %v 初始数据失败! [err]: %+v"
 	InitDataSuccess = "\n[%v] --> %v 初始数据成功!"
@@ -48,7 +48,7 @@ type initSlice []*orderedInitializer
 
 var (
 	initializers initSlice
-	cache        map[string]*orderedInitializer
+	initCache    map[string]*orderedInitializer
 )
 
 // RegisterInit 注册要执行的初始化过程，InitDB() 时根据注册的 initializer 进行初始化
@@ -56,18 +56,18 @@ func RegisterInit(order int, i Initializer) {
 	if initializers == nil {
 		initializers = initSlice{}
 	}
-	if cache == nil {
-		cache = map[string]*orderedInitializer{}
+	if initCache == nil {
+		initCache = map[string]*orderedInitializer{}
 	}
 	name := i.InitializerName()
-	if _, existed := cache[name]; existed {
+	if _, existed := initCache[name]; existed {
 		panicStr := fmt.Sprintf("InitializerName conflict on %s", name)
-		global.OMS_LOG.Error(panicStr)
-		panic(panicStr)
+		// 表名冲突，写入fatal日志，因为代码错误，会导致程序不能正确运行
+		global.OMS_LOG.Fatal(panicStr)
 	}
 	oi := orderedInitializer{order, i}
 	initializers = append(initializers, &oi)
-	cache[name] = &oi
+	initCache[name] = &oi
 }
 
 /* ------ * service * ------ */
@@ -82,7 +82,7 @@ type InitDBServiceImpl struct{}
 // 已经初始化，重启服务后，清除 initializers
 func (s *InitDBServiceImpl) ClearInitializer() {
 	initializers = initSlice{}
-	cache = map[string]*orderedInitializer{}
+	initCache = map[string]*orderedInitializer{}
 }
 
 // 初始化数据
@@ -121,7 +121,7 @@ func (s *InitDBServiceImpl) InitDB() (err error) {
 	global.OMS_LOG.Info("初始化数据成功")
 
 	initializers = initSlice{}
-	cache = map[string]*orderedInitializer{}
+	initCache = map[string]*orderedInitializer{}
 
 	return err
 }

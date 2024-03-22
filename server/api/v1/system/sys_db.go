@@ -41,7 +41,7 @@ func (*DbApi) CheckUpdate(c *gin.Context) {
 		fmt.Println("[Golang] DB需要升级: " + err.Error())
 		response.Fail(gin.H{"updated": false}, "DB需要升级", c)
 	} else {
-		updateDBService.ClearInitializer()
+		updateDBService.ClearUpdater()
 		response.Success(gin.H{"updated": true}, "DB已升级", c)
 	}
 }
@@ -57,7 +57,7 @@ func (*DbApi) UpdateDB(c *gin.Context) {
 			response.Success(nil, "升级DB成功", c)
 		}
 	} else {
-		updateDBService.ClearInitializer()
+		updateDBService.ClearUpdater()
 		response.Success(nil, "DB已升级", c)
 	}
 }
