@@ -28,12 +28,12 @@ type TypedDbInitHandler interface {
 	InitData(ctx context.Context, inits initSlice) error   // 建数据
 }
 
-// Initializer 提供 dao/*/init() 使用的接口，每个 initializer 完成一个初始化过程
+// Initializer 提供 initializer/*/init() 使用的接口，每个 initializer 完成一个初始化过程
 type Initializer interface {
 	InitializerName() string // 需要初始化注册名，可以是表名，也可以是其他
 	TableCreated(ctx context.Context) bool
-	MigrateTable(ctx context.Context) (next context.Context, err error)
-	InitializeData(ctx context.Context) (next context.Context, err error)
+	MigrateTable(ctx context.Context) (next context.Context, err error)   // ！注意：这里是create表结构
+	InitializeData(ctx context.Context) (next context.Context, err error) // ！注意：这里是insert数据
 	DataInserted(ctx context.Context) bool
 }
 

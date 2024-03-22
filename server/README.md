@@ -27,7 +27,7 @@ system:
     tls-key: ./resource/cert/server.key
 zap:
     level: info
-version: "v0.0.1"
+version: "v0.0.3"
 ```
 >cors: whitelist下保留添加真实域名，删掉多余域名，注意格式
 >mysql: 数据库主要配置

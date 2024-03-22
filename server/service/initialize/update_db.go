@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sort"
 
 	"github.com/jasvtfvan/oms-admin/server/global"
 )
@@ -15,21 +16,23 @@ const (
 )
 
 const (
-	UpdateOrderSystem = 10
-	UpdateOrderDemo   = 1000
+	UpdateOrder = 10
 )
 
 // TypedDbUpdateHandler 执行传入的 updater
 type TypedDbUpdateHandler interface {
-	UpdateConfig(ctx context.Context) error                  // 回写配置
-	UpdateTables(ctx context.Context, inits initSlice) error // 建表
-	UpdateData(ctx context.Context, inits initSlice) error   // 建数据
+	UpdateConfig(ctx context.Context) error                        // 回写配置
+	UpdateTables(ctx context.Context, updaters updaterSlice) error // 更新表
+	UpdateData(ctx context.Context, updaters updaterSlice) error   // 更新数据
 }
 
-// Updater 提供 dao/*/init() 使用的接口，每个 updater 完成一个初始化过程
+// Updater 提供 updater/*/init() 使用的接口，每个 updater 完成一个初始化过程
 type Updater interface {
-	UpdaterName() string // 需要初始化注册名，可以是表名，也可以是其他
+	// 需要初始化注册名，可以是表名，也可以是其他
+	UpdaterName() string
+	// ！注意：这里是merge表结构，不会删除原有字段
 	UpdateTable(ctx context.Context) (next context.Context, err error)
+	// ！注意：这里主要是update数据，如果使用insert插入关联表，需要单独建立关联表updater
 	UpdateData(ctx context.Context) (next context.Context, err error)
 }
 
@@ -47,6 +50,11 @@ var (
 	updaterCache map[string]*orderedUpdater
 )
 
+/*
+	！注意：更新之后，下次再更新，把上次 init() 方法注释掉，避免重复更新。
+	（当然如果上次更新再执行一次，不影响系统其他功能，也可以忽略，但不建议那样）
+	（只保留demo的更新样例，也可以一次性增加多个空表，用来做业务）
+*/
 // RegisterUpdate 注册要执行的初始化过程，UpdateDB() 时根据注册的 updater 进行初始化
 func RegisterUpdate(order int, up Updater) {
 	if updaters == nil {
@@ -83,10 +91,69 @@ func (s *UpdateDBServiceImpl) ClearUpdater() {
 
 // 升级的前提是，部署了代码，部署代码一定会重新启动server，需要更新表结构，更新必要数据
 func (s *UpdateDBServiceImpl) UpdateDB() (err error) {
-	// ctx := context.Background()
+	ctx := context.Background()
 	if len(updaters) == 0 {
 		return errors.New("升级任务列表为空，请检查是否已执行完成")
 	}
+	/*
+		保证有依赖的 initializer 排在后面执行
+		Note: 若 initializer 只有单一依赖，可以写为 B=A+1, C=A+1; 由于 BC 之间没有依赖关系，所以谁先谁后并不影响初始化
+		若存在多个依赖，可以写为 C=A+B, D=A+B+C, E=A+1;
+		C必然>A|B，因此在AB之后执行，D必然>A|B|C，因此在ABC后执行，而E只依赖A，顺序与CD无关，因此E与CD哪个先执行并不影响
+	*/
+	sort.Sort(&updaters)
+
+	var updateHandler TypedDbUpdateHandler
+	switch global.OMS_CONFIG.System.DbType {
+	case "mysql":
+		updateHandler = NewMysqlUpdateHandler()
+	default:
+		updateHandler = NewMysqlUpdateHandler()
+	}
+
+	if err = updateHandler.UpdateConfig(ctx); err != nil {
+		return err
+	}
+	global.OMS_LOG.Info("更新配置成功")
+	if err = updateHandler.UpdateTables(ctx, updaters); err != nil {
+		return err
+	}
+	global.OMS_LOG.Info("更新表结构成功")
+	if err = updateHandler.UpdateData(ctx, updaters); err != nil {
+		return err
+	}
+	global.OMS_LOG.Info("更新数据成功")
+
+	updaters = updaterSlice{}
+	updaterCache = map[string]*orderedUpdater{}
 
 	return err
+}
+
+// updateTables 创建表（默认 dbUpdateHandler.updateTables 行为）
+func updateTables(ctx context.Context, updaters updaterSlice) error {
+	next, cancel := context.WithCancel(ctx)
+	defer func(c func()) { c() }(cancel)
+	for _, up := range updaters {
+		if nt, err := up.UpdateTable(next); err != nil {
+			return err
+		} else {
+			next = nt
+		}
+	}
+	return nil
+}
+
+/* -- sortable interface -- */
+
+func (a updaterSlice) Len() int {
+	return len(a)
+}
+
+func (a updaterSlice) Less(i, j int) bool {
+	return a[i].order < a[j].order
+}
+
+func (a updaterSlice) Swap(i, j int) {
+	a[i], a[j] = a[j], a[i]
 }

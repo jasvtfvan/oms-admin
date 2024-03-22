@@ -20,6 +20,7 @@ func (*DbRouter) InitDbPrivateRouter(router *gin.RouterGroup) {
 	r := router.Group("init")
 	dbApi := v1.ApiGroupApp.System.DbApi
 	{
-		r.GET("updatedb", dbApi.UpdateDB) // 更新db
+		r.GET("checkupdate", dbApi.CheckUpdate) // 检查更新
+		r.GET("updatedb", dbApi.UpdateDB)       // 更新db
 	}
 }
