@@ -10,6 +10,7 @@ import (
 
 type DBService interface {
 	CheckDB() error
+	CheckUpdate() error
 }
 
 type DBServiceImpl struct{}
@@ -24,10 +25,22 @@ func (*DBServiceImpl) CheckDB() (err error) {
 		if !tableCreated {
 			return errors.New("表结构尚未创建")
 		}
-		err := db.Where("version_name = ?", "oms_server").First(&system.SysVersion{}).Error
+		err := db.Where("version_name = ?", "oms_version").First(&system.SysVersion{}).Error
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return errors.New("表数据尚未插入")
 		}
+	}
+	return err
+}
+
+// 检查是否需要升级
+func (*DBServiceImpl) CheckUpdate() (err error) {
+	db := global.OMS_DB
+	sysVersion := &system.SysVersion{}
+	db.Where("version_name = ?", "oms_version").First(sysVersion)
+	version := global.OMS_CONFIG.Version
+	if sysVersion.Version != version {
+		return errors.New("需升级为:" + version)
 	}
 	return err
 }

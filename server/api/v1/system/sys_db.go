@@ -15,6 +15,7 @@ func (*DbApi) CheckDB(c *gin.Context) {
 		fmt.Println("[Golang] DB尚未初始化: " + err.Error())
 		response.Fail(gin.H{"ready": false}, "DB尚未初始化", c)
 	} else {
+		initDBService.ClearInitializer()
 		response.Success(gin.H{"ready": true}, "DB已准备就绪", c)
 	}
 }
@@ -35,7 +36,28 @@ func (*DbApi) InitDB(c *gin.Context) {
 	}
 }
 
+func (*DbApi) CheckUpdate(c *gin.Context) {
+	if err := systemDBService.CheckUpdate(); err != nil {
+		fmt.Println("[Golang] DB需要升级: " + err.Error())
+		response.Fail(gin.H{"updated": false}, "DB需要升级", c)
+	} else {
+		updateDBService.ClearInitializer()
+		response.Success(gin.H{"updated": true}, "DB已升级", c)
+	}
+}
+
 func (*DbApi) UpdateDB(c *gin.Context) {
-	global.OMS_LOG.Info("[Golang] 升级数据库成功")
-	global.OMS_LOG.Error("[Golang] 升级数据库失败")
+	if err := systemDBService.CheckUpdate(); err != nil {
+		fmt.Println("[Golang] DB需要升级: " + err.Error())
+		if err := updateDBService.UpdateDB(); err != nil {
+			global.OMS_LOG.Error("[Golang] 升级DB失败" + ": " + err.Error())
+			response.Fail(nil, "升级DB失败", c)
+		} else {
+			fmt.Println("[Golang] 升级DB成功")
+			response.Success(nil, "升级DB成功", c)
+		}
+	} else {
+		updateDBService.ClearInitializer()
+		response.Success(nil, "DB已升级", c)
+	}
 }

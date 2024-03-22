@@ -74,9 +74,16 @@ func RegisterInit(order int, i Initializer) {
 
 type InitDBService interface {
 	InitDB() error
+	ClearInitializer()
 }
 
 type InitDBServiceImpl struct{}
+
+// 已经初始化，重启服务后，清除 initializers
+func (s *InitDBServiceImpl) ClearInitializer() {
+	initializers = initSlice{}
+	cache = map[string]*orderedInitializer{}
+}
 
 // 初始化数据
 func (s *InitDBServiceImpl) InitDB() (err error) {
