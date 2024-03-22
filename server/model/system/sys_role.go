@@ -25,7 +25,9 @@ var sysRoleWorkerId int64 = sysGroupWorkerId + 1
 
 // BeforeCreate 钩子，在创建记录前设置自定义的ID
 func (s *SysRole) BeforeCreate(db *gorm.DB) error {
-	snowflakeWorker := utils.NewSnowflakeWorker(sysRoleWorkerId)
-	s.BaseModel.ID = uint(snowflakeWorker.NextId())
+	if s.ID == 0 {
+		snowflakeWorker := utils.NewSnowflakeWorker(sysRoleWorkerId)
+		s.ID = uint(snowflakeWorker.NextId())
+	}
 	return nil
 }

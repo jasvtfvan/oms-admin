@@ -23,7 +23,9 @@ var sysVersionWorkerId int64 = 0
 
 // BeforeCreate 钩子，在创建记录前设置自定义的ID
 func (s *SysVersion) BeforeCreate(db *gorm.DB) error {
-	snowflakeWorker := utils.NewSnowflakeWorker(sysVersionWorkerId)
-	s.ID = uint(snowflakeWorker.NextId())
+	if s.ID == 0 {
+		snowflakeWorker := utils.NewSnowflakeWorker(sysVersionWorkerId)
+		s.ID = uint(snowflakeWorker.NextId())
+	}
 	return nil
 }

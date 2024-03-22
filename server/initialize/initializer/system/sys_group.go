@@ -6,7 +6,6 @@ import (
 
 	"github.com/jasvtfvan/oms-admin/server/global"
 	"github.com/jasvtfvan/oms-admin/server/initialize/initializer"
-	"github.com/jasvtfvan/oms-admin/server/model/common"
 	systemModel "github.com/jasvtfvan/oms-admin/server/model/system"
 	initializeService "github.com/jasvtfvan/oms-admin/server/service/initialize"
 )
@@ -26,9 +25,9 @@ func (i *initSysGroup) InitializeData(ctx context.Context) (next context.Context
 	db := global.OMS_DB
 	slices := []systemModel.SysGroup{
 		{
-			BaseModel: common.BaseModel{
-				ID: 1, // 根主动设置为1，其他直接通过1判断即可
-			},
+			// BaseModel: common.BaseModel{
+			// 	ID: 1,
+			// },
 			ShortName: "根组织",
 			OrgCode:   "root",
 			ParentID:  0,

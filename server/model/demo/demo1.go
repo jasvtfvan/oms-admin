@@ -19,7 +19,9 @@ var demo1WorkerId int64 = demoWorkerId + 1
 
 // BeforeCreate 钩子，在创建记录前设置自定义的ID
 func (s *Demo1) BeforeCreate(db *gorm.DB) error {
-	snowflakeWorker := utils.NewSnowflakeWorker(demo1WorkerId)
-	s.BaseModel.ID = uint(snowflakeWorker.NextId())
+	if s.ID == 0 {
+		snowflakeWorker := utils.NewSnowflakeWorker(demo1WorkerId)
+		s.ID = uint(snowflakeWorker.NextId())
+	}
 	return nil
 }

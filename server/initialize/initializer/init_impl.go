@@ -10,7 +10,12 @@ import (
 
 func DataInserted[T any](ctx context.Context, instance T, query string, args ...string) bool {
 	db := global.OMS_DB
-	err := db.Where(query, args).First(instance).Error
+
+	var interfaceArgs []interface{}
+	for _, arg := range args {
+		interfaceArgs = append(interfaceArgs, arg)
+	}
+	err := db.Where(query, interfaceArgs...).First(instance).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return false

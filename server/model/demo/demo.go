@@ -15,11 +15,13 @@ func (d *Demo) TableName() string {
 	return "demo"
 }
 
-var demoWorkerId int64 = 0
+var demoWorkerId int64 = 100
 
 // BeforeCreate 钩子，在创建记录前设置自定义的ID
 func (s *Demo) BeforeCreate(db *gorm.DB) error {
-	snowflakeWorker := utils.NewSnowflakeWorker(demoWorkerId)
-	s.BaseModel.ID = uint(snowflakeWorker.NextId())
+	if s.ID == 0 {
+		snowflakeWorker := utils.NewSnowflakeWorker(demoWorkerId)
+		s.ID = uint(snowflakeWorker.NextId())
+	}
 	return nil
 }
