@@ -11,8 +11,8 @@ func (*DbRouter) InitDbPublicRouter(router *gin.RouterGroup) {
 	r := router.Group("init")
 	dbApi := v1.ApiGroupApp.System.DbApi
 	{
-		r.GET("checkdb", dbApi.CheckDB) // 检查是否需要初始化
-		r.GET("initdb", dbApi.InitDB)   // 初始化db
+		r.GET("checkinit", dbApi.CheckInit) // 检查是否需要初始化
+		r.GET("initdb", dbApi.InitDB)       // 初始化db
 	}
 }
 

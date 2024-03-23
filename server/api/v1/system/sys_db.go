@@ -10,7 +10,7 @@ import (
 
 type DbApi struct{}
 
-func (*DbApi) CheckDB(c *gin.Context) {
+func (*DbApi) CheckInit(c *gin.Context) {
 	if err := initDBService.CheckDB(); err != nil {
 		fmt.Println("[Golang] DB尚未初始化: " + err.Error())
 		response.Fail(gin.H{"ready": false}, "DB尚未初始化", c)
