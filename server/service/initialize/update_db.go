@@ -13,6 +13,7 @@ import (
 const (
 	UpdateMysql       = "mysql"
 	UpdateDataFailed  = "\n[%v] --> %v 更新数据失败! [err]: %+v"
+	UpdateTableFailed = "\n[%v] --> %v 更新表结构失败! [err]: %+v"
 	UpdateDataSuccess = "\n[%v] --> %v 更新数据成功!"
 )
 
@@ -138,20 +139,6 @@ func (s *UpdateDBServiceImpl) UpdateDB() (err error) {
 	updaterCache = map[string]*orderedUpdater{}
 
 	return err
-}
-
-// updateTables 创建表（默认 dbUpdateHandler.updateTables 行为）
-func updateTables(ctx context.Context, updaters updaterSlice) error {
-	next, cancel := context.WithCancel(ctx)
-	defer func(c func()) { c() }(cancel)
-	for _, up := range updaters {
-		if nt, err := up.UpdateTable(next); err != nil {
-			return err
-		} else {
-			next = nt
-		}
-	}
-	return nil
 }
 
 /* -- sortable interface -- */

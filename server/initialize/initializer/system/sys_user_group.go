@@ -76,5 +76,5 @@ func (i *initSysUserGroup) TableCreated(ctx context.Context) bool {
 
 // auto run
 func init() {
-	initializeService.RegisterInit(initOrderSysUserGroup, &initSysUserGroup{})
+	initializeService.RegisterInit(initOrderSysUserGroup, &initSysUserGroup{}, &systemModel.SysUserGroup{})
 }

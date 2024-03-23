@@ -27,7 +27,20 @@ func (h *MysqlInitHandler) WriteConfig(ctx context.Context) error {
 
 // InitTables implements system.TypedDbInitHandler.
 func (h *MysqlInitHandler) InitTables(ctx context.Context, inits initSlice) error {
-	return createTables(ctx, inits)
+	next, cancel := context.WithCancel(ctx)
+	defer func(c func()) { c() }(cancel)
+	for _, in := range inits {
+		if in.TableCreated(next) {
+			continue
+		}
+		if n, err := in.MigrateTable(next); err != nil {
+			global.OMS_LOG.Error(fmt.Sprintf(InitTableFailed, InitMysql, in.InitializerName(), err.Error()))
+			return err
+		} else {
+			next = n
+		}
+	}
+	return nil
 }
 
 // InitData implements system.TypedDbInitHandler.
@@ -41,8 +54,7 @@ func (h *MysqlInitHandler) InitData(ctx context.Context, inits initSlice) error 
 			continue
 		}
 		if n, err := in.InitializeData(next); err != nil {
-			// 数据初始化失败，写入fatal日志，因为系统数据不全，会导致程序不能正确运行
-			global.OMS_LOG.Fatal(fmt.Sprintf(InitDataFailed, InitMysql, in.InitializerName(), err.Error()))
+			global.OMS_LOG.Error(fmt.Sprintf(InitDataFailed, InitMysql, in.InitializerName(), err.Error()))
 			return err
 		} else {
 			// 数据初始化成功，写入info日志

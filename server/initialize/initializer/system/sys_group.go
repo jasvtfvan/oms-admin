@@ -68,5 +68,5 @@ func (i *initSysGroup) TableCreated(ctx context.Context) bool {
 
 // auto run
 func init() {
-	initializeService.RegisterInit(initOrderSysGroup, &initSysGroup{})
+	initializeService.RegisterInit(initOrderSysGroup, &initSysGroup{}, &systemModel.SysGroup{})
 }

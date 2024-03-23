@@ -14,6 +14,7 @@ import (
 const (
 	InitMysql       = "mysql"
 	InitDataExist   = "\n[%v] --> %v 的初始数据已存在!"
+	InitTableFailed = "\n[%v] --> %v 创建表失败! [err]: %+v"
 	InitDataFailed  = "\n[%v] --> %v 初始数据失败! [err]: %+v"
 	InitDataSuccess = "\n[%v] --> %v 初始数据成功!"
 )
@@ -42,14 +43,21 @@ type orderedInitializer struct {
 
 // initSlice 供 initializer 排序依赖时使用
 type initSlice []*orderedInitializer
+type tableSlice []interface{}
 
 var (
 	initializers initSlice
 	initCache    map[string]*orderedInitializer
+	initTables   tableSlice
 )
 
 // RegisterInit 注册要执行的初始化过程，InitDB() 时根据注册的 initializer 进行初始化
-func RegisterInit(order int, i Initializer) {
+func RegisterInit(order int, i Initializer, model interface{}) {
+	if initTables == nil {
+		initTables = tableSlice{}
+	}
+	initTables = append(initTables, model)
+
 	if initializers == nil {
 		initializers = initSlice{}
 	}
@@ -128,35 +136,37 @@ func (s *InitDBServiceImpl) InitDB() (err error) {
 	}
 	global.OMS_LOG.Info("更新配置文件成功")
 	if err = initHandler.InitTables(ctx, initializers); err != nil {
+		if dErr := deleteTables(); dErr != nil {
+			global.OMS_LOG.Error("表删除失败（初始化失败，需要删表重启，重新初始化），请手动删表：" + dErr.Error())
+		}
 		return err
 	}
 	global.OMS_LOG.Info("初始化表成功")
 	if err = initHandler.InitData(ctx, initializers); err != nil {
+		if dErr := deleteTables(); dErr != nil {
+			global.OMS_LOG.Error("表删除失败（初始化失败，需要删表重启，重新初始化），请手动删表：" + dErr.Error())
+		}
 		return err
 	}
 	global.OMS_LOG.Info("初始化数据成功")
 
 	initializers = initSlice{}
 	initCache = map[string]*orderedInitializer{}
+	initTables = tableSlice{}
 
 	return err
 }
 
-// createTables 创建表（默认 dbInitHandler.initTables 行为）
-func createTables(ctx context.Context, inits initSlice) error {
-	next, cancel := context.WithCancel(ctx)
-	defer func(c func()) { c() }(cancel)
-	for _, in := range inits {
-		if in.TableCreated(next) {
-			continue
-		}
-		if n, err := in.MigrateTable(next); err != nil {
+// 删除表，初始化过程失败。需要调整代码重新初始化，要删除所有表。
+func deleteTables() (err error) {
+	db := global.OMS_DB
+	for _, table := range initTables {
+		if err := db.Migrator().DropTable(table); err != nil {
 			return err
-		} else {
-			next = n
 		}
 	}
-	return nil
+	initTables = tableSlice{}
+	return err
 }
 
 /* -- sortable interface -- */

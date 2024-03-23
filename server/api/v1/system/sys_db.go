@@ -24,7 +24,8 @@ func (*DbApi) InitDB(c *gin.Context) {
 	if err := initDBService.CheckDB(); err != nil {
 		fmt.Println("[Golang] DB尚未初始化: " + err.Error())
 		if err := initDBService.InitDB(); err != nil {
-			global.OMS_LOG.Error("[Golang] 初始化DB失败" + ": " + err.Error())
+			// 初始化失败，写入fatal日志，因为代码错误，会导致程序不能正确运行
+			global.OMS_LOG.Fatal("初始化DB失败" + ": " + err.Error())
 			response.Fail(nil, "初始化DB失败", c)
 		} else {
 			fmt.Println("[Golang] 初始化DB成功")

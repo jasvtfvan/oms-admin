@@ -76,5 +76,5 @@ func (i *initSysUserRole) TableCreated(ctx context.Context) bool {
 
 // auto run
 func init() {
-	initializeService.RegisterInit(initOrderSysUserRole, &initSysUserRole{})
+	initializeService.RegisterInit(initOrderSysUserRole, &initSysUserRole{}, &systemModel.SysUserRole{})
 }

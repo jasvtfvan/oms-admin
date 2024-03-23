@@ -55,5 +55,5 @@ func (i *initSysVersion) TableCreated(ctx context.Context) bool {
 
 // auto run
 func init() {
-	initializeService.RegisterInit(initOrderSysVersion, &initSysVersion{})
+	initializeService.RegisterInit(initOrderSysVersion, &initSysVersion{}, &systemModel.SysVersion{})
 }

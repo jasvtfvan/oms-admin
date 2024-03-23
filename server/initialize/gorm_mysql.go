@@ -20,6 +20,7 @@ func GormMysql() *gorm.DB {
 		SkipInitializeWithVersion: false,   // 根据版本自动配置
 	}
 	if db, err := gorm.Open(mysql.New(mysqlConfig), internal.Gorm.Config(m.Prefix, m.Singular)); err != nil {
+		// 连接数据库失败，写入fatal日志，因为代码错误，会导致程序不能正确运行
 		global.OMS_LOG.Fatal("Gorm数据库连接失败")
 		return nil
 	} else {

@@ -61,5 +61,5 @@ func (i *initSysUser) TableCreated(ctx context.Context) bool {
 
 // auto run
 func init() {
-	initializeService.RegisterInit(initOrderSysUser, &initSysUser{})
+	initializeService.RegisterInit(initOrderSysUser, &initSysUser{}, &systemModel.SysUser{})
 }

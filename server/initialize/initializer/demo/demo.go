@@ -53,5 +53,5 @@ func (i *initDemo) TableCreated(ctx context.Context) bool {
 
 // auto run
 func init() {
-	initializeService.RegisterInit(initOrderDemo, &initDemo{})
+	initializeService.RegisterInit(initOrderDemo, &initDemo{}, &demoModel.Demo{})
 }
