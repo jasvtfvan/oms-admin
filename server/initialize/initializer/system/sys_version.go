@@ -11,7 +11,7 @@ import (
 )
 
 // 初始化顺序
-const initOrderSysVersion = initializeService.InitOrderSystem + 1
+const initOrderSysVersion = global.InitOrderSystem + 1
 
 type initSysVersion struct{}
 

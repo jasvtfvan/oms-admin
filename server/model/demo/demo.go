@@ -1,6 +1,7 @@
 package demo
 
 import (
+	"github.com/jasvtfvan/oms-admin/server/global"
 	"github.com/jasvtfvan/oms-admin/server/model/common"
 	"github.com/jasvtfvan/oms-admin/server/utils"
 	"gorm.io/gorm"
@@ -16,7 +17,7 @@ func (d *Demo) TableName() string {
 	return "demo"
 }
 
-var demoWorkerId int64 = 100
+var demoWorkerId int64 = global.DemoWorkerId
 
 // BeforeCreate 钩子，在创建记录前设置自定义的ID
 func (s *Demo) BeforeCreate(db *gorm.DB) error {

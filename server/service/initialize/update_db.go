@@ -7,16 +7,13 @@ import (
 	"sort"
 
 	"github.com/jasvtfvan/oms-admin/server/global"
+	"github.com/jasvtfvan/oms-admin/server/model/system"
 )
 
 const (
 	UpdateMysql       = "mysql"
 	UpdateDataFailed  = "\n[%v] --> %v 更新数据失败! [err]: %+v"
 	UpdateDataSuccess = "\n[%v] --> %v 更新数据成功!"
-)
-
-const (
-	UpdateOrder = 10
 )
 
 // TypedDbUpdateHandler 执行传入的 updater
@@ -77,11 +74,24 @@ func RegisterUpdate(order int, up Updater) {
 /* ------ * service * ------ */
 
 type UpdateDBService interface {
-	UpdateDB() error
+	CheckUpdate() error
 	ClearUpdater()
+	UpdateDB() error
 }
 
 type UpdateDBServiceImpl struct{}
+
+// 检查是否需要升级
+func (*UpdateDBServiceImpl) CheckUpdate() (err error) {
+	db := global.OMS_DB
+	sysVersion := &system.SysVersion{}
+	db.Where("version_name = ?", "oms_version").First(sysVersion)
+	version := global.OMS_CONFIG.Version
+	if sysVersion.Version != version {
+		return errors.New("需升级为:" + version)
+	}
+	return err
+}
 
 // 已经升级，重启服务后，清除 updaters
 func (s *UpdateDBServiceImpl) ClearUpdater() {

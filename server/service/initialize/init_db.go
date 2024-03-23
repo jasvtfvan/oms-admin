@@ -7,6 +7,8 @@ import (
 	"sort"
 
 	"github.com/jasvtfvan/oms-admin/server/global"
+	"github.com/jasvtfvan/oms-admin/server/model/system"
+	"gorm.io/gorm"
 )
 
 const (
@@ -14,11 +16,6 @@ const (
 	InitDataExist   = "\n[%v] --> %v 的初始数据已存在!"
 	InitDataFailed  = "\n[%v] --> %v 初始数据失败! [err]: %+v"
 	InitDataSuccess = "\n[%v] --> %v 初始数据成功!"
-)
-
-const (
-	InitOrderSystem = 10
-	InitOrderDemo   = 1000
 )
 
 // TypedDbInitHandler 执行传入的 initializer
@@ -73,11 +70,30 @@ func RegisterInit(order int, i Initializer) {
 /* ------ * service * ------ */
 
 type InitDBService interface {
-	InitDB() error
+	CheckDB() error
 	ClearInitializer()
+	InitDB() error
 }
 
 type InitDBServiceImpl struct{}
+
+// 检查数据连接
+func (*InitDBServiceImpl) CheckDB() (err error) {
+	if global.OMS_DB == nil {
+		return errors.New("DB为空，数据库未创建")
+	} else {
+		db := global.OMS_DB
+		tableCreated := db.Migrator().HasTable(&system.SysVersion{})
+		if !tableCreated {
+			return errors.New("表结构尚未创建")
+		}
+		err := db.Where("version_name = ?", "oms_version").First(&system.SysVersion{}).Error
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errors.New("表数据尚未插入")
+		}
+	}
+	return err
+}
 
 // 已经初始化，重启服务后，清除 initializers
 func (s *InitDBServiceImpl) ClearInitializer() {

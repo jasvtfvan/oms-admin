@@ -3,6 +3,7 @@ package system
 import (
 	"time"
 
+	"github.com/jasvtfvan/oms-admin/server/global"
 	"github.com/jasvtfvan/oms-admin/server/utils"
 	"gorm.io/gorm"
 )
@@ -19,7 +20,7 @@ func (s *SysVersion) TableName() string {
 	return "sys_version"
 }
 
-var sysVersionWorkerId int64 = 0
+var sysVersionWorkerId int64 = global.SystemWorkerId
 
 // BeforeCreate 钩子，在创建记录前设置自定义的ID
 func (s *SysVersion) BeforeCreate(db *gorm.DB) error {

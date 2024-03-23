@@ -5,7 +5,8 @@ import (
 
 	_ "github.com/jasvtfvan/oms-admin/server/initialize/initializer/demo"
 	_ "github.com/jasvtfvan/oms-admin/server/initialize/initializer/system"
-	_ "github.com/jasvtfvan/oms-admin/server/initialize/updater"
+	_ "github.com/jasvtfvan/oms-admin/server/initialize/updater/demo"
+	_ "github.com/jasvtfvan/oms-admin/server/initialize/updater/system"
 	"github.com/jasvtfvan/oms-admin/server/utils"
 )
 

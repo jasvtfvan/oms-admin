@@ -1,12 +1,9 @@
 package system
 
 type ServiceGroup struct {
-	DBService
 }
 
 func NewServiceGroup() *ServiceGroup {
-	group := &ServiceGroup{
-		DBService: new(DBServiceImpl),
-	}
+	group := &ServiceGroup{}
 	return group
 }

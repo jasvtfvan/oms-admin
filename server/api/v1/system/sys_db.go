@@ -11,7 +11,7 @@ import (
 type DbApi struct{}
 
 func (*DbApi) CheckDB(c *gin.Context) {
-	if err := systemDBService.CheckDB(); err != nil {
+	if err := initDBService.CheckDB(); err != nil {
 		fmt.Println("[Golang] DB尚未初始化: " + err.Error())
 		response.Fail(gin.H{"ready": false}, "DB尚未初始化", c)
 	} else {
@@ -21,7 +21,7 @@ func (*DbApi) CheckDB(c *gin.Context) {
 }
 
 func (*DbApi) InitDB(c *gin.Context) {
-	if err := systemDBService.CheckDB(); err != nil {
+	if err := initDBService.CheckDB(); err != nil {
 		fmt.Println("[Golang] DB尚未初始化: " + err.Error())
 		if err := initDBService.InitDB(); err != nil {
 			global.OMS_LOG.Error("[Golang] 初始化DB失败" + ": " + err.Error())
@@ -37,7 +37,7 @@ func (*DbApi) InitDB(c *gin.Context) {
 }
 
 func (*DbApi) CheckUpdate(c *gin.Context) {
-	if err := systemDBService.CheckUpdate(); err != nil {
+	if err := updateDBService.CheckUpdate(); err != nil {
 		fmt.Println("[Golang] DB需要升级: " + err.Error())
 		response.Fail(gin.H{"updated": false}, "DB需要升级", c)
 	} else {
@@ -47,7 +47,7 @@ func (*DbApi) CheckUpdate(c *gin.Context) {
 }
 
 func (*DbApi) UpdateDB(c *gin.Context) {
-	if err := systemDBService.CheckUpdate(); err != nil {
+	if err := updateDBService.CheckUpdate(); err != nil {
 		fmt.Println("[Golang] DB需要升级: " + err.Error())
 		if err := updateDBService.UpdateDB(); err != nil {
 			global.OMS_LOG.Error("[Golang] 升级DB失败" + ": " + err.Error())

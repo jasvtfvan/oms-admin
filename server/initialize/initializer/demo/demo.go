@@ -11,7 +11,7 @@ import (
 )
 
 // 初始化顺序
-const initOrderDemo = initializeService.InitOrderDemo + 1
+const initOrderDemo = global.InitOrderDemo + 1
 
 type initDemo struct{}
 

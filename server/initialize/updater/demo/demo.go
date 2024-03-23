@@ -11,7 +11,7 @@ import (
 )
 
 // 更新顺序
-const updateOrderDemo = initialize.UpdateOrder + 1
+const updateOrderDemo = global.UpdateOrderDemo + 1
 
 type updateDemo struct{}
 
