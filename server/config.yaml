@@ -28,7 +28,7 @@ email:
 excel:
     dir: ./resource/excel/
 jwt:
-    signing-key: 8628b010-3a7e-44bd-a0fb-6ec98fed8118
+    signing-key: fef6dbb0-f4b8-4b56-8a47-54c2336a5b91
     expires-time: 7d
     buffer-time: 1d
     issuer: FVan
@@ -63,7 +63,7 @@ system:
     use-tls: false
     tls-cert: ./resource/cert/server.pem
     tls-key: ./resource/cert/server.key
-version: v0.0.4
+version: v0.0.1
 zap:
     level: debug
     prefix: '[github.com/jasvtfvan/oms-admin/server]'
