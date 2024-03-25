@@ -12,7 +12,7 @@ import (
 )
 
 // 初始化顺序
-const initOrderSysUserGroup = initOrderSysUser + 1
+const initOrderSysUserGroup = global.InitOrderSysUserGroup
 
 type initSysUserGroup struct{}
 

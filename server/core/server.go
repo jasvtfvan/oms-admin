@@ -19,7 +19,7 @@ type serverTLS interface {
 
 func RunWindowsServer() {
 	// 初始化redis服务
-	// initialize.Redis()
+	initialize.Redis()
 
 	// 从db加载jwt数据
 	// 	if global.OMS_DB != nil {

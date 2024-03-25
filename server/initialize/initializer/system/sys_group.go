@@ -11,7 +11,7 @@ import (
 )
 
 // 初始化顺序
-const initOrderSysGroup = initOrderSysVersion + 1
+const initOrderSysGroup = global.InitOrderSysGroup
 
 type initSysGroup struct{}
 

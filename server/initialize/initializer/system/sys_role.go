@@ -11,7 +11,7 @@ import (
 )
 
 // 初始化顺序
-const initOrderSysRole = initOrderSysGroup + 1
+const initOrderSysRole = global.InitOrderSysRole
 
 type initSysRole struct{}
 
@@ -62,5 +62,5 @@ func (i *initSysRole) TableCreated(ctx context.Context) bool {
 
 // auto run
 func init() {
-	initializeService.RegisterInit(initOrderSysUser, &initSysRole{}, &systemModel.SysRole{})
+	initializeService.RegisterInit(initOrderSysRole, &initSysRole{}, &systemModel.SysRole{})
 }
