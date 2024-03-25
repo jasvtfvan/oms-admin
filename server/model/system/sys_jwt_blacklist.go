@@ -19,7 +19,7 @@ func (s *JWTBlackList) TableName() string {
 	return "sys_jwt_blacklist"
 }
 
-var sysJWTBlacklistWorkerId int64 = global.SystemWorkerId
+var sysJWTBlacklistWorkerId int64 = global.SysJWTBlacklistWorkerId
 
 // BeforeCreate 钩子，在创建记录前设置自定义的ID
 func (s *JWTBlackList) BeforeCreate(db *gorm.DB) error {

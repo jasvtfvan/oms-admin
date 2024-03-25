@@ -10,7 +10,7 @@ import (
 )
 
 // 更新顺序
-const updateOrderSysVersion = global.UpdateOrderSystem + 1
+const updateOrderSysVersion = global.UpdateOrderSysVersion
 
 type updateSysVersion struct{}
 

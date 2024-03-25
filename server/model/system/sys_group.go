@@ -1,6 +1,7 @@
 package system
 
 import (
+	"github.com/jasvtfvan/oms-admin/server/global"
 	"github.com/jasvtfvan/oms-admin/server/model/common"
 	"github.com/jasvtfvan/oms-admin/server/utils"
 	"gorm.io/gorm"
@@ -21,7 +22,7 @@ func (s *SysGroup) TableName() string {
 	return "sys_group"
 }
 
-var sysGroupWorkerId int64 = sysVersionWorkerId + 1
+var sysGroupWorkerId int64 = global.SysGroupWorkerId
 
 // BeforeCreate 钩子，在创建记录前设置自定义的ID
 func (s *SysGroup) BeforeCreate(db *gorm.DB) error {

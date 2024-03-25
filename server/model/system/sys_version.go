@@ -20,7 +20,7 @@ func (s *SysVersion) TableName() string {
 	return "sys_version"
 }
 
-var sysVersionWorkerId int64 = global.SystemWorkerId
+var sysVersionWorkerId int64 = global.SysVersionWorkerId
 
 // BeforeCreate 钩子，在创建记录前设置自定义的ID
 func (s *SysVersion) BeforeCreate(db *gorm.DB) error {
