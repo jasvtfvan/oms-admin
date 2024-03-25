@@ -38,6 +38,21 @@ version: "v0.0.3"
 
 ### 开发环境
 
+#### 代码更新
+* 特殊代码简介
+1. initializer用来注册所有初始化程序，一个表（或复杂结构）对应一个go文件，
+其中init_impl.go和register_tables.go不需要修改，属于封装内容
+2. updater用来注册所有更新程序，一个表（或复杂结构）对应一个go文件，
+其中register_tables.go不需要修改，属于封装内容
+3. 在service/initialize中，实现了对initializer和updater的统一调度
+
+* 数据库更新，需更新内容：
+1. /model/模块文件夹/表结构.go 添加/修改要升级的内容
+1. /global/order_vars.go 更新对应的初始化顺序
+2. /initialize/updater/模块文件夹/表结构.go 添加/修改要升级的内容
+3. /initialize/initializer/模块文件夹/表结构.go 更新的内容同步到初始化逻辑
+4. /initialize/migrate/tables.go 没经过initializer/updater的，需初始化/更新的空表
+
 #### docker-redis启动
 ```sh
 docker run --name redis \

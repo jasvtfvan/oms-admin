@@ -7,7 +7,7 @@ import (
 
 	"github.com/jasvtfvan/oms-admin/server/global"
 	"github.com/jasvtfvan/oms-admin/server/model/demo"
-	"github.com/jasvtfvan/oms-admin/server/service/initialize"
+	initializeService "github.com/jasvtfvan/oms-admin/server/service/initialize"
 )
 
 // 更新顺序
@@ -42,5 +42,5 @@ func (u *updateDemo) UpdaterName() string {
 
 // auto run
 func init() {
-	initialize.RegisterUpdate(updateOrderDemo, &updateDemo{})
+	initializeService.RegisterUpdate(updateOrderDemo, &updateDemo{})
 }

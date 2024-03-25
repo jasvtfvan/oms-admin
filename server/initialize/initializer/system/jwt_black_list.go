@@ -16,7 +16,7 @@ type initJWTBlackList struct{}
 
 // DataInserted implements initialize.Initializer.
 func (i *initJWTBlackList) DataInserted(ctx context.Context) bool {
-	return false
+	return true
 }
 
 // InitializeData implements initialize.Initializer.

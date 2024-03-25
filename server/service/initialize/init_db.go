@@ -52,11 +52,11 @@ var (
 )
 
 // RegisterInit 注册要执行的初始化过程，InitDB() 时根据注册的 initializer 进行初始化
-func RegisterInit(order int, i Initializer, model interface{}) {
+func RegisterInit(order int, i Initializer, model ...interface{}) {
 	if initTables == nil {
 		initTables = tableSlice{}
 	}
-	initTables = append(initTables, model)
+	initTables = append(initTables, model...)
 
 	if initializers == nil {
 		initializers = initSlice{}

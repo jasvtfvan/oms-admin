@@ -11,12 +11,15 @@ package global
 const (
 	InitOrderLevel1 = 10
 	InitOrderLevel2 = 1000
+	InitOrderLevel3 = 100000
 )
 
-// 升级顺序
+// 升级顺序 ！注意：升级代码-结构/数据 <==保持同步==> 初始化代码-结构/数据，
+// 通过同步，部署其他企业时，一次性初始化，无需再执行升级程序
 const (
 	UpdateOrderLevel1 = 10
 	UpdateOrderLevel2 = 1000
+	UpdateOrderLevel3 = 100000
 )
 
 // ID WorkerId
@@ -32,15 +35,18 @@ const (
 // 初始化顺序定义
 const (
 	InitOrderSysVersion   = InitOrderLevel1 + 1
-	InitOrderJWTBlackList = InitOrderSysVersion + 1
-	InitOrderSysGroup     = InitOrderJWTBlackList + 1
-	InitOrderSysRole      = InitOrderSysGroup + 1
-	InitOrderSysUser      = InitOrderSysRole + 1
-	InitOrderSysUserGroup = InitOrderSysUser + 1
-	InitOrderSysUserRole  = InitOrderSysUserGroup + 1
+	InitOrderJWTBlackList = InitOrderLevel1 + 2
+	InitOrderSysGroup     = InitOrderLevel1 + 3
+	InitOrderSysRole      = InitOrderLevel1 + 4
+	InitOrderSysUser      = InitOrderLevel1 + 5
+	InitOrderSysUserGroup = InitOrderLevel1 + 6
+	InitOrderSysUserRole  = InitOrderLevel1 + 7
 )
 const (
-	InitOrderDemo = InitOrderLevel2 + 1
+	InitOrderRegisterTables = InitOrderLevel2 + 1
+)
+const (
+	InitOrderDemo = InitOrderLevel3 + 1
 )
 
 // 升级顺序定义
@@ -48,16 +54,19 @@ const (
 	UpdateOrderSysVersion = UpdateOrderLevel1 + 1
 )
 const (
-	UpdateOrderDemo = UpdateOrderLevel2 + 1
+	UpdateOrderRegisterTables = UpdateOrderLevel2 + 1
+)
+const (
+	UpdateOrderDemo = UpdateOrderLevel3 + 1
 )
 
 // ID WorkerId
 const (
 	SysVersionWorkerId      = WorkerIdLevel1 + 1
-	SysJWTBlacklistWorkerId = SysVersionWorkerId + 1
-	SysGroupWorkerId        = SysJWTBlacklistWorkerId + 1
-	SysRoleWorkerId         = SysGroupWorkerId + 1
-	SysUserWorkerId         = SysRoleWorkerId + 1
+	SysJWTBlacklistWorkerId = WorkerIdLevel1 + 2
+	SysGroupWorkerId        = WorkerIdLevel1 + 3
+	SysRoleWorkerId         = WorkerIdLevel1 + 4
+	SysUserWorkerId         = WorkerIdLevel1 + 5
 )
 const (
 	DemoWorkerId = WorkerIdLevel2 + 1
