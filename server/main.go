@@ -36,5 +36,12 @@ func main() {
 			db.Close()
 		}()
 	}
+	if global.OMS_REDIS != nil {
+		rdb := global.OMS_REDIS
+		defer func() {
+			fmt.Println(utils.GetStringWithTime("====== [Golang] main.go 关闭REDIS连接 ======"))
+			rdb.Close()
+		}()
+	}
 	core.RunWindowsServer()
 }

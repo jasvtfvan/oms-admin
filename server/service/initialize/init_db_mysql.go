@@ -4,25 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/jasvtfvan/oms-admin/server/global"
-	"github.com/jasvtfvan/oms-admin/server/utils"
 )
 
 type MysqlInitHandler struct{}
 
 func NewMysqlInitHandler() *MysqlInitHandler {
 	return &MysqlInitHandler{}
-}
-
-// WriteConfig implements TypedDbInitHandler.
-func (h *MysqlInitHandler) WriteConfig(ctx context.Context) error {
-	global.OMS_CONFIG.JWT.SigningKey = uuid.Must(uuid.NewV4()).String()
-	cs := utils.StructToMap(global.OMS_CONFIG)
-	for k, v := range cs {
-		global.OMS_VP.Set(k, v)
-	}
-	return global.OMS_VP.WriteConfig()
 }
 
 // InitTables implements system.TypedDbInitHandler.

@@ -19,7 +19,6 @@ const (
 
 // TypedDbUpdateHandler 执行传入的 updater
 type TypedDbUpdateHandler interface {
-	UpdateConfig(ctx context.Context) error                        // 回写配置
 	UpdateTables(ctx context.Context, updaters updaterSlice) error // 更新表
 	UpdateData(ctx context.Context, updaters updaterSlice) error   // 更新数据
 }
@@ -120,10 +119,6 @@ func (s *UpdateDBServiceImpl) UpdateDB() (err error) {
 		updateHandler = NewMysqlUpdateHandler()
 	}
 
-	if err = updateHandler.UpdateConfig(ctx); err != nil {
-		return err
-	}
-	global.OMS_LOG.Info("更新配置成功")
 	if err = updateHandler.UpdateTables(ctx, updaters); err != nil {
 		return err
 	}

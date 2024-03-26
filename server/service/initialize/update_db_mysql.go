@@ -4,22 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/jasvtfvan/oms-admin/server/global"
-	"github.com/jasvtfvan/oms-admin/server/utils"
 )
 
 type MysqlUpdateHandler struct{}
-
-// UpdateConfig implements TypedDbUpdateHandler.
-func (m *MysqlUpdateHandler) UpdateConfig(ctx context.Context) error {
-	global.OMS_CONFIG.JWT.SigningKey = uuid.Must(uuid.NewV4()).String()
-	cs := utils.StructToMap(global.OMS_CONFIG)
-	for k, v := range cs {
-		global.OMS_VP.Set(k, v)
-	}
-	return global.OMS_VP.WriteConfig()
-}
 
 // UpdateData implements TypedDbUpdateHandler.
 func (m *MysqlUpdateHandler) UpdateData(ctx context.Context, updaters updaterSlice) error {

@@ -7,12 +7,14 @@ import (
 )
 
 type JWTService interface {
+	JsonInBlackList(JWTList system.JWTBlackList) error
 }
 
 type JWTServiceImpl struct{}
 
 func (*JWTServiceImpl) JsonInBlackList(JWTList system.JWTBlackList) (err error) {
-	// db := global.OMS_DB
+	db := global.OMS_DB
+	err = db.Create(&JWTList).Error
 
 	return err
 }

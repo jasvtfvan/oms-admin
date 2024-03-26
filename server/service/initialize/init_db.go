@@ -21,7 +21,6 @@ const (
 
 // TypedDbInitHandler 执行传入的 initializer
 type TypedDbInitHandler interface {
-	WriteConfig(ctx context.Context) error                 // 回写配置
 	InitTables(ctx context.Context, inits initSlice) error // 建表
 	InitData(ctx context.Context, inits initSlice) error   // 建数据
 }
@@ -131,10 +130,6 @@ func (s *InitDBServiceImpl) InitDB() (err error) {
 		initHandler = NewMysqlInitHandler()
 	}
 
-	if err = initHandler.WriteConfig(ctx); err != nil {
-		return err
-	}
-	global.OMS_LOG.Info("更新配置文件成功")
 	if err = initHandler.InitTables(ctx, initializers); err != nil {
 		if dErr := deleteTables(); dErr != nil {
 			global.OMS_LOG.Error("表删除失败（初始化失败，需要删表重启，重新初始化），请手动删表：" + dErr.Error())

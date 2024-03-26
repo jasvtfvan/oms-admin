@@ -3,6 +3,7 @@ package demo
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/jasvtfvan/oms-admin/server/global"
 	"github.com/jasvtfvan/oms-admin/server/initialize/initializer"
@@ -27,6 +28,7 @@ func (i *initDemo) InitializeData(ctx context.Context) (next context.Context, er
 	slices := []demoModel.Demo{
 		{
 			Name: "demo",
+			Desc: "初始化描述" + time.Now().Format(time.DateTime),
 		},
 	}
 	if err = db.Create(&slices).Error; err != nil {
