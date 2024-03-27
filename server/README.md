@@ -17,7 +17,7 @@ mysql:
     path: 127.0.0.1
 redis:
     addr: 127.0.0.1:6379
-    password: ""
+    password: "Redis123Admin456"
     db: 0
 system:
     env: release

@@ -2,8 +2,8 @@ captcha:
     key-long: 6
     img-width: 240
     img-height: 80
-    open-captcha: 0
-    open-captcha-timeout: 3600
+    open-captcha: 3
+    open-captcha-timeout: 300
 cors:
     mode: strict-whitelist
     whitelist:

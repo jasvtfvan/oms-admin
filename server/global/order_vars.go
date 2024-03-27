@@ -35,12 +35,11 @@ const (
 // 初始化顺序定义
 const (
 	InitOrderSysVersion   = InitOrderLevel1 + 1
-	InitOrderJWTBlackList = InitOrderLevel1 + 2
-	InitOrderSysGroup     = InitOrderLevel1 + 3
-	InitOrderSysRole      = InitOrderLevel1 + 4
-	InitOrderSysUser      = InitOrderLevel1 + 5
-	InitOrderSysUserGroup = InitOrderLevel1 + 6
-	InitOrderSysUserRole  = InitOrderLevel1 + 7
+	InitOrderSysGroup     = InitOrderLevel1 + 2
+	InitOrderSysRole      = InitOrderLevel1 + 3
+	InitOrderSysUser      = InitOrderLevel1 + 4
+	InitOrderSysUserGroup = InitOrderLevel1 + 5
+	InitOrderSysUserRole  = InitOrderLevel1 + 6
 )
 const (
 	InitOrderRegisterTables = InitOrderLevel2 + 1
@@ -62,11 +61,10 @@ const (
 
 // ID WorkerId
 const (
-	SysVersionWorkerId      = WorkerIdLevel1 + 1
-	SysJWTBlacklistWorkerId = WorkerIdLevel1 + 2
-	SysGroupWorkerId        = WorkerIdLevel1 + 3
-	SysRoleWorkerId         = WorkerIdLevel1 + 4
-	SysUserWorkerId         = WorkerIdLevel1 + 5
+	SysVersionWorkerId = WorkerIdLevel1 + 1
+	SysGroupWorkerId   = WorkerIdLevel1 + 2
+	SysRoleWorkerId    = WorkerIdLevel1 + 3
+	SysUserWorkerId    = WorkerIdLevel1 + 4
 )
 const (
 	DemoWorkerId = WorkerIdLevel2 + 1

@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jasvtfvan/oms-admin/server/global"
 	"github.com/jasvtfvan/oms-admin/server/initialize"
-	"github.com/jasvtfvan/oms-admin/server/service/system"
 	"go.uber.org/zap"
 )
 
@@ -21,11 +20,6 @@ type serverTLS interface {
 func RunWindowsServer() {
 	// 初始化redis服务
 	initialize.Redis()
-
-	// 从db加载jwt数据
-	if global.OMS_DB != nil {
-		system.LoadAll()
-	}
 
 	var router *gin.Engine
 	// 开启zap的debug，才打印请求信息
