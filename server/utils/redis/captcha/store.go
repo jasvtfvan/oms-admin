@@ -64,13 +64,45 @@ var once sync.Once
 func GetRedisStore() *RedisStore {
 	if redisStore == nil {
 		once.Do(func() {
-			timeout := global.OMS_CONFIG.Captcha.OpenCaptchaTimeOut
 			redisStore = &RedisStore{
-				Expiration: time.Second * time.Duration(timeout),
+				Expiration: time.Minute * 3,
 				PreKey:     "CAPTCHA_",
 				Context:    context.TODO(),
 			}
 		})
 	}
 	return redisStore
+}
+
+/*
+记录验证码次数
+*/
+func (rs *RedisStore) GetCount(key string) (int, error) {
+	val, err := global.OMS_REDIS.Get(rs.Context, (rs.PreKey + "COUNT_" + key)).Int()
+	return val, err
+}
+func (rs *RedisStore) InitCount(key string) {
+	timeout := global.OMS_CONFIG.Captcha.OpenCaptchaTimeout
+	err := global.OMS_REDIS.Set(rs.Context, (rs.PreKey + "COUNT_" + key), 1, time.Second*time.Duration(timeout)).Err()
+	if err != nil {
+		global.OMS_LOG.Error("Captcha RedisStore InitCount Error:", zap.Error(err))
+	}
+}
+func (rs *RedisStore) AddCount(key string) {
+	val, err := global.OMS_REDIS.Get(rs.Context, (rs.PreKey + "COUNT_" + key)).Int()
+	if val == 0 || err != nil {
+		rs.InitCount(key)
+	} else {
+		timeout := global.OMS_CONFIG.Captcha.OpenCaptchaTimeout
+		err := global.OMS_REDIS.Set(rs.Context, (rs.PreKey + "COUNT_" + key), val+1, time.Second*time.Duration(timeout)).Err()
+		if err != nil {
+			global.OMS_LOG.Error("Captcha RedisStore AddCount Error:", zap.Error(err))
+		}
+	}
+}
+func (rs *RedisStore) DelCount(key string) {
+	err := global.OMS_REDIS.Del(rs.Context, (rs.PreKey + "COUNT_" + key)).Err()
+	if err != nil {
+		global.OMS_LOG.Error("Captcha RedisStore DelCount Error:", zap.Error(err))
+	}
 }
