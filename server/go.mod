@@ -8,12 +8,14 @@ require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-sql-driver/mysql v1.7.0
 	github.com/gofrs/uuid/v5 v5.0.0
+	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/mojocn/base64Captcha v1.3.6
 	github.com/redis/go-redis/v9 v9.5.1
 	github.com/spf13/viper v1.18.2
 	github.com/unrolled/secure v1.14.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.16.0
+	golang.org/x/sync v0.5.0
 	gorm.io/driver/mysql v1.5.4
 	gorm.io/gorm v1.25.7
 )

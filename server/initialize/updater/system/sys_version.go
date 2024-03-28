@@ -19,7 +19,7 @@ func (u *updateSysVersion) UpdateData(ctx context.Context) (next context.Context
 	db := global.OMS_DB
 
 	version := global.OMS_CONFIG.Version
-	result := db.Model(system.SysVersion{}).Where("version_name = ?", "oms_version").
+	result := db.Model(system.SysVersion{}).Where("version_code = ?", "oms_version").
 		Updates(system.SysVersion{Version: version})
 	if err = result.Error; err != nil {
 		return ctx, errors.New(err.Error() + ": " + u.UpdaterName() + " 表数据更新失败")

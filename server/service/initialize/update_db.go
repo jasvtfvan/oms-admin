@@ -83,7 +83,7 @@ type UpdateDBServiceImpl struct{}
 func (*UpdateDBServiceImpl) CheckUpdate() (err error) {
 	db := global.OMS_DB
 	sysVersion := &system.SysVersion{}
-	db.Where("version_name = ?", "oms_version").First(sysVersion)
+	db.Where("version_code = ?", "oms_version").First(sysVersion)
 	version := global.OMS_CONFIG.Version
 	if sysVersion.Version != version {
 		return errors.New("需升级为:" + version)

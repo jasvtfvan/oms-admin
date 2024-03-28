@@ -17,7 +17,7 @@ type initSysVersion struct{}
 
 // DataInserted implements initialize.Initializer.
 func (i *initSysVersion) DataInserted(ctx context.Context) bool {
-	return initializer.DataInserted(ctx, &systemModel.SysVersion{}, "version_name = ?", "oms_version")
+	return initializer.DataInserted(ctx, &systemModel.SysVersion{}, "version_code = ?", "oms_version")
 }
 
 // InitializeData implements initialize.Initializer.
@@ -27,6 +27,7 @@ func (i *initSysVersion) InitializeData(ctx context.Context) (next context.Conte
 	version := global.OMS_CONFIG.Version
 	slices := []systemModel.SysVersion{
 		{
+			VersionCode: "oms_version",
 			VersionName: "oms_version",
 			Version:     version,
 		},

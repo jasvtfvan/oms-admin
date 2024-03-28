@@ -94,7 +94,7 @@ func (*InitDBServiceImpl) CheckDB() (err error) {
 		if !tableCreated {
 			return errors.New("表结构尚未创建")
 		}
-		err := db.Where("version_name = ?", "oms_version").First(&system.SysVersion{}).Error
+		err := db.Where("version_code = ?", "oms_version").First(&system.SysVersion{}).Error
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return errors.New("表数据尚未插入")
 		}
