@@ -64,6 +64,7 @@ func (j *JWT) CreateToken(claims CustomClaims) (string, error) {
 
 // 根据旧token创建新token
 func (j *JWT) CreateTokenByOldToken(oldToken string, claims CustomClaims) (string, error) {
+	// 多个并发操作，只有第一个操作真正执行，其他等待第一个操作结果
 	v, err, _ := j.SingleflightGroup.Do("JWT:"+oldToken, func() (interface{}, error) {
 		return j.CreateToken(claims)
 	})

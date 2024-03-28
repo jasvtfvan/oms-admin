@@ -2,6 +2,7 @@ package jwt
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"github.com/jasvtfvan/oms-admin/server/global"
@@ -50,11 +51,23 @@ func (rs *RedisStore) UseWithCtx(ctx context.Context) *RedisStore {
 	return rs
 }
 
-func NewDefaultRedisStore() *RedisStore {
-	exp, _ := utils.ParseDuration(global.OMS_CONFIG.JWT.ExpiresTime)
-	return &RedisStore{
-		Expiration: exp,
-		PreKey:     "JWT_",
-		Context:    context.TODO(),
+/*
+单例模式
+*/
+
+var redisStore *RedisStore
+var once sync.Once
+
+func GetRedisStore() *RedisStore {
+	if redisStore == nil {
+		once.Do(func() {
+			exp, _ := utils.ParseDuration(global.OMS_CONFIG.JWT.ExpiresTime)
+			redisStore = &RedisStore{
+				Expiration: exp,
+				PreKey:     "JWT_",
+				Context:    context.TODO(),
+			}
+		})
 	}
+	return redisStore
 }

@@ -2,6 +2,7 @@ package captcha
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"github.com/jasvtfvan/oms-admin/server/global"
@@ -53,11 +54,23 @@ func (rs *RedisStore) UseWithCtx(ctx context.Context) base64Captcha.Store {
 	return rs
 }
 
-func NewDefaultRedisStore() *RedisStore {
-	timeout := global.OMS_CONFIG.Captcha.OpenCaptchaTimeOut
-	return &RedisStore{
-		Expiration: time.Second * time.Duration(timeout),
-		PreKey:     "CAPTCHA_",
-		Context:    context.TODO(),
+/*
+单例模式
+*/
+
+var redisStore *RedisStore
+var once sync.Once
+
+func GetRedisStore() *RedisStore {
+	if redisStore == nil {
+		once.Do(func() {
+			timeout := global.OMS_CONFIG.Captcha.OpenCaptchaTimeOut
+			redisStore = &RedisStore{
+				Expiration: time.Second * time.Duration(timeout),
+				PreKey:     "CAPTCHA_",
+				Context:    context.TODO(),
+			}
+		})
 	}
+	return redisStore
 }
