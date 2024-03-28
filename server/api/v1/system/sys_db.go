@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jasvtfvan/oms-admin/server/global"
 	"github.com/jasvtfvan/oms-admin/server/model/common/response"
+	"github.com/jasvtfvan/oms-admin/server/utils"
 )
 
 type DbApi struct{}
@@ -38,6 +39,13 @@ func (*DbApi) InitDB(c *gin.Context) {
 }
 
 func (*DbApi) CheckUpdate(c *gin.Context) {
+	v := c.Value("claims")
+	if claims, ok := v.(utils.CustomClaims); ok {
+		if claims.Username != "admin" {
+			response.Fail(gin.H{"updated": false}, "系统超级管理员才有权限", c)
+			return
+		}
+	}
 	if err := updateDBService.CheckUpdate(); err != nil {
 		fmt.Println("[Golang] DB需要升级: " + err.Error())
 		response.Fail(gin.H{"updated": false}, "DB需要升级", c)
@@ -48,6 +56,13 @@ func (*DbApi) CheckUpdate(c *gin.Context) {
 }
 
 func (*DbApi) UpdateDB(c *gin.Context) {
+	v := c.Value("claims")
+	if claims, ok := v.(utils.CustomClaims); ok {
+		if claims.Username != "admin" {
+			response.Fail(nil, "系统超级管理员才有权限", c)
+			return
+		}
+	}
 	if err := updateDBService.CheckUpdate(); err != nil {
 		fmt.Println("[Golang] DB需要升级: " + err.Error())
 		if err := updateDBService.UpdateDB(); err != nil {

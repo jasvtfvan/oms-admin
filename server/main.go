@@ -26,7 +26,7 @@ func main() {
 	global.OMS_VP = core.Viper()       // 加载配置文件
 	global.OMS_LOG = core.Zap()        // 初始化zap日志库
 	zap.ReplaceGlobals(global.OMS_LOG) // 使用全局log
-	global.OMS_DB = initialize.Gorm()  // gorm连接数据库
+	global.OMS_DB = initialize.Gorm()  // gorm连接数据库 [导入initialize包，register_init执行]
 	if global.OMS_DB != nil {
 		// 根据系统版本，决定是否AutoMigrate表结构 TODO
 		// 程序结束前关闭数据库链接
@@ -36,6 +36,7 @@ func main() {
 			db.Close()
 		}()
 	}
+	initialize.Redis() // 初始化redis服务
 	if global.OMS_REDIS != nil {
 		rdb := global.OMS_REDIS
 		defer func() {

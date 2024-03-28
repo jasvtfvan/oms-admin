@@ -18,9 +18,6 @@ type serverTLS interface {
 }
 
 func RunWindowsServer() {
-	// 初始化redis服务
-	initialize.Redis()
-
 	var router *gin.Engine
 	// 开启zap的debug，才打印请求信息
 	if global.OMS_CONFIG.Zap.Level == "debug" {

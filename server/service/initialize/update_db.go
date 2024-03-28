@@ -60,9 +60,9 @@ func RegisterUpdate(order int, up Updater) {
 	}
 	name := up.UpdaterName()
 	if _, existed := updaterCache[name]; existed {
+		// 表名冲突，会导致程序不能正确运行，init函数在main函数前运行，出错后禁止启动
 		panicStr := fmt.Sprintf("UpdaterName conflict on %s", name)
-		// 此处不能panic，因为系统已经运行，此处记录日志，用于排查冲突，修复后再次升级
-		global.OMS_LOG.Error(panicStr)
+		panic(panicStr)
 	}
 	oup := orderedUpdater{order, up}
 	updaters = append(updaters, &oup)

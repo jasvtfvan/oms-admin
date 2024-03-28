@@ -65,9 +65,9 @@ func RegisterInit(order int, i Initializer, model ...interface{}) {
 	}
 	name := i.InitializerName()
 	if _, existed := initCache[name]; existed {
+		// 表名冲突，会导致程序不能正确运行，init函数在main函数前运行，出错后禁止启动
 		panicStr := fmt.Sprintf("InitializerName conflict on %s", name)
-		// 表名冲突，写入fatal日志，因为代码错误，会导致程序不能正确运行
-		global.OMS_LOG.Fatal(panicStr)
+		panic(panicStr)
 	}
 	oi := orderedInitializer{order, i}
 	initializers = append(initializers, &oi)

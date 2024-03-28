@@ -4,6 +4,7 @@ import "github.com/jasvtfvan/oms-admin/server/service"
 
 type ApiGroup struct {
 	DbApi
+	UserApi
 }
 
 var (
