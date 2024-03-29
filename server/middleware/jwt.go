@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"errors"
-	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -60,7 +59,6 @@ func JWTAuth() gin.HandlerFunc {
 			claims.ExpiresAt = jwt.NewNumericDate(time.Now().Add(exp)) // 过期时间
 			newToken, _ := j.CreateTokenByOldToken(token, *claims)
 			ctx.Header("new-token", newToken)
-			ctx.Header("new-token-expires-at", strconv.FormatInt(claims.ExpiresAt.Unix(), 10))
 			jwtStore.Set(username, newToken)
 		}
 		ctx.Set("claims", claims)

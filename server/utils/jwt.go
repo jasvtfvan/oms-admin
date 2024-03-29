@@ -10,11 +10,11 @@ import (
 )
 
 var (
-	ErrTokenExpired     = errors.New("token is expired")
-	ErrTokenNotValidYet = errors.New("token not active yet")
-	ErrTokenMalformed   = errors.New("that's not even a token")
-	ErrTokenInvalid     = errors.New("couldn't handle this token")
-	ErrTokenTypeError   = errors.New("unexpected return type from token")
+	ErrTokenExpired     = errors.New("令牌超时")
+	ErrTokenNotValidYet = errors.New("令牌尚未生效")
+	ErrTokenMalformed   = errors.New("非法令牌")
+	ErrTokenInvalid     = errors.New("无处理令牌")
+	ErrTokenTypeError   = errors.New("令牌类型转换错误")
 )
 
 type CustomClaims struct {

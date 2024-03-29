@@ -73,8 +73,14 @@ func (u *UserApi) Login(c *gin.Context) {
 		isOpen = true
 	}
 
+	// 开启后，验证码信息不能为空
+	if isOpen && (req.CaptchaId == "" || req.Captcha == "") {
+		response.Fail(nil, "请输入验证码", c)
+		return
+	}
+
 	// 如果防爆尚未开启，直接进行登录；如果防爆开启，则需要验证码验证，验证码只能使用一次
-	if !isOpen || (req.CaptchaId != "" && req.Captcha != "" && captchaStore.Verify(req.CaptchaId, req.Captcha, true)) {
+	if !isOpen || captchaStore.Verify(req.CaptchaId, req.Captcha, true) {
 		// 登录service，失败或用户禁用，则返回错误信息，验证码次数+1
 		user, err := userService.Login(req.Username, req.Password)
 		if err != nil {
@@ -103,6 +109,7 @@ func (u *UserApi) Login(c *gin.Context) {
 			User:  *user,
 			Token: token,
 		}, "登录成功", c)
+		return
 	}
 
 	//验证码次数+1
