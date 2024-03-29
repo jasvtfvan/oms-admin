@@ -41,6 +41,15 @@ func (rs *RedisStore) Set(key string, value string) error {
 	return nil
 }
 
+func (rs *RedisStore) Del(key string) error {
+	err := global.OMS_REDIS.Del(rs.Context, (rs.PreKey + key)).Err()
+	if err != nil {
+		global.OMS_LOG.Error("JWT RedisStore Del Error:", zap.Error(err))
+		return err
+	}
+	return nil
+}
+
 func (rs *RedisStore) Verify(key string, answer string, clear bool) bool {
 	v := rs.Get(key, clear)
 	return v == answer

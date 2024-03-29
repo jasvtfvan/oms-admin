@@ -109,6 +109,11 @@ tinyint vs int，float vs double，date vs datetime
 * 6、使用专业SQL注入检测工具检测，如sqlmap、SQLninja
 * 7、避免将SQL错误信息返回到前端，以防止攻击者利用这些错误信息进行SQL注入
 
+### 附录
+
+#### 参考文献
+[gorm](https://learnku.com/docs/gorm/v2)
+
 #### 特别鸣谢
 [piexlmax](https://github.com/piexlmax)  https://www.gin-vue-admin.com/
 [ZHOUYI](https://gitee.com/Z568_568)  https://gitee.com/Z568_568/ZY-Admin-template

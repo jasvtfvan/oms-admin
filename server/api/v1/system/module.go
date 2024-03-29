@@ -10,4 +10,6 @@ type ApiGroup struct {
 var (
 	initDBService   = service.ServiceGroupApp.Initialize.InitDBService
 	updateDBService = service.ServiceGroupApp.Initialize.UpdateDBService
+	userService     = service.ServiceGroupApp.System.UserService
+	jwtService      = service.ServiceGroupApp.System.JWTService
 )

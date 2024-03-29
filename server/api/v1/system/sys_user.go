@@ -48,15 +48,15 @@ func (u *UserApi) Captcha(c *gin.Context) {
 }
 
 func (u *UserApi) Login(c *gin.Context) {
-	var user sysReq.Login
-	err := c.ShouldBindJSON(&user) // 自动绑定
-	key := c.ClientIP()            // 使用ip当验证码的key
+	var req sysReq.Login
+	err := c.ShouldBindJSON(&req) // 自动绑定
+	key := c.ClientIP()           // 使用ip当验证码的key
 
 	if err != nil {
 		response.Fail(nil, err.Error(), c)
 		return
 	}
-	err = utils.Verify(user, utils.LoginVerify)
+	err = utils.Verify(req, utils.LoginVerify)
 	if err != nil {
 		response.Fail(nil, err.Error(), c)
 		return
@@ -74,23 +74,38 @@ func (u *UserApi) Login(c *gin.Context) {
 	}
 
 	// 如果防爆尚未开启，直接进行登录；如果防爆开启，则需要验证码验证，验证码只能使用一次
-	if !isOpen || (user.CaptchaId != "" && user.Captcha != "" && captchaStore.Verify(user.CaptchaId, user.Captcha, true)) {
+	if !isOpen || (req.CaptchaId != "" && req.Captcha != "" && captchaStore.Verify(req.CaptchaId, req.Captcha, true)) {
 		// 登录service，失败或用户禁用，则返回错误信息，验证码次数+1
-		// 登录成功，清除验证码次数，则创建token，返回正确信息
+		user, err := userService.Login(req.Username, req.Password)
+		if err != nil {
+			global.OMS_LOG.Error("登录失败，用户名或密码错误", zap.Error(err))
+			captchaStore.AddCount(key) // 验证码次数+1
+			response.Fail(nil, "用户名或密码错误", c)
+			return
+		}
+		if !user.Enable {
+			global.OMS_LOG.Error("登录失败，用户被禁用", zap.Error(err))
+			captchaStore.AddCount(key) // 验证码次数+1
+			response.Fail(nil, "用户被禁用", c)
+			return
+		}
+		// 登录成功，清除验证码次数，创建token，返回正确信息
+		token, err := jwtService.GenerateToken(user)
+		if err != nil {
+			global.OMS_LOG.Error("获取token失败", zap.Error(err))
+			captchaStore.AddCount(key) // 验证码次数+1
+			response.Fail(nil, "令牌获取失败", c)
+			return
+		}
+		global.OMS_LOG.Info("登录成功")
+		captchaStore.DelCount(key)
+		response.Success(sysRes.Login{
+			User:  *user,
+			Token: token,
+		}, "登录成功", c)
 	}
 
 	//验证码次数+1
 	captchaStore.AddCount(key)
 	response.Fail(nil, "验证码错误", c)
-}
-
-// 类型转换
-func interfaceToInt(v interface{}) (i int) {
-	switch v := v.(type) {
-	case int:
-		i = v
-	default:
-		i = 0
-	}
-	return
 }
