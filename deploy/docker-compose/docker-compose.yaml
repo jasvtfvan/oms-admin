@@ -16,7 +16,7 @@ services:
     build:
       context: ../../web
       dockerfile: ./Dockerfile
-    container_name: gva-web
+    container_name: oms-web
     restart: always
     ports:
       - '8080:8080'
@@ -30,7 +30,7 @@ services:
     build:
       context: ../../server
       dockerfile: ./Dockerfile
-    container_name: gva-server
+    container_name: oms-server
     restart: always
     ports:
       - '8888:8888'
@@ -46,17 +46,16 @@ services:
       - cache_network
 
   mysql:
-    image: mysql:8.0.21       # 如果您是 arm64 架构：如 MacOS 的 M1，请修改镜像为 image: mysql/mysql-server:8.0.21
-    container_name: gva-mysql
-    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci #设置utf8字符集
+    image: mysql:8.0.36
+    container_name: oms-mysql
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     restart: always
     ports:
-      - "13306:3306"  # host物理直接映射端口为13306
+      - "127.0.0.1:3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: 'Aa@6447985' # root管理员用户密码
-      MYSQL_DATABASE: 'qmPlus' # 初始化启动时要创建的数据库的名称
-      MYSQL_USER: 'gva'
-      # MYSQL_PASSWORD: 'Aa@6447985'
+      MYSQL_ROOT_PASSWORD: 'Mysql123Admin456'
+      MYSQL_DATABASE: 'oms'
+      MYSQL_USER: 'root'
     volumes:
       - mysql:/var/lib/mysql
     networks:
@@ -64,7 +63,7 @@ services:
 
   redis:
     image: redis:6.2.14
-    container_name: gva-redis # 容器名
+    container_name: oms-redis
     restart: always
     ports:
       - '127.0.0.1:6379:6379'

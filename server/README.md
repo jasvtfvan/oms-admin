@@ -27,7 +27,7 @@ system:
     tls-key: ./resource/cert/server.key
 zap:
     level: info
-version: "v0.0.3"
+version: "v0.0.1"
 ```
 >cors: whitelist下保留添加真实域名，删掉多余域名，注意格式
 >mysql: 数据库主要配置
@@ -55,7 +55,7 @@ version: "v0.0.3"
 
 #### docker-redis启动
 ```sh
-docker run --name redis \
+docker run --name oms-redis \
 -p 127.0.0.1:6379:6379 \
 -v ~/Documents/data/redis/data:/data \
 -d --restart=always redis:6.2.14
@@ -63,7 +63,7 @@ docker run --name redis \
 
 #### docker-mysql启动
 ```sh
-docker run --name mysql \
+docker run --name oms-mysql \
 -e MYSQL_ROOT_PASSWORD=Mysql123Admin456 \
 -p 127.0.0.1:3306:3306 \
 -v ~/Documents/data/mysql/data:/var/lib/mysql \
