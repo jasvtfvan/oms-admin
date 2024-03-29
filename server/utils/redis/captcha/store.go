@@ -18,13 +18,13 @@ type RedisStore struct {
 
 // Get implements base64Captcha.Store.
 func (rs *RedisStore) Get(key string, clear bool) string {
-	val, err := global.OMS_REDIS.Get(rs.Context, (rs.PreKey + key)).Result()
+	val, err := global.OMS_REDIS.Get(rs.Context, (rs.PreKey + "ANSWER_" + key)).Result()
 	if err != nil {
 		global.OMS_LOG.Error("Captcha RedisStore Get Error:", zap.Error(err))
 		return ""
 	}
 	if clear {
-		err := global.OMS_REDIS.Del(rs.Context, (rs.PreKey + key)).Err()
+		err := global.OMS_REDIS.Del(rs.Context, (rs.PreKey + "ANSWER_" + key)).Err()
 		if err != nil {
 			global.OMS_LOG.Error("Captcha RedisStore Get(Clear) Error:", zap.Error(err))
 			return ""
@@ -35,7 +35,7 @@ func (rs *RedisStore) Get(key string, clear bool) string {
 
 // Set implements base64Captcha.Store.
 func (rs *RedisStore) Set(key string, value string) error {
-	err := global.OMS_REDIS.Set(rs.Context, (rs.PreKey + key), value, rs.Expiration).Err()
+	err := global.OMS_REDIS.Set(rs.Context, (rs.PreKey + "ANSWER_" + key), value, rs.Expiration).Err()
 	if err != nil {
 		global.OMS_LOG.Error("Captcha RedisStore Set Error:", zap.Error(err))
 		return err

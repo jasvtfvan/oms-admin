@@ -114,5 +114,6 @@ func (u *UserApi) Login(c *gin.Context) {
 
 	//验证码次数+1
 	captchaStore.AddCount(key)
+	// 如果超过10次错误，锁定用户1小时，联系管理员解锁 TODO
 	response.Fail(nil, "验证码错误", c)
 }
