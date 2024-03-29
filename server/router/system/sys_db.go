@@ -11,16 +11,16 @@ func (*DbRouter) InitDbPublicRouter(router *gin.RouterGroup) {
 	r := router.Group("init")
 	dbApi := v1.ApiGroupApp.System.DbApi
 	{
-		r.GET("checkinit", dbApi.CheckInit) // 检查是否需要初始化
-		r.GET("initdb", dbApi.InitDB)       // 初始化db
+		r.POST("check", dbApi.CheckInit) // 检查是否需要初始化
+		r.POST("db", dbApi.InitDB)       // 初始化db
 	}
 }
 
 func (*DbRouter) InitDbPrivateRouter(router *gin.RouterGroup) {
-	r := router.Group("init")
+	r := router.Group("update")
 	dbApi := v1.ApiGroupApp.System.DbApi
 	{
-		r.POST("checkupdate", dbApi.CheckUpdate) // 检查更新
-		r.POST("updatedb", dbApi.UpdateDB)       // 更新db
+		r.POST("check", dbApi.CheckUpdate) // 检查更新
+		r.POST("db", dbApi.UpdateDB)       // 更新db
 	}
 }
