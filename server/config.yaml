@@ -40,9 +40,11 @@ mysql:
     port: "3306"
     config: charset=utf8mb4&parseTime=True&loc=Local
     db-name: oms
-    username: root
+    # username: root
+    username: mysql_admin
     password: Mysql123Admin456
-    path: 127.0.0.1
+    # path: 127.0.0.1
+    path: rm-2ze4vq08r30l8n0327o.mysql.rds.aliyuncs.com
     engine: InnoDB
     log-mode: error
     max-idle-conns: 10
