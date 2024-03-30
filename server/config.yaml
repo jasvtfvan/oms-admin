@@ -64,6 +64,7 @@ system:
     username: oms_admin
     # 超级管理员初始密码
     password: Oms123Admin456
+    # debug、release、test，生产环境使用release
     env: debug
     db-type: mysql
     # 路由全局前缀
@@ -78,6 +79,7 @@ system:
     tls-key: ./resource/cert/server.key
 version: v0.0.2
 zap:
+    # debug、info、warn等等，生产环境使用info，如果查看请求信息使用debug
     level: debug
     prefix: '[github.com/jasvtfvan/oms-admin/server]'
     format: console

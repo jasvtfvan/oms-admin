@@ -11,14 +11,66 @@ import (
 
 type UserService interface {
 	Login(username string, password string) (*sysModel.SysUser, error)
-	DeleteUser(id uint) error
-	DisableUser(id uint) error
+	DeleteUser(uint) error
+	DisableUser(uint) error
+	EnableUser(uint) error
+	ResetPassword(uint, string) error
 }
 
 type UserServiceImpl struct{}
 
+func (*UserServiceImpl) ResetPassword(id uint, newPassword string) error {
+	sysUser, err := sysDao.FindUserById(id)
+	if err != nil {
+		return err
+	}
+	if sysUser == nil {
+		return errors.New("没有对应用户数据")
+	}
+	if newPassword == "" {
+		newPassword = sysUser.Username + "123456"
+	}
+	password := utils.BcryptHash(newPassword)
+	row, err := sysDao.UpdatePassword(id, password)
+	if err != nil {
+		return err
+	}
+	if row != 0 {
+		return errors.New("没有对应数据")
+	}
+	jwtStore := jwtRedis.GetRedisStore()
+	err = jwtStore.Del(sysUser.Username)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (*UserServiceImpl) EnableUser(id uint) error {
+	row, err := sysDao.EnableUser(id)
+	if err != nil {
+		return err
+	}
+	if row != 0 {
+		return errors.New("没有对应数据")
+	}
+	sysUser, err := sysDao.FindUserById(id)
+	if err != nil {
+		return err
+	}
+	if sysUser == nil {
+		return errors.New("没有对应用户数据")
+	}
+	jwtStore := jwtRedis.GetRedisStore()
+	err = jwtStore.Del(sysUser.Username)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (*UserServiceImpl) DisableUser(id uint) error {
-	row, err := sysDao.DeleteUser(id)
+	row, err := sysDao.DisableUser(id)
 	if err != nil {
 		return err
 	}
