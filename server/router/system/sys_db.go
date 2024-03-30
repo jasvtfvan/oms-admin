@@ -16,7 +16,9 @@ func (*DbRouter) InitDbPublicRouter(router *gin.RouterGroup) {
 	}
 }
 
-func (*DbRouter) InitDbPrivateRouter(router *gin.RouterGroup) {
+func (*DbRouter) InitDbPrivateRouter(router *gin.RouterGroup) {}
+
+func (*DbRouter) InitDbCasbinRouter(router *gin.RouterGroup) {
 	r := router.Group("update")
 	dbApi := v1.ApiGroupApp.System.DbApi
 	{

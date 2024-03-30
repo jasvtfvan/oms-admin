@@ -129,7 +129,9 @@ tinyint vs int，float vs double，date vs datetime
 ### 附录
 
 #### 参考文献
+[gin](https://learnku.com/docs/gin-gonic/1.7)
 [gorm](https://learnku.com/docs/gorm/v2)
+[casbin](https://casbin.org/zh/)
 
 #### 特别鸣谢
 [piexlmax](https://github.com/piexlmax)  https://www.gin-vue-admin.com/

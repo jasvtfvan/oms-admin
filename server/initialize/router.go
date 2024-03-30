@@ -99,9 +99,16 @@ func Routers(logger *zap.Logger) *gin.Engine {
 
 	// 注册路由-鉴权
 	privateGroup := r.Group(global.OMS_CONFIG.System.RouterPrefix)
-	privateGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler())
+	privateGroup.Use(middleware.JWTAuth())
 	{
 		router.InitPrivateRouter(privateGroup)
+	}
+
+	// 注册路由-鉴权-casbin接口权限
+	casbinGroup := r.Group(global.OMS_CONFIG.System.RouterPrefix)
+	casbinGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler())
+	{
+		router.InitCasbinRouter(casbinGroup)
 	}
 
 	global.OMS_LOG.Info("router register success! 路由注册成功!")

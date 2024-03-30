@@ -17,3 +17,14 @@ func (*UserRouter) InitUserPublicRouter(router *gin.RouterGroup) {
 }
 
 func (*UserRouter) InitUserPrivateRouter(router *gin.RouterGroup) {}
+
+func (*UserRouter) InitUserCasbinRouter(router *gin.RouterGroup) {
+	r := router.Group("user")
+	userApi := v1.ApiGroupApp.System.UserApi
+	{
+		r.DELETE("delete/:id", userApi.DeleteUser)
+		r.PUT("disable/:id", userApi.DisableUser)
+		r.PUT("enable/:id", userApi.EnableUser)
+		r.PUT("reset-pwd", userApi.ResetPassword)
+	}
+}

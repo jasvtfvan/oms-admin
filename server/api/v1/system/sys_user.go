@@ -2,6 +2,7 @@ package system
 
 import (
 	"encoding/json"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jasvtfvan/oms-admin/server/global"
@@ -17,6 +18,75 @@ import (
 var captchaStore = captcha.GetRedisStore()
 
 type UserApi struct{}
+
+func (u *UserApi) ResetPassword(c *gin.Context) {
+	var req sysReq.ResetUserPassword
+	err := c.ShouldBindJSON(&req) // 自动绑定
+	if err != nil {
+		response.Fail(nil, err.Error(), c)
+		return
+	}
+	if req.ID == 0 {
+		response.Fail(nil, "id不能为空", c)
+		return
+	}
+	newPassword := req.Password
+	encryptedPassword, err := userService.ResetPassword(uint(req.ID), newPassword)
+	if err != nil {
+		global.OMS_LOG.Error("重置用户密码失败id:"+strconv.Itoa(req.ID), zap.Error(err))
+		response.Fail(gin.H{encryptedPassword: encryptedPassword}, "操作失败:"+err.Error(), c)
+		return
+	}
+	response.Success(gin.H{encryptedPassword: encryptedPassword}, "操作成功", c)
+}
+
+func (u *UserApi) EnableUser(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		response.Fail(nil, "id不能为空", c)
+		return
+	}
+	idInt, _ := strconv.Atoi(id)
+	err := userService.EnableUser(uint(idInt))
+	if err != nil {
+		global.OMS_LOG.Error("启用用户失败id:"+id, zap.Error(err))
+		response.Fail(nil, "操作失败:"+err.Error(), c)
+		return
+	}
+	response.Success(nil, "操作成功", c)
+}
+
+func (u *UserApi) DisableUser(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		response.Fail(nil, "id不能为空", c)
+		return
+	}
+	idInt, _ := strconv.Atoi(id)
+	err := userService.DisableUser(uint(idInt))
+	if err != nil {
+		global.OMS_LOG.Error("禁用用户失败id:"+id, zap.Error(err))
+		response.Fail(nil, "操作失败:"+err.Error(), c)
+		return
+	}
+	response.Success(nil, "操作成功", c)
+}
+
+func (u *UserApi) DeleteUser(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		response.Fail(nil, "id不能为空", c)
+		return
+	}
+	idInt, _ := strconv.Atoi(id)
+	err := userService.DeleteUser(uint(idInt))
+	if err != nil {
+		global.OMS_LOG.Error("删除用户失败id:"+id, zap.Error(err))
+		response.Fail(nil, "操作失败:"+err.Error(), c)
+		return
+	}
+	response.Success(nil, "操作成功", c)
+}
 
 func (u *UserApi) Captcha(c *gin.Context) {
 	openCaptcha := global.OMS_CONFIG.Captcha.OpenCaptcha // 防爆次数
