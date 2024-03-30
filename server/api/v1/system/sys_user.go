@@ -1,6 +1,8 @@
 package system
 
 import (
+	"encoding/json"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jasvtfvan/oms-admin/server/global"
 	"github.com/jasvtfvan/oms-admin/server/model/common/response"
@@ -50,8 +52,6 @@ func (u *UserApi) Captcha(c *gin.Context) {
 func (u *UserApi) Login(c *gin.Context) {
 	var req sysReq.Login
 	err := c.ShouldBindJSON(&req) // 自动绑定
-	key := c.ClientIP()           // 使用ip当验证码的key
-
 	if err != nil {
 		response.Fail(nil, err.Error(), c)
 		return
@@ -62,10 +62,25 @@ func (u *UserApi) Login(c *gin.Context) {
 		return
 	}
 
+	var userCreds sysReq.UserCredentials
+	err = json.Unmarshal([]byte(req.Secret), &userCreds)
+	if err != nil {
+		response.Fail(nil, "参数格式错误: "+err.Error(), c)
+		return
+	}
+
+	key := c.ClientIP()                                  // 使用ip当验证码的key
 	openCaptcha := global.OMS_CONFIG.Captcha.OpenCaptcha // 防爆次数
 	count, ok := captchaStore.GetCount(key)              // 验证码次数
 	if ok != nil {
 		captchaStore.InitCount(key) // 初始化次数1
+	}
+
+	if userCreds.Username == "" || userCreds.Password == "" {
+		//验证码次数+1
+		captchaStore.AddCount(key)
+		response.Fail(nil, "用户名或密码错误", c)
+		return
 	}
 
 	var isOpen bool // 为0直接开启防爆 或者 如果超过防爆次数，则开启防爆
@@ -75,6 +90,8 @@ func (u *UserApi) Login(c *gin.Context) {
 
 	// 开启后，验证码信息不能为空
 	if isOpen && (req.CaptchaId == "" || req.Captcha == "") {
+		//验证码次数+1
+		captchaStore.AddCount(key)
 		response.Fail(nil, "请输入验证码", c)
 		return
 	}
@@ -82,7 +99,7 @@ func (u *UserApi) Login(c *gin.Context) {
 	// 如果防爆尚未开启，直接进行登录；如果防爆开启，则需要验证码验证，验证码只能使用一次
 	if !isOpen || captchaStore.Verify(req.CaptchaId, req.Captcha, true) {
 		// 登录service，失败或用户禁用，则返回错误信息，验证码次数+1
-		user, err := userService.Login(req.Username, req.Password)
+		user, err := userService.Login(userCreds.Username, userCreds.Password)
 		if err != nil {
 			global.OMS_LOG.Error("登录失败，用户名或密码错误", zap.Error(err))
 			captchaStore.AddCount(key) // 验证码次数+1
@@ -104,7 +121,7 @@ func (u *UserApi) Login(c *gin.Context) {
 			return
 		}
 		global.OMS_LOG.Info("登录成功")
-		captchaStore.DelCount(key)
+		captchaStore.DelCount(key) // 清除验证码次数
 		response.Success(sysRes.Login{
 			User:  *user,
 			Token: token,
