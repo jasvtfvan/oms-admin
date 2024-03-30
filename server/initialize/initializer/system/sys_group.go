@@ -22,6 +22,7 @@ func (i *initSysGroup) DataInserted(ctx context.Context) bool {
 
 // InitializeData implements initialize.Initializer.
 func (i *initSysGroup) InitializeData(ctx context.Context) (next context.Context, err error) {
+	// rootUsername := global.OMS_CONFIG.System.Username
 	db := global.OMS_DB
 	slices := []systemModel.SysGroup{
 		{
@@ -36,7 +37,7 @@ func (i *initSysGroup) InitializeData(ctx context.Context) (next context.Context
 			// SysRoles: []systemModel.SysRole{
 			// 	{
 			// 		RoleName: "超级管理员",
-			// 		RoleCode: "admin",
+			// 		RoleCode: rootUsername,
 			// 		Sort:     0,
 			// 		Comment:  "超级管理员",
 			// 		Enable:   true,

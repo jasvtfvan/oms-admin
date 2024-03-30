@@ -12,14 +12,16 @@ cors:
 mysql:
     port: "3306"
     db-name: oms
-    username: root
+    username: mysql_admin
     password: Mysql123Admin456
-    path: 127.0.0.1
+    path: rm-2ze4vq08r30l8n032.mysql.rds.aliyuncs.com
 redis:
     addr: 127.0.0.1:6379
-    password: "Redis123Admin456"
+    password: Redis123Admin456
     db: 0
 system:
+    username: oms_admin
+    password: Oms123Admin456
     env: release
     addr: 8888
     use-tls: false
@@ -92,9 +94,10 @@ tinyint vs int，float vs double，date vs datetime
 * 13、批量操作时最好是一条sql语句搞定；其次是打包成一个事务，一次性提交<br>
 （高并发情况下减少对共享资源的争用）
 * 14、不要使用连表操作，join逻辑在业务代码里完成
-* 15、查看连接数 ```show processlist;```
-* 16、查看连接超时时间 ```show global variables like 'wait_timeout'; -- 单位秒```
-* 17、设置连接超时是时间 ```set global wait_timeout = 28800; -- 设置为28800秒，即8小时```
+* 15、查看连接情况 ```show processlist;```
+* 16、根据用户查看连接情况 ```SELECT * FROM information_schema.processlist WHERE USER='mysql_admin';```
+* 17、查看连接超时时间 ```show global variables like 'wait_timeout'; -- 单位秒```
+* 18、设置连接超时是时间 ```set global wait_timeout = 28800; -- 设置为28800秒，即8小时```
 
 #### mysql防止sql注入
 * 1、检查select username from user where username='"+username+"'
@@ -108,6 +111,20 @@ tinyint vs int，float vs double，date vs datetime
 * 5、不要将用户输入直接嵌入到sql语句中，不要使用字符串拼接，应该使用参数化查询接口
 * 6、使用专业SQL注入检测工具检测，如sqlmap、SQLninja
 * 7、避免将SQL错误信息返回到前端，以防止攻击者利用这些错误信息进行SQL注入
+
+
+### 常见解决方案
+
+#### 忘记密码
+登录管理员，重置用户密码
+默认密码 username123456 ，登录后发现密码小于6位、没有大小写字母、没有数字，强制修改
+
+#### 超级管理员忘记密码
+1. 本地环境运行 generator_test.go TestBcryptHash方法
+2. 将所得密文手动更新到mysql
+3. 手动连接redis，找到jwt_管理员username，清除
+4. 告诉管理员新密码，尝试登录
+
 
 ### 附录
 

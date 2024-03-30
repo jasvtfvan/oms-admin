@@ -2,7 +2,9 @@ captcha:
     key-long: 6
     img-width: 240
     img-height: 80
+    # 0代表一直开启，大于0代表几次之后开启
     open-captcha: 3
+    # open-captcha大于0时才生效
     open-captcha-timeout: 3600
 cors:
     mode: strict-whitelist
@@ -43,7 +45,9 @@ mysql:
     # username: root
     username: mysql_admin
     password: Mysql123Admin456
+    # 阿里云举例：ECS服务器和RDS数据库，在同一个区域，使用内网连接地址
     # path: 127.0.0.1
+    # path: rm-2ze4vq08r30l8n032.mysql.rds.aliyuncs.com
     path: rm-2ze4vq08r30l8n0327o.mysql.rds.aliyuncs.com
     engine: InnoDB
     log-mode: error
@@ -56,16 +60,23 @@ redis:
     password: ""
     db: 0
 system:
+    # 超级管理员用户名
+    username: oms_admin
+    # 超级管理员初始密码
+    password: Oms123Admin456
     env: debug
     db-type: mysql
+    # 路由全局前缀
     router-prefix: ""
     addr: 8888
+    # IP限制次数 一个小时15000次
     iplimit-count: 15000
+    # IP限制一个小时
     iplimit-time: 3600
     use-tls: false
     tls-cert: ./resource/cert/server.pem
     tls-key: ./resource/cert/server.key
-version: v0.0.1
+version: v0.0.2
 zap:
     level: debug
     prefix: '[github.com/jasvtfvan/oms-admin/server]'

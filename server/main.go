@@ -24,6 +24,7 @@ import (
 func main() {
 	core.WritePIDToFile()              // vscode debug模式下，将pid写入txt文件，停止时可以根据pid进行kill操作
 	global.OMS_VP = core.Viper()       // 加载配置文件
+	initialize.VerifyInit()            // 验证基础信息
 	global.OMS_LOG = core.Zap()        // 初始化zap日志库
 	zap.ReplaceGlobals(global.OMS_LOG) // 使用全局log
 	global.OMS_DB = initialize.Gorm()  // gorm连接数据库 [导入initialize包，register_init执行]

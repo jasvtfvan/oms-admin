@@ -18,17 +18,20 @@ type initSysUser struct{}
 
 // DataInserted implements initialize.Initializer.
 func (i *initSysUser) DataInserted(ctx context.Context) bool {
-	return initializer.DataInserted(ctx, &systemModel.SysUser{}, "username = ?", "admin")
+	rootUsername := global.OMS_CONFIG.System.Username
+	return initializer.DataInserted(ctx, &systemModel.SysUser{}, "username = ?", rootUsername)
 }
 
 // InitializeData implements initialize.Initializer.
 func (i *initSysUser) InitializeData(ctx context.Context) (next context.Context, err error) {
+	rootUsername := global.OMS_CONFIG.System.Username
+	rootPassword := global.OMS_CONFIG.System.Password
 	db := global.OMS_DB
 
-	password := utils.BcryptHash("Oms123Admin456")
+	password := utils.BcryptHash(rootPassword)
 	slices := []systemModel.SysUser{
 		{
-			Username: "admin",
+			Username: rootUsername,
 			Password: password,
 			NickName: "超级管理员",
 			Avatar:   "",
