@@ -12,8 +12,11 @@ import (
 	jwtRedis "github.com/jasvtfvan/oms-admin/server/utils/redis/jwt"
 )
 
+var jwtStore = jwtRedis.GetRedisStore()
+
 func JWTAuth() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		jwtStore = jwtStore.UseWithCtx(ctx)
 		/*
 			1.获取令牌
 		*/
@@ -43,7 +46,6 @@ func JWTAuth() gin.HandlerFunc {
 		/*
 			3.通过缓存比对令牌
 		*/
-		jwtStore := jwtRedis.GetRedisStore()
 		username := claims.Username
 		var cacheToken string = jwtStore.Get(username, false)
 		if token != cacheToken {

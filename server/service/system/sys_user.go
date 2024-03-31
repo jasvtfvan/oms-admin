@@ -7,7 +7,6 @@ import (
 	sysModel "github.com/jasvtfvan/oms-admin/server/model/system"
 	"github.com/jasvtfvan/oms-admin/server/utils"
 	"github.com/jasvtfvan/oms-admin/server/utils/crypto"
-	jwtRedis "github.com/jasvtfvan/oms-admin/server/utils/redis/jwt"
 )
 
 type UserService interface {
@@ -42,7 +41,6 @@ func (*UserServiceImpl) ResetPassword(id uint, newPassword string) (string, erro
 	}
 	encryptedPassword := crypto.AesEncrypt(newPassword)
 	// 删除jwt缓存
-	jwtStore := jwtRedis.GetRedisStore()
 	err = jwtStore.Del(sysUser.Username)
 	if err != nil {
 		return encryptedPassword, err
@@ -65,7 +63,6 @@ func (*UserServiceImpl) EnableUser(id uint) error {
 	if sysUser == nil {
 		return errors.New("没有对应用户数据")
 	}
-	jwtStore := jwtRedis.GetRedisStore()
 	err = jwtStore.Del(sysUser.Username)
 	if err != nil {
 		return err
@@ -88,7 +85,6 @@ func (*UserServiceImpl) DisableUser(id uint) error {
 	if sysUser == nil {
 		return errors.New("没有对应用户数据")
 	}
-	jwtStore := jwtRedis.GetRedisStore()
 	err = jwtStore.Del(sysUser.Username)
 	if err != nil {
 		return err
@@ -111,7 +107,6 @@ func (*UserServiceImpl) DeleteUser(id uint) error {
 	if sysUser == nil {
 		return errors.New("没有对应用户数据")
 	}
-	jwtStore := jwtRedis.GetRedisStore()
 	err = jwtStore.Del(sysUser.Username)
 	if err != nil {
 		return err

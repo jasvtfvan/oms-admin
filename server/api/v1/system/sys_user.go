@@ -15,7 +15,9 @@ import (
 	"go.uber.org/zap"
 )
 
-var captchaStore = captcha.GetRedisStore()
+var captchaBuildBase64Store = captcha.GetBuildBase64Store()
+var captchaLoginCountStore = captcha.GetLoginCountStore()
+var captchaBuildCountStore = captcha.GetBuildCountStore()
 
 type UserApi struct{}
 
@@ -89,28 +91,43 @@ func (u *UserApi) DeleteUser(c *gin.Context) {
 }
 
 func (u *UserApi) Captcha(c *gin.Context) {
-	openCaptcha := global.OMS_CONFIG.Captcha.OpenCaptcha // 防爆次数
-	key := c.ClientIP()                                  // 使用ip当验证码的key
-	count, ok := captchaStore.GetCount(key)              // 验证码次数
-	if ok != nil {
-		captchaStore.InitCount(key) // 初始化次数1
+	key := c.ClientIP()                                                       // 使用ip当验证码的key
+	openCaptchaBuildCountMax := global.OMS_CONFIG.Captcha.OpenCaptchaBuildMax // 验证码次数最多可以生成多少次，超过后锁定timeout时长
+	buildCountCount := captchaBuildCountStore.UseWithCtx(c).GetCount(key)     // 验证码次数
+	if buildCountCount == 0 {
+		captchaBuildCountStore.InitCount(key) // 初始化次数1
 	}
 
+	if buildCountCount > openCaptchaBuildCountMax {
+		captchaBuildCountStore.AddCount(key) // 生成验证码次数+1
+		response.Fail(nil, "操作太频繁，过一阵再来尝试。也可以联系管理员", c)
+		return
+	}
+
+	openCaptcha := global.OMS_CONFIG.Captcha.OpenCaptcha        // 防爆次数
+	count := captchaLoginCountStore.UseWithCtx(c).GetCount(key) // 验证码次数
+	if count == 0 {
+		captchaLoginCountStore.InitCount(key) // 初始化次数1
+	}
 	var isOpen bool // 为0直接开启防爆 或者 如果超过防爆次数，则开启防爆
 	if openCaptcha == 0 || count > openCaptcha {
 		isOpen = true
 	}
-	height := global.OMS_CONFIG.Captcha.ImgHeight                           // 验证码高度
-	width := global.OMS_CONFIG.Captcha.ImgWidth                             // 验证码宽度
-	keyLong := global.OMS_CONFIG.Captcha.KeyLong                            // 验证码长度
-	driver := base64Captcha.NewDriverDigit(height, width, keyLong, 0.7, 80) // 初始化driver
-	captcha := base64Captcha.NewCaptcha(driver, captchaStore.UseWithCtx(c)) // 新建验证码对象
-	id, b64s, _, err := captcha.Generate()                                  // 生成验证码信息
+
+	height := global.OMS_CONFIG.Captcha.ImgHeight                                      // 验证码高度
+	width := global.OMS_CONFIG.Captcha.ImgWidth                                        // 验证码宽度
+	keyLong := global.OMS_CONFIG.Captcha.KeyLong                                       // 验证码长度
+	driver := base64Captcha.NewDriverDigit(height, width, keyLong, 0.7, 80)            // 初始化driver
+	captcha := base64Captcha.NewCaptcha(driver, captchaBuildBase64Store.UseWithCtx(c)) // 新建验证码对象
+	id, b64s, _, err := captcha.Generate()                                             // 生成验证码信息
 	if err != nil {
+		captchaBuildCountStore.AddCount(key) // 生成验证码次数+1
 		global.OMS_LOG.Error("验证码获取失败:", zap.Error(err))
 		response.Fail(nil, "验证码获取失败", c)
 		return
 	}
+
+	captchaBuildCountStore.AddCount(key) // 生成验证码次数+1
 	response.Success(sysRes.SysCaptchaResponse{
 		CaptchaId:     id,
 		PicPath:       b64s,
@@ -120,17 +137,16 @@ func (u *UserApi) Captcha(c *gin.Context) {
 }
 
 func (u *UserApi) Login(c *gin.Context) {
-	// 记录登录次数
-	key := c.ClientIP()                                        // 使用ip当验证码的key
-	openCaptcha := global.OMS_CONFIG.Captcha.OpenCaptcha       // 防爆次数
-	openCaptchaMax := global.OMS_CONFIG.Captcha.OpenCaptchaMax // 最大次数，超过后锁定timeout时长
-	count, ok := captchaStore.GetCount(key)                    // 验证码次数
-	if ok != nil {
-		captchaStore.InitCount(key) // 初始化次数1
+	key := c.ClientIP()                                         // 使用ip当验证码的key
+	openCaptcha := global.OMS_CONFIG.Captcha.OpenCaptcha        // 防爆次数
+	openCaptchaMax := global.OMS_CONFIG.Captcha.OpenCaptchaMax  // 最大次数，超过后锁定timeout时长
+	count := captchaLoginCountStore.UseWithCtx(c).GetCount(key) // 验证码次数
+	if count == 0 {
+		captchaLoginCountStore.InitCount(key) // 初始化次数1
 	}
 
 	if count > openCaptchaMax {
-		captchaStore.AddCount(key) // 验证码次数+1
+		captchaLoginCountStore.AddCount(key) // 验证码次数+1
 		response.Fail(nil, "错误太多频繁，过一阵再来尝试。也可以联系管理员", c)
 		return
 	}
@@ -138,13 +154,13 @@ func (u *UserApi) Login(c *gin.Context) {
 	var req sysReq.Login
 	err := c.ShouldBindJSON(&req) // 自动绑定
 	if err != nil {
-		captchaStore.AddCount(key) // 验证码次数+1
+		captchaLoginCountStore.AddCount(key) // 验证码次数+1
 		response.Fail(nil, err.Error(), c)
 		return
 	}
 	err = utils.Verify(req, utils.LoginVerify)
 	if err != nil {
-		captchaStore.AddCount(key) // 验证码次数+1
+		captchaLoginCountStore.AddCount(key) // 验证码次数+1
 		response.Fail(nil, err.Error(), c)
 		return
 	}
@@ -152,13 +168,13 @@ func (u *UserApi) Login(c *gin.Context) {
 	var userCreds sysReq.UserCredentials
 	err = json.Unmarshal([]byte(req.Secret), &userCreds)
 	if err != nil {
-		captchaStore.AddCount(key) // 验证码次数+1
+		captchaLoginCountStore.AddCount(key) // 验证码次数+1
 		response.Fail(nil, "参数格式错误: "+err.Error(), c)
 		return
 	}
 
 	if userCreds.Username == "" || userCreds.Password == "" {
-		captchaStore.AddCount(key) // 验证码次数+1
+		captchaLoginCountStore.AddCount(key) // 验证码次数+1
 		response.Fail(nil, "用户名或密码错误", c)
 		return
 	}
@@ -170,24 +186,24 @@ func (u *UserApi) Login(c *gin.Context) {
 
 	// 开启后，验证码信息不能为空
 	if isOpen && (req.CaptchaId == "" || req.Captcha == "") {
-		captchaStore.AddCount(key) // 验证码次数+1
+		captchaLoginCountStore.AddCount(key) // 验证码次数+1
 		response.Fail(nil, "请输入验证码", c)
 		return
 	}
 
 	// 如果防爆尚未开启，直接进行登录；如果防爆开启，则需要验证码验证，验证码只能使用一次
-	if !isOpen || captchaStore.Verify(req.CaptchaId, req.Captcha, true) {
+	if !isOpen || captchaBuildBase64Store.Verify(req.CaptchaId, req.Captcha, true) {
 		// 登录service，失败或用户禁用，则返回错误信息，验证码次数+1
 		user, err := userService.Login(userCreds.Username, userCreds.Password)
 		if err != nil {
 			global.OMS_LOG.Error("登录失败，用户名或密码错误", zap.Error(err))
-			captchaStore.AddCount(key) // 验证码次数+1
+			captchaLoginCountStore.AddCount(key) // 验证码次数+1
 			response.Fail(nil, "用户名或密码错误", c)
 			return
 		}
 		if !user.Enable {
 			global.OMS_LOG.Error("登录失败，用户被禁用", zap.Error(err))
-			captchaStore.AddCount(key) // 验证码次数+1
+			captchaLoginCountStore.AddCount(key) // 验证码次数+1
 			response.Fail(nil, "用户被禁用", c)
 			return
 		}
@@ -195,12 +211,13 @@ func (u *UserApi) Login(c *gin.Context) {
 		token, err := jwtService.GenerateToken(user)
 		if err != nil {
 			global.OMS_LOG.Error("获取token失败", zap.Error(err))
-			captchaStore.AddCount(key) // 验证码次数+1
+			captchaLoginCountStore.AddCount(key) // 验证码次数+1
 			response.Fail(nil, "令牌获取失败", c)
 			return
 		}
 		global.OMS_LOG.Info("登录成功")
-		captchaStore.DelCount(key) // 清除验证码次数
+		captchaBuildCountStore.DelCount(key) // 清除生成次数
+		captchaLoginCountStore.DelCount(key) // 清除验证码次数
 		response.Success(sysRes.Login{
 			User:  *user,
 			Token: token,
@@ -208,6 +225,6 @@ func (u *UserApi) Login(c *gin.Context) {
 		return
 	}
 
-	captchaStore.AddCount(key) // 验证码次数+1
+	captchaLoginCountStore.AddCount(key) // 验证码次数+1
 	response.Fail(nil, "验证码错误", c)
 }

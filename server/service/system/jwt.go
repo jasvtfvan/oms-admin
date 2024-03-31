@@ -3,7 +3,6 @@ package system
 import (
 	sysModel "github.com/jasvtfvan/oms-admin/server/model/system"
 	"github.com/jasvtfvan/oms-admin/server/utils"
-	jwtRedis "github.com/jasvtfvan/oms-admin/server/utils/redis/jwt"
 )
 
 type JWTService interface {
@@ -23,7 +22,6 @@ func (*JWTServiceImpl) GenerateToken(sysUser *sysModel.SysUser) (string, error) 
 	if err != nil {
 		return "", err
 	}
-	jwtStore := jwtRedis.GetRedisStore()
 	err = jwtStore.Set(sysUser.Username, token)
 	if err != nil {
 		return "", err
