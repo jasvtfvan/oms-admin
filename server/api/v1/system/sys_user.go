@@ -120,14 +120,31 @@ func (u *UserApi) Captcha(c *gin.Context) {
 }
 
 func (u *UserApi) Login(c *gin.Context) {
+	// 记录登录次数
+	key := c.ClientIP()                                        // 使用ip当验证码的key
+	openCaptcha := global.OMS_CONFIG.Captcha.OpenCaptcha       // 防爆次数
+	openCaptchaMax := global.OMS_CONFIG.Captcha.OpenCaptchaMax // 最大次数，超过后锁定timeout时长
+	count, ok := captchaStore.GetCount(key)                    // 验证码次数
+	if ok != nil {
+		captchaStore.InitCount(key) // 初始化次数1
+	}
+
+	if count > openCaptchaMax {
+		captchaStore.AddCount(key) // 验证码次数+1
+		response.Fail(nil, "错误太多频繁，过一阵再来尝试。也可以联系管理员", c)
+		return
+	}
+
 	var req sysReq.Login
 	err := c.ShouldBindJSON(&req) // 自动绑定
 	if err != nil {
+		captchaStore.AddCount(key) // 验证码次数+1
 		response.Fail(nil, err.Error(), c)
 		return
 	}
 	err = utils.Verify(req, utils.LoginVerify)
 	if err != nil {
+		captchaStore.AddCount(key) // 验证码次数+1
 		response.Fail(nil, err.Error(), c)
 		return
 	}
@@ -135,20 +152,13 @@ func (u *UserApi) Login(c *gin.Context) {
 	var userCreds sysReq.UserCredentials
 	err = json.Unmarshal([]byte(req.Secret), &userCreds)
 	if err != nil {
+		captchaStore.AddCount(key) // 验证码次数+1
 		response.Fail(nil, "参数格式错误: "+err.Error(), c)
 		return
 	}
 
-	key := c.ClientIP()                                  // 使用ip当验证码的key
-	openCaptcha := global.OMS_CONFIG.Captcha.OpenCaptcha // 防爆次数
-	count, ok := captchaStore.GetCount(key)              // 验证码次数
-	if ok != nil {
-		captchaStore.InitCount(key) // 初始化次数1
-	}
-
 	if userCreds.Username == "" || userCreds.Password == "" {
-		//验证码次数+1
-		captchaStore.AddCount(key)
+		captchaStore.AddCount(key) // 验证码次数+1
 		response.Fail(nil, "用户名或密码错误", c)
 		return
 	}
@@ -160,8 +170,7 @@ func (u *UserApi) Login(c *gin.Context) {
 
 	// 开启后，验证码信息不能为空
 	if isOpen && (req.CaptchaId == "" || req.Captcha == "") {
-		//验证码次数+1
-		captchaStore.AddCount(key)
+		captchaStore.AddCount(key) // 验证码次数+1
 		response.Fail(nil, "请输入验证码", c)
 		return
 	}
@@ -199,8 +208,6 @@ func (u *UserApi) Login(c *gin.Context) {
 		return
 	}
 
-	//验证码次数+1
-	captchaStore.AddCount(key)
-	// 如果超过10次错误，锁定用户1小时，联系管理员解锁 TODO
+	captchaStore.AddCount(key) // 验证码次数+1
 	response.Fail(nil, "验证码错误", c)
 }

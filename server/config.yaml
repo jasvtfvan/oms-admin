@@ -2,10 +2,12 @@ captcha:
     key-long: 6
     img-width: 240
     img-height: 80
-    # 0代表一直开启，大于0代表几次之后开启
+    # 0代表直接开启，大于0代表登录失败几次之后开启
     open-captcha: 3
     # open-captcha大于0时才生效
     open-captcha-timeout: 3600
+    # 最多登录失败几次后就锁定open-captcha-timeout秒的时长
+    open-captcha-max: 10
 cors:
     mode: strict-whitelist
     whitelist:

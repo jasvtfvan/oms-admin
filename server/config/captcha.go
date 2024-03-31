@@ -6,4 +6,5 @@ type Captcha struct {
 	ImgHeight          int `mapstructure:"img-height" json:"img-height" yaml:"img-height"`                               // 验证码高度
 	OpenCaptcha        int `mapstructure:"open-captcha" json:"open-captcha" yaml:"open-captcha"`                         // 防爆破验证码开启次数，0代表每次登录都需要验证码，其他数字代表错误密码次数，如3代表错误三次后出现验证码
 	OpenCaptchaTimeout int `mapstructure:"open-captcha-timeout" json:"open-captcha-timeout" yaml:"open-captcha-timeout"` // 防爆破验证码超时时间，单位：s(秒)，超过这个时间，恢复直接登录
+	OpenCaptchaMax     int `mapstructure:"open-captcha-max" json:"open-captcha-max" yaml:"open-captcha-max"`             // 最多登录失败次数，锁定错误ip时长OpenCaptchaTimeout秒
 }
