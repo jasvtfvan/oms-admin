@@ -93,10 +93,9 @@ func (u *UserApi) DeleteUser(c *gin.Context) {
 func (u *UserApi) Captcha(c *gin.Context) {
 	key := c.ClientIP()                                                       // 使用ip当验证码的key
 	openCaptchaBuildCountMax := global.OMS_CONFIG.Captcha.OpenCaptchaBuildMax // 验证码次数最多可以生成多少次，超过后锁定timeout时长
-	buildCountCount := captchaBuildCountStore.UseWithCtx(c).GetCount(key)     // 验证码次数
-	if buildCountCount == 0 {
-		captchaBuildCountStore.InitCount(key) // 初始化次数1
-	}
+	captchaBuildCountStore = captchaBuildCountStore.UseWithCtx(c)
+	captchaBuildCountStore.InitCount(key)
+	buildCountCount := captchaBuildCountStore.GetCount(key) // 验证码次数
 
 	if buildCountCount > openCaptchaBuildCountMax {
 		captchaBuildCountStore.AddCount(key) // 生成验证码次数+1
@@ -104,12 +103,11 @@ func (u *UserApi) Captcha(c *gin.Context) {
 		return
 	}
 
-	openCaptcha := global.OMS_CONFIG.Captcha.OpenCaptcha        // 防爆次数
-	count := captchaLoginCountStore.UseWithCtx(c).GetCount(key) // 验证码次数
-	if count == 0 {
-		captchaLoginCountStore.InitCount(key) // 初始化次数1
-	}
-	var isOpen bool // 为0直接开启防爆 或者 如果超过防爆次数，则开启防爆
+	openCaptcha := global.OMS_CONFIG.Captcha.OpenCaptcha // 防爆次数
+	captchaLoginCountStore = captchaLoginCountStore.UseWithCtx(c)
+	captchaLoginCountStore.InitCount(key)
+	count := captchaLoginCountStore.GetCount(key) // 验证码次数
+	var isOpen bool                               // 为0直接开启防爆 或者 如果超过防爆次数，则开启防爆
 	if openCaptcha == 0 || count > openCaptcha {
 		isOpen = true
 	}
@@ -137,13 +135,12 @@ func (u *UserApi) Captcha(c *gin.Context) {
 }
 
 func (u *UserApi) Login(c *gin.Context) {
-	key := c.ClientIP()                                         // 使用ip当验证码的key
-	openCaptcha := global.OMS_CONFIG.Captcha.OpenCaptcha        // 防爆次数
-	openCaptchaMax := global.OMS_CONFIG.Captcha.OpenCaptchaMax  // 最大次数，超过后锁定timeout时长
-	count := captchaLoginCountStore.UseWithCtx(c).GetCount(key) // 验证码次数
-	if count == 0 {
-		captchaLoginCountStore.InitCount(key) // 初始化次数1
-	}
+	key := c.ClientIP()                                        // 使用ip当验证码的key
+	openCaptcha := global.OMS_CONFIG.Captcha.OpenCaptcha       // 防爆次数
+	openCaptchaMax := global.OMS_CONFIG.Captcha.OpenCaptchaMax // 最大次数，超过后锁定timeout时长
+	captchaLoginCountStore = captchaLoginCountStore.UseWithCtx(c)
+	captchaLoginCountStore.InitCount(key)
+	count := captchaLoginCountStore.GetCount(key) // 验证码次数
 
 	if count > openCaptchaMax {
 		captchaLoginCountStore.AddCount(key) // 验证码次数+1
