@@ -10,6 +10,7 @@ import (
 	sysReq "github.com/jasvtfvan/oms-admin/server/model/system/request"
 	sysRes "github.com/jasvtfvan/oms-admin/server/model/system/response"
 	"github.com/jasvtfvan/oms-admin/server/utils"
+	"github.com/jasvtfvan/oms-admin/server/utils/crypto"
 	"github.com/jasvtfvan/oms-admin/server/utils/redis/captcha"
 	"github.com/mojocn/base64Captcha"
 	"go.uber.org/zap"
@@ -162,8 +163,9 @@ func (u *UserApi) Login(c *gin.Context) {
 		return
 	}
 
+	decrypted := crypto.RsaDecrypt(req.Secret)
 	var userCreds sysReq.UserCredentials
-	err = json.Unmarshal([]byte(req.Secret), &userCreds)
+	err = json.Unmarshal([]byte(decrypted), &userCreds)
 	if err != nil {
 		captchaLoginCountStore.AddCount(key) // 验证码次数+1
 		response.Fail(nil, "参数格式错误: "+err.Error(), c)

@@ -3,11 +3,14 @@ package internal
 import (
 	"crypto/rand"
 	"crypto/rsa"
+	"crypto/sha256"
 	"crypto/x509"
 	"encoding/pem"
 	"errors"
 	"fmt"
 )
+
+var label = []byte("oms")
 
 // 加密
 func RsaEncrypt(origData []byte, publicKey []byte) ([]byte, error) {
@@ -23,13 +26,18 @@ func RsaEncrypt(origData []byte, publicKey []byte) ([]byte, error) {
 	}
 	// 类型断言
 	pub := pubInterface.(*rsa.PublicKey)
-	//加密
-	return rsa.EncryptPKCS1v15(rand.Reader, pub, origData)
+
+	// 使用OAEP进行加密
+	encrypted, err := rsa.EncryptOAEP(sha256.New(), rand.Reader, pub, origData, label)
+	if err != nil {
+		return nil, err
+	}
+	return encrypted, nil
 }
 
 // 解密
 func RsaDecrypt(cipherText []byte, privateKey []byte) ([]byte, error) {
-	//解密
+	//解密pem格式的私钥
 	block, _ := pem.Decode(privateKey)
 	if block == nil {
 		return nil, errors.New("private key error")
@@ -39,8 +47,12 @@ func RsaDecrypt(cipherText []byte, privateKey []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	// 解密
-	return rsa.DecryptPKCS1v15(rand.Reader, priv, cipherText)
+
+	decrypted, err := rsa.DecryptOAEP(sha256.New(), rand.Reader, priv, cipherText, label)
+	if err != nil {
+		return nil, err
+	}
+	return decrypted, nil
 }
 
 // 生成密钥对
@@ -48,7 +60,7 @@ func GetRsaKeyPair() (string, string, error) {
 	var privateKeyResult string
 	var publicKeyResult string
 
-	// 生成RSA密钥对
+	// 生成RSA私钥
 	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		errStr := fmt.Sprintf("私钥生成失败: %s", err.Error())

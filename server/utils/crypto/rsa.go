@@ -1,6 +1,10 @@
 package crypto
 
-import "github.com/jasvtfvan/oms-admin/server/utils/crypto/internal"
+import (
+	"encoding/base64"
+
+	"github.com/jasvtfvan/oms-admin/server/utils/crypto/internal"
+)
 
 var privateKey = []byte(`
 -----BEGIN RSA PRIVATE KEY-----
@@ -51,10 +55,11 @@ func GenerateKeyPair() (string, string, error) {
 
 func RsaEncrypt(orig string) string {
 	enBytes, _ := internal.RsaEncrypt([]byte(orig), publicKey)
-	return string(enBytes)
+	return base64.StdEncoding.EncodeToString(enBytes)
 }
 
 func RsaDecrypt(encrypted string) string {
-	deBytes, _ := internal.RsaDecrypt([]byte(encrypted), privateKey)
+	enBytes, _ := base64.StdEncoding.DecodeString(encrypted)
+	deBytes, _ := internal.RsaDecrypt(enBytes, privateKey)
 	return string(deBytes)
 }
