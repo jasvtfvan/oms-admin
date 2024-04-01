@@ -49,7 +49,7 @@ func JWTAuth() gin.HandlerFunc {
 		username := claims.Username
 		var cacheToken string = jwtStore.Get(username, false)
 		if token != cacheToken {
-			response.Fail(gin.H{"reload": true}, "其他客户端登录，令牌失效", ctx)
+			response.Fail(gin.H{"reload": true}, "其他客户端登录，令牌已失效", ctx)
 			ctx.Abort()
 			return
 		}

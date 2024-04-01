@@ -95,10 +95,12 @@ func (u *UserApi) Captcha(c *gin.Context) {
 	key := c.ClientIP()                                                       // 使用ip当验证码的key
 	openCaptchaBuildCountMax := global.OMS_CONFIG.Captcha.OpenCaptchaBuildMax // 验证码次数最多可以生成多少次，超过后锁定timeout时长
 	captchaBuildCountStore = captchaBuildCountStore.UseWithCtx(c)
-	captchaBuildCountStore.InitCount(key)
 	buildCountCount := captchaBuildCountStore.GetCount(key) // 验证码次数
+	if buildCountCount <= 0 {
+		captchaBuildCountStore.InitCount(key)
+	}
 
-	if buildCountCount > openCaptchaBuildCountMax {
+	if buildCountCount >= openCaptchaBuildCountMax {
 		captchaBuildCountStore.AddCount(key) // 生成验证码次数+1
 		response.Fail(nil, "操作太频繁，过一阵再来尝试。也可以联系管理员", c)
 		return
@@ -106,10 +108,13 @@ func (u *UserApi) Captcha(c *gin.Context) {
 
 	openCaptcha := global.OMS_CONFIG.Captcha.OpenCaptcha // 防爆次数
 	captchaLoginCountStore = captchaLoginCountStore.UseWithCtx(c)
-	captchaLoginCountStore.InitCount(key)
 	count := captchaLoginCountStore.GetCount(key) // 验证码次数
-	var isOpen bool                               // 为0直接开启防爆 或者 如果超过防爆次数，则开启防爆
-	if openCaptcha == 0 || count > openCaptcha {
+	if count <= 0 {
+		captchaLoginCountStore.InitCount(key)
+	}
+	var isOpen bool // 为0直接开启防爆 或者 如果超过防爆次数，则开启防爆
+	// 如果当前是第4次，count上次计算为3，这次需要>=
+	if openCaptcha == 0 || count >= openCaptcha {
 		isOpen = true
 	}
 
@@ -140,10 +145,12 @@ func (u *UserApi) Login(c *gin.Context) {
 	openCaptcha := global.OMS_CONFIG.Captcha.OpenCaptcha       // 防爆次数
 	openCaptchaMax := global.OMS_CONFIG.Captcha.OpenCaptchaMax // 最大次数，超过后锁定timeout时长
 	captchaLoginCountStore = captchaLoginCountStore.UseWithCtx(c)
-	captchaLoginCountStore.InitCount(key)
 	count := captchaLoginCountStore.GetCount(key) // 验证码次数
+	if count <= 0 {
+		captchaLoginCountStore.InitCount(key)
+	}
 
-	if count > openCaptchaMax {
+	if count >= openCaptchaMax { // 超过最大次数，锁定
 		captchaLoginCountStore.AddCount(key) // 验证码次数+1
 		response.Fail(nil, "错误太过频繁，过一阵再来尝试。也可以联系管理员", c)
 		return
@@ -179,7 +186,8 @@ func (u *UserApi) Login(c *gin.Context) {
 	}
 
 	var isOpen bool // 为0直接开启防爆 或者 如果超过防爆次数，则开启防爆
-	if openCaptcha == 0 || count > openCaptcha {
+	// 如果当前是第4次，count上次计算为3，这次需要>=
+	if openCaptcha == 0 || count >= openCaptcha {
 		isOpen = true
 	}
 
