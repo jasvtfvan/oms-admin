@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	sysDao "github.com/jasvtfvan/oms-admin/server/dao/system"
+	"github.com/jasvtfvan/oms-admin/server/global"
 	sysModel "github.com/jasvtfvan/oms-admin/server/model/system"
 	"github.com/jasvtfvan/oms-admin/server/utils"
 	"github.com/jasvtfvan/oms-admin/server/utils/crypto"
@@ -11,6 +12,7 @@ import (
 
 type UserService interface {
 	Login(username string, password string) (*sysModel.SysUser, error)
+	FindUser(uint) (*sysModel.SysUser, error)
 	DeleteUser(uint) error
 	DisableUser(uint) error
 	EnableUser(uint) error
@@ -19,13 +21,17 @@ type UserService interface {
 
 type UserServiceImpl struct{}
 
+func (*UserServiceImpl) FindUser(id uint) (*sysModel.SysUser, error) {
+	return sysDao.FindUserById(id)
+}
+
 func (*UserServiceImpl) ResetPassword(id uint, newPassword string) (string, error) {
 	sysUser, err := sysDao.FindUserById(id)
 	if err != nil {
 		return "", err
 	}
 	if sysUser == nil {
-		return "", errors.New("没有对应用户数据")
+		return "", errors.New("没有查到该用户")
 	}
 	if newPassword == "" {
 		// 默认密码举例：zhangsan123456
@@ -37,7 +43,7 @@ func (*UserServiceImpl) ResetPassword(id uint, newPassword string) (string, erro
 		return "", err
 	}
 	if row != 0 {
-		return "", errors.New("没有对应数据")
+		return "", errors.New("数据未响应")
 	}
 	encryptedPassword := crypto.AesEncrypt(newPassword)
 	// 删除jwt缓存
@@ -49,19 +55,23 @@ func (*UserServiceImpl) ResetPassword(id uint, newPassword string) (string, erro
 }
 
 func (*UserServiceImpl) EnableUser(id uint) error {
-	row, err := sysDao.EnableUser(id)
-	if err != nil {
-		return err
-	}
-	if row != 0 {
-		return errors.New("没有对应数据")
-	}
 	sysUser, err := sysDao.FindUserById(id)
 	if err != nil {
 		return err
 	}
 	if sysUser == nil {
-		return errors.New("没有对应用户数据")
+		return errors.New("没有查到该用户")
+	}
+	if global.OMS_CONFIG.System.Username == sysUser.Username {
+		return errors.New("不能对系统管理员进行操作")
+	}
+
+	row, err := sysDao.EnableUser(id)
+	if err != nil {
+		return err
+	}
+	if row == 0 {
+		return errors.New("数据未响应")
 	}
 	err = jwtStore.Del(sysUser.Username)
 	if err != nil {
@@ -71,19 +81,23 @@ func (*UserServiceImpl) EnableUser(id uint) error {
 }
 
 func (*UserServiceImpl) DisableUser(id uint) error {
-	row, err := sysDao.DisableUser(id)
-	if err != nil {
-		return err
-	}
-	if row != 0 {
-		return errors.New("没有对应数据")
-	}
 	sysUser, err := sysDao.FindUserById(id)
 	if err != nil {
 		return err
 	}
 	if sysUser == nil {
-		return errors.New("没有对应用户数据")
+		return errors.New("没有查到该用户")
+	}
+	if global.OMS_CONFIG.System.Username == sysUser.Username {
+		return errors.New("不能对系统管理员进行操作")
+	}
+
+	row, err := sysDao.DisableUser(id)
+	if err != nil {
+		return err
+	}
+	if row == 0 {
+		return errors.New("数据未响应")
 	}
 	err = jwtStore.Del(sysUser.Username)
 	if err != nil {
@@ -93,19 +107,23 @@ func (*UserServiceImpl) DisableUser(id uint) error {
 }
 
 func (*UserServiceImpl) DeleteUser(id uint) error {
-	row, err := sysDao.DeleteUser(id)
-	if err != nil {
-		return err
-	}
-	if row != 0 {
-		return errors.New("没有对应数据")
-	}
 	sysUser, err := sysDao.FindUserById(id)
 	if err != nil {
 		return err
 	}
 	if sysUser == nil {
-		return errors.New("没有对应用户数据")
+		return errors.New("没有查到该用户")
+	}
+	if global.OMS_CONFIG.System.Username == sysUser.Username {
+		return errors.New("不能对系统管理员进行操作")
+	}
+
+	row, err := sysDao.DeleteUser(id)
+	if err != nil {
+		return err
+	}
+	if row == 0 {
+		return errors.New("数据未响应")
 	}
 	err = jwtStore.Del(sysUser.Username)
 	if err != nil {

@@ -47,7 +47,7 @@ func DeleteUser(id uint) (int64, error) {
 func FindUserById(id uint) (*system.SysUser, error) {
 	var user system.SysUser
 	db := global.OMS_DB
-	err := db.First(&user, 10).Error
+	err := db.First(&user, id).Error
 	return &user, err
 }
 
