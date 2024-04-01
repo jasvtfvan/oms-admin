@@ -3,11 +3,12 @@ package initialize
 import (
 	"errors"
 
+	"github.com/coocood/freecache"
 	"github.com/jasvtfvan/oms-admin/server/global"
 	"github.com/jasvtfvan/oms-admin/server/utils"
 )
 
-func VerifyInit() {
+func BaseInit() {
 	_, err := utils.ParseDuration(global.OMS_CONFIG.JWT.ExpiresTime)
 	if err != nil {
 		panic(err)
@@ -24,4 +25,8 @@ func VerifyInit() {
 	if rootPassword == "" {
 		panic(errors.New("系统管理员密码不能为空"))
 	}
+
+	// size单位为Byte(1Byte=8bit)，最小要求为512KB
+	var sizeDefault = 100 * 1024 * 1024 // 100M
+	global.OMS_FREECACHE = freecache.NewCache(sizeDefault)
 }

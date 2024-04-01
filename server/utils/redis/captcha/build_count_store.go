@@ -16,8 +16,7 @@ type BuildCountStore struct {
 }
 
 func (rs *BuildCountStore) InitCount(key string) {
-	timeout := global.OMS_CONFIG.Captcha.OpenCaptchaTimeout
-	err := global.OMS_REDIS.Set(rs.Context, (rs.PreKey + key), 0, time.Second*time.Duration(timeout)).Err()
+	err := global.OMS_REDIS.Set(rs.Context, (rs.PreKey + key), 0, rs.Expiration).Err()
 	if err != nil {
 		global.OMS_LOG.Error("Captcha BuildCountStore InitCount Error:", zap.Error(err))
 	}
@@ -38,8 +37,7 @@ func (rs *BuildCountStore) AddCount(key string) {
 	if err == nil && val != 0 {
 		value += val
 	}
-	timeout := global.OMS_CONFIG.Captcha.OpenCaptchaTimeout
-	err = global.OMS_REDIS.Set(rs.Context, (rs.PreKey + key), value, time.Second*time.Duration(timeout)).Err()
+	err = global.OMS_REDIS.Set(rs.Context, (rs.PreKey + key), value, rs.Expiration).Err()
 	if err != nil {
 		global.OMS_LOG.Error("Captcha BuildCountStore AddCount Error:", zap.Error(err))
 	}
@@ -67,8 +65,9 @@ var buildCountOnce sync.Once
 func GetBuildCountStore() *BuildCountStore {
 	if buildCountCountStore == nil {
 		buildCountOnce.Do(func() {
+			timeout := global.OMS_CONFIG.Captcha.OpenCaptchaTimeout
 			buildCountCountStore = &BuildCountStore{
-				Expiration: time.Minute * 3,
+				Expiration: time.Second * time.Duration(timeout),
 				PreKey:     "CAPTCHA_BUILD_COUNT_",
 				Context:    context.TODO(),
 			}

@@ -15,7 +15,7 @@ import (
 //go:generate go mod tidy
 
 // @title                       Gin-Vue-Admin Swagger API接口文档
-// @version                     v0.0.3
+// @version                     参考config.yaml
 // @description                 使用gin+vue进行极速开发的全栈开发基础平台
 // @securityDefinitions.apikey  ApiKeyAuth
 // @in                          header
@@ -24,7 +24,7 @@ import (
 func main() {
 	core.WritePIDToFile()              // vscode debug模式下，将pid写入txt文件，停止时可以根据pid进行kill操作
 	global.OMS_VP = core.Viper()       // 加载配置文件
-	initialize.VerifyInit()            // 验证基础信息
+	initialize.BaseInit()              // 验证基础信息
 	global.OMS_LOG = core.Zap()        // 初始化zap日志库
 	zap.ReplaceGlobals(global.OMS_LOG) // 使用全局log
 	global.OMS_DB = initialize.Gorm()  // gorm连接数据库 [导入initialize包，register_init执行]

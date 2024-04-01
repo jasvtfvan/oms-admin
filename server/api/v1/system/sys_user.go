@@ -145,7 +145,7 @@ func (u *UserApi) Login(c *gin.Context) {
 
 	if count > openCaptchaMax {
 		captchaLoginCountStore.AddCount(key) // 验证码次数+1
-		response.Fail(nil, "错误太多频繁，过一阵再来尝试。也可以联系管理员", c)
+		response.Fail(nil, "错误太过频繁，过一阵再来尝试。也可以联系管理员", c)
 		return
 	}
 

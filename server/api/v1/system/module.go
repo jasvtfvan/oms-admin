@@ -6,6 +6,7 @@ type ApiGroup struct {
 	DbApi
 	UserApi
 	CasbinApi
+	CacheApi
 }
 
 var (

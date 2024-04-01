@@ -8,6 +8,7 @@ import (
 
 	"github.com/jasvtfvan/oms-admin/server/global"
 	"github.com/jasvtfvan/oms-admin/server/model/system"
+	"github.com/jasvtfvan/oms-admin/server/utils/freecache"
 	"gorm.io/gorm"
 )
 
@@ -85,7 +86,13 @@ type InitDBService interface {
 type InitDBServiceImpl struct{}
 
 // 检查数据连接
-func (*InitDBServiceImpl) CheckDB() (err error) {
+func (*InitDBServiceImpl) CheckDB() error {
+	var readyStruct freecache.Bool
+	isReady := cacheStore.Get("DBReady", readyStruct)
+	if cacheStore.Verify("DBReady", true, isReady) {
+		return nil
+	}
+
 	if global.OMS_DB == nil {
 		return errors.New("DB为空，数据库未创建")
 	} else {
@@ -99,7 +106,9 @@ func (*InitDBServiceImpl) CheckDB() (err error) {
 			return errors.New("表数据尚未插入")
 		}
 	}
-	return err
+
+	cacheStore.Set("DBReady", true)
+	return nil
 }
 
 // 已经初始化，重启服务后，清除 initializers

@@ -16,8 +16,7 @@ type LoginCountStore struct {
 }
 
 func (rs *LoginCountStore) InitCount(key string) {
-	timeout := global.OMS_CONFIG.Captcha.OpenCaptchaTimeout
-	err := global.OMS_REDIS.Set(rs.Context, (rs.PreKey + key), 0, time.Second*time.Duration(timeout)).Err()
+	err := global.OMS_REDIS.Set(rs.Context, (rs.PreKey + key), 0, rs.Expiration).Err()
 	if err != nil {
 		global.OMS_LOG.Error("Captcha LoginCountStore InitCount Error:", zap.Error(err))
 	}
@@ -38,8 +37,7 @@ func (rs *LoginCountStore) AddCount(key string) {
 	if err == nil && val != 0 {
 		value += val
 	}
-	timeout := global.OMS_CONFIG.Captcha.OpenCaptchaTimeout
-	err = global.OMS_REDIS.Set(rs.Context, (rs.PreKey + key), value, time.Second*time.Duration(timeout)).Err()
+	err = global.OMS_REDIS.Set(rs.Context, (rs.PreKey + key), value, rs.Expiration).Err()
 	if err != nil {
 		global.OMS_LOG.Error("Captcha LoginCountStore AddCount Error:", zap.Error(err))
 	}
@@ -67,8 +65,9 @@ var loginOnce sync.Once
 func GetLoginCountStore() *LoginCountStore {
 	if loginCountStore == nil {
 		loginOnce.Do(func() {
+			timeout := global.OMS_CONFIG.Captcha.OpenCaptchaTimeout
 			loginCountStore = &LoginCountStore{
-				Expiration: time.Minute * 3,
+				Expiration: time.Second * time.Duration(timeout),
 				PreKey:     "CAPTCHA_LOGIN_COUNT_",
 				Context:    context.TODO(),
 			}

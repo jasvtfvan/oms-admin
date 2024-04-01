@@ -41,7 +41,7 @@ func (*DbApi) InitDB(c *gin.Context) {
 func (*DbApi) CheckUpdate(c *gin.Context) {
 	rootUsername := global.OMS_CONFIG.System.Username
 	v := c.Value("claims")
-	if claims, ok := v.(utils.CustomClaims); ok {
+	if claims, ok := v.(*utils.CustomClaims); ok {
 		if claims.Username != rootUsername {
 			response.Fail(gin.H{"updated": false}, "系统超级管理员才有权限", c)
 			return
@@ -59,7 +59,7 @@ func (*DbApi) CheckUpdate(c *gin.Context) {
 func (*DbApi) UpdateDB(c *gin.Context) {
 	rootUsername := global.OMS_CONFIG.System.Username
 	v := c.Value("claims")
-	if claims, ok := v.(utils.CustomClaims); ok {
+	if claims, ok := v.(*utils.CustomClaims); ok {
 		if claims.Username != rootUsername {
 			response.Fail(nil, "系统超级管理员才有权限", c)
 			return

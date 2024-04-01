@@ -11,7 +11,7 @@ func CasbinHandler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		rootUsername := global.OMS_CONFIG.System.Username
 		v := ctx.Value("claims")
-		if claims, ok := v.(utils.CustomClaims); ok {
+		if claims, ok := v.(*utils.CustomClaims); ok {
 			if claims.Username == rootUsername { // 超级管理员，所有接口都可以访问
 				ctx.Next()
 			} else {
