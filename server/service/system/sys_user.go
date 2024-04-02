@@ -12,11 +12,11 @@ import (
 
 type UserService interface {
 	Login(username string, password string) (*sysModel.SysUser, error)
-	FindUser(uint) (*sysModel.SysUser, error)
 	DeleteUser(uint) error
 	DisableUser(uint) error
 	EnableUser(uint) error
 	ResetPassword(uint, string) (string, error)
+	FindUser(uint) (*sysModel.SysUser, error)
 }
 
 type UserServiceImpl struct{}

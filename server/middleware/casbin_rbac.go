@@ -30,11 +30,5 @@ func handler(ctx *gin.Context) {
 	// 1、接口属于casbin-api列表
 	// 2、角色list中具有满足casbin的api权限
 	// 3、角色list中具有所在群组的权限（或当前群组向上能追溯到list中的角色）
-	group := ctx.Request.Header.Get("x-group")
-	if group == "" {
-		response.Fail(nil, "组织编号不能为空", ctx)
-		ctx.Abort()
-		return
-	}
 	ctx.Next()
 }

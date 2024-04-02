@@ -15,4 +15,5 @@ var (
 	userService      = service.ServiceGroupApp.System.UserService
 	jwtService       = service.ServiceGroupApp.System.JWTService
 	casbinApiService = service.ServiceGroupApp.System.CasbinApiService
+	groupService     = service.ServiceGroupApp.System.GroupService
 )

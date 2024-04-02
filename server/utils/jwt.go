@@ -24,8 +24,15 @@ type CustomClaims struct {
 }
 
 type BaseClaims struct {
-	ID       uint
-	Username string
+	ID           uint
+	Username     string
+	LogOperation bool
+	Groups       []GroupClaims
+}
+
+type GroupClaims struct {
+	OrgCode   string
+	ShortName string
 }
 
 type JWT struct {

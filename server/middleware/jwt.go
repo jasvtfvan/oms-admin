@@ -26,6 +26,12 @@ func JWTAuth() gin.HandlerFunc {
 			ctx.Abort()
 			return
 		}
+		orgCode := ctx.Request.Header.Get("x-group")
+		if orgCode == "" {
+			response.Fail(gin.H{"reload": true}, "组织编号不能为空", ctx)
+			ctx.Abort()
+			return
+		}
 		/*
 			2.验证令牌
 		*/

@@ -212,6 +212,13 @@ func (u *UserApi) Login(c *gin.Context) {
 			response.Fail(nil, "用户被禁用", c)
 			return
 		}
+		user.SysGroups, err = groupService.FindGroupsByUserID(user.ID)
+		if err != nil {
+			global.OMS_LOG.Error("登录失败，用户组织查询失败", zap.Error(err))
+			captchaLoginCountStore.AddCount(key) // 验证码次数+1
+			response.Fail(nil, "用户组织查询失败", c)
+			return
+		}
 		// 登录成功，清除验证码次数，创建token，返回正确信息
 		token, err := jwtService.GenerateToken(user)
 		if err != nil {

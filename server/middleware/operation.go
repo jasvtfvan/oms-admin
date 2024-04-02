@@ -33,10 +33,9 @@ func init() {
 
 func OperationRecord() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		rootUsername := global.OMS_CONFIG.System.Username
 		v := ctx.Value("claims")
 		if claims, ok := v.(*utils.CustomClaims); ok {
-			if claims.Username == rootUsername { // 目前只记录超级管理员操作
+			if claims.LogOperation {
 				userId := int(claims.BaseClaims.ID)
 				handleOperationRecord(ctx, userId)
 			} else {

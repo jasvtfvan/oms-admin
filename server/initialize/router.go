@@ -99,14 +99,14 @@ func Routers(logger *zap.Logger) *gin.Engine {
 
 	// 注册路由-鉴权
 	privateGroup := r.Group(global.OMS_CONFIG.System.RouterPrefix)
-	privateGroup.Use(middleware.JWTAuth())
+	privateGroup.Use(middleware.JWTAuth()).Use(middleware.OperationRecord())
 	{
 		router.InitPrivateRouter(privateGroup)
 	}
 
 	// 注册路由-鉴权-casbin接口权限
 	casbinGroup := r.Group(global.OMS_CONFIG.System.RouterPrefix)
-	casbinGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler())
+	casbinGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.OperationRecord())
 	{
 		router.InitCasbinRouter(casbinGroup)
 	}

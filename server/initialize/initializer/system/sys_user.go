@@ -31,13 +31,14 @@ func (i *initSysUser) InitializeData(ctx context.Context) (next context.Context,
 	password := utils.BcryptHash(rootPassword)
 	slices := []systemModel.SysUser{
 		{
-			Username: rootUsername,
-			Password: password,
-			NickName: "超级管理员",
-			Avatar:   "",
-			Phone:    "",
-			Email:    "",
-			Enable:   true,
+			Username:     rootUsername,
+			Password:     password,
+			NickName:     "超级管理员",
+			Avatar:       "",
+			Phone:        "",
+			Email:        "",
+			Enable:       true,
+			LogOperation: true,
 		},
 	}
 	if err = db.Create(&slices).Error; err != nil {

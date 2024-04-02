@@ -56,15 +56,16 @@ version: "v0.0.1"
 4. /initialize/migrate/tables.go 没经过initializer/updater的，需初始化/更新的空表
 
 #### RBAC模型说明
-1. group为树结构设计，根group只有一个，其他公司/集团属于根的下级
+1. group为树结构设计，根group只有一个，其他公司/集团属于根的下级，所有业务数据根据group隔离
 2. role设计比较特殊，依赖group存在，不能单独存在，一个group下可以创建多个role
 3. user与group是多对多关系，user与role是多对多关系，user跟group关联决定当前组织，可以在多个group间来回切换，但不能同时操作多个group，而具体权限要根据role去匹配
 ```golang
 [relationship]              [description]
-group   1<-->n  group       tree
+group   1<-->n  group       tree结构
 group   1<-->n  role        role属于group
 user    n<-->n  group       user可以为多个group工作
 user    n<-->n  role        user切换到指定group通过role确定权限
+group   1<-->n  business    user切换到指定group，每条业务数据隶属于group
 ```
 
 #### docker-redis启动

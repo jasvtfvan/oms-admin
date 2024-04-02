@@ -9,6 +9,7 @@ type ServiceGroup struct {
 	JWTService
 	CasbinApiService
 	OperationRecordService
+	GroupService
 }
 
 func NewServiceGroup() *ServiceGroup {
@@ -17,6 +18,7 @@ func NewServiceGroup() *ServiceGroup {
 		JWTService:             new(JWTServiceImpl),
 		CasbinApiService:       new(CasbinApiServiceImpl),
 		OperationRecordService: new(OperationRecordServiceImpl),
+		GroupService:           new(GroupServiceImpl),
 	}
 	return group
 }
