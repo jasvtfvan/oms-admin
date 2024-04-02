@@ -12,10 +12,10 @@ import (
 
 type UserService interface {
 	Login(username string, password string) (*sysModel.SysUser, error)
-	DeleteUser(uint) error
-	DisableUser(uint) error
-	EnableUser(uint) error
-	ResetPassword(uint, string) (string, error)
+	DeleteUser(uint) (string, error)
+	DisableUser(uint) (string, error)
+	EnableUser(uint) (string, error)
+	ResetPassword(uint, string) (string, string, error)
 	FindUser(uint) (*sysModel.SysUser, error)
 }
 
@@ -25,13 +25,13 @@ func (*UserServiceImpl) FindUser(id uint) (*sysModel.SysUser, error) {
 	return sysDao.FindUserById(id)
 }
 
-func (*UserServiceImpl) ResetPassword(id uint, newPassword string) (string, error) {
+func (*UserServiceImpl) ResetPassword(id uint, newPassword string) (string, string, error) {
 	sysUser, err := sysDao.FindUserById(id)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 	if sysUser == nil {
-		return "", errors.New("没有查到该用户")
+		return "", "", errors.New("没有查到该用户")
 	}
 	if newPassword == "" {
 		// 默认密码举例：zhangsan123456
@@ -40,96 +40,79 @@ func (*UserServiceImpl) ResetPassword(id uint, newPassword string) (string, erro
 	password := utils.BcryptHash(newPassword)
 	row, err := sysDao.UpdatePassword(id, password)
 	if err != nil {
-		return "", err
+		return "", sysUser.Username, err
 	}
 	if row != 0 {
-		return "", errors.New("数据未响应")
+		return "", sysUser.Username, errors.New("数据未响应")
 	}
 	encryptedPassword := crypto.AesEncrypt(newPassword)
-	// 删除jwt缓存
-	err = jwtStore.Del(sysUser.Username)
-	if err != nil {
-		return encryptedPassword, err
-	}
-	return encryptedPassword, nil
+	return encryptedPassword, sysUser.Username, nil
 }
 
-func (*UserServiceImpl) EnableUser(id uint) error {
+func (*UserServiceImpl) EnableUser(id uint) (string, error) {
 	sysUser, err := sysDao.FindUserById(id)
 	if err != nil {
-		return err
+		return "", err
 	}
 	if sysUser == nil {
-		return errors.New("没有查到该用户")
+		return "", errors.New("没有查到该用户")
 	}
 	if global.OMS_CONFIG.System.Username == sysUser.Username {
-		return errors.New("不能对系统管理员进行操作")
+		return sysUser.Username, errors.New("不能对系统管理员进行操作")
 	}
 
 	row, err := sysDao.EnableUser(id)
 	if err != nil {
-		return err
+		return sysUser.Username, err
 	}
 	if row == 0 {
-		return errors.New("数据未响应")
+		return sysUser.Username, errors.New("数据未响应")
 	}
-	err = jwtStore.Del(sysUser.Username)
-	if err != nil {
-		return err
-	}
-	return nil
+	return sysUser.Username, nil
 }
 
-func (*UserServiceImpl) DisableUser(id uint) error {
+func (*UserServiceImpl) DisableUser(id uint) (string, error) {
 	sysUser, err := sysDao.FindUserById(id)
 	if err != nil {
-		return err
+		return "", err
 	}
 	if sysUser == nil {
-		return errors.New("没有查到该用户")
+		return "", errors.New("没有查到该用户")
 	}
 	if global.OMS_CONFIG.System.Username == sysUser.Username {
-		return errors.New("不能对系统管理员进行操作")
+		return sysUser.Username, errors.New("不能对系统管理员进行操作")
 	}
 
 	row, err := sysDao.DisableUser(id)
 	if err != nil {
-		return err
+		return sysUser.Username, err
 	}
 	if row == 0 {
-		return errors.New("数据未响应")
+		return sysUser.Username, errors.New("数据未响应")
 	}
-	err = jwtStore.Del(sysUser.Username)
-	if err != nil {
-		return err
-	}
-	return nil
+	return sysUser.Username, nil
 }
 
-func (*UserServiceImpl) DeleteUser(id uint) error {
+func (*UserServiceImpl) DeleteUser(id uint) (string, error) {
 	sysUser, err := sysDao.FindUserById(id)
 	if err != nil {
-		return err
+		return "", err
 	}
 	if sysUser == nil {
-		return errors.New("没有查到该用户")
+		return "", errors.New("没有查到该用户")
 	}
 	if global.OMS_CONFIG.System.Username == sysUser.Username {
-		return errors.New("不能对系统管理员进行操作")
+		return sysUser.Username, errors.New("不能对系统管理员进行操作")
 	}
 
 	row, err := sysDao.DeleteUser(id)
 	if err != nil {
-		return err
+		return sysUser.Username, err
 	}
 	if row == 0 {
-		return errors.New("数据未响应")
+		return sysUser.Username, errors.New("数据未响应")
 	}
-	err = jwtStore.Del(sysUser.Username)
-	if err != nil {
-		return err
-	}
-	return nil
+	return sysUser.Username, nil
 }
 
 func (*UserServiceImpl) Login(username string, password string) (*sysModel.SysUser, error) {

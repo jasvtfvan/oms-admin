@@ -65,9 +65,9 @@ var buildCountOnce sync.Once
 func GetBuildCountStore() *BuildCountStore {
 	if buildCountCountStore == nil {
 		buildCountOnce.Do(func() {
-			timeout := global.OMS_CONFIG.Captcha.OpenCaptchaTimeout
 			buildCountCountStore = &BuildCountStore{
-				Expiration: time.Second * time.Duration(timeout),
+				// 由于在api声明时调用方法，拿不到global，选择在此写死
+				Expiration: 1 * time.Hour,
 				PreKey:     "CAPTCHA_BUILD_COUNT_",
 				Context:    context.TODO(),
 			}

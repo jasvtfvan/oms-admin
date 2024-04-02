@@ -65,9 +65,9 @@ var loginOnce sync.Once
 func GetLoginCountStore() *LoginCountStore {
 	if loginCountStore == nil {
 		loginOnce.Do(func() {
-			timeout := global.OMS_CONFIG.Captcha.OpenCaptchaTimeout
 			loginCountStore = &LoginCountStore{
-				Expiration: time.Second * time.Duration(timeout),
+				// 由于在api声明时调用方法，拿不到global，选择在此写死
+				Expiration: 1 * time.Hour,
 				PreKey:     "CAPTCHA_LOGIN_COUNT_",
 				Context:    context.TODO(),
 			}

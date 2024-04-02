@@ -2,6 +2,7 @@ package system
 
 import (
 	"encoding/json"
+	"errors"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -34,11 +35,14 @@ func (u *UserApi) ResetPassword(c *gin.Context) {
 		return
 	}
 	newPassword := req.Password
-	encryptedPassword, err := userService.ResetPassword(uint(req.ID), newPassword)
+	encryptedPassword, username, err := userService.ResetPassword(uint(req.ID), newPassword)
 	if err != nil {
-		global.OMS_LOG.Error("重置用户密码失败id:"+strconv.Itoa(req.ID), zap.Error(err))
+		global.OMS_LOG.Error("重置用户密码失败:"+username, zap.Error(err))
 		response.Fail(gin.H{encryptedPassword: encryptedPassword}, "操作失败:"+err.Error(), c)
 		return
+	}
+	if err = jwtService.DelStore(username); err != nil {
+		global.OMS_LOG.Error("删除jwt缓存失败:"+username, zap.Error(err))
 	}
 	response.Success(gin.H{encryptedPassword: encryptedPassword}, "操作成功", c)
 }
@@ -50,9 +54,9 @@ func (u *UserApi) EnableUser(c *gin.Context) {
 		return
 	}
 	idInt, _ := strconv.Atoi(id)
-	err := userService.EnableUser(uint(idInt))
+	username, err := userService.EnableUser(uint(idInt))
 	if err != nil {
-		global.OMS_LOG.Error("启用用户失败id:"+id, zap.Error(err))
+		global.OMS_LOG.Error("启用用户失败:"+username, zap.Error(err))
 		response.Fail(nil, "操作失败:"+err.Error(), c)
 		return
 	}
@@ -66,11 +70,14 @@ func (u *UserApi) DisableUser(c *gin.Context) {
 		return
 	}
 	idInt, _ := strconv.Atoi(id)
-	err := userService.DisableUser(uint(idInt))
+	username, err := userService.DisableUser(uint(idInt))
 	if err != nil {
-		global.OMS_LOG.Error("禁用用户失败id:"+id, zap.Error(err))
+		global.OMS_LOG.Error("禁用用户失败:"+username, zap.Error(err))
 		response.Fail(nil, "操作失败:"+err.Error(), c)
 		return
+	}
+	if err = jwtService.DelStore(username); err != nil {
+		global.OMS_LOG.Error("删除jwt缓存失败:"+username, zap.Error(err))
 	}
 	response.Success(nil, "操作成功", c)
 }
@@ -82,11 +89,14 @@ func (u *UserApi) DeleteUser(c *gin.Context) {
 		return
 	}
 	idInt, _ := strconv.Atoi(id)
-	err := userService.DeleteUser(uint(idInt))
+	username, err := userService.DeleteUser(uint(idInt))
 	if err != nil {
-		global.OMS_LOG.Error("删除用户失败id:"+id, zap.Error(err))
+		global.OMS_LOG.Error("删除用户失败:"+username, zap.Error(err))
 		response.Fail(nil, "操作失败:"+err.Error(), c)
 		return
+	}
+	if err = jwtService.DelStore(username); err != nil {
+		global.OMS_LOG.Error("删除jwt缓存失败:"+username, zap.Error(err))
 	}
 	response.Success(nil, "操作成功", c)
 }
@@ -101,6 +111,7 @@ func (u *UserApi) Captcha(c *gin.Context) {
 	}
 
 	if buildCountCount >= openCaptchaBuildCountMax {
+		global.OMS_LOG.Error("获取验证码，太频繁", zap.Error(errors.New("ip: "+key)))
 		response.Fail(nil, "操作太频繁，过一阵再来尝试。", c)
 		return
 	}
@@ -150,6 +161,7 @@ func (u *UserApi) Login(c *gin.Context) {
 	}
 
 	if count >= openCaptchaMax { // 超过最大次数，锁定
+		global.OMS_LOG.Error("错误登录，太频繁", zap.Error(errors.New("ip: "+key)))
 		response.Fail(nil, "错误太过频繁，过一阵再来尝试。", c)
 		return
 	}

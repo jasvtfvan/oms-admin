@@ -12,10 +12,9 @@ import (
 	jwtRedis "github.com/jasvtfvan/oms-admin/server/utils/redis/jwt"
 )
 
-var jwtStore = jwtRedis.GetRedisStore()
-
 func JWTAuth() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		var jwtStore = jwtRedis.GetRedisStore() // 不能放在声明区，因为拿不到global
 		jwtStore = jwtStore.UseWithCtx(ctx)
 		/*
 			1.获取令牌

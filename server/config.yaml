@@ -4,12 +4,10 @@ captcha:
     img-height: 80
     # 0代表直接开启，3代表登录失败3次之后开启
     open-captcha: 3
-    # 登录失败10次后就锁定，锁定时长为open-captcha-timeout秒
+    # 登录失败10次后就锁定，锁定时长为1小时
     open-captcha-max: 10
-    # 最多生成20次，超过锁定open-captcha-timeout秒
+    # 最多生成20次，超过锁定1小时
     open-captcha-build-max: 20
-    # 缓存时长，登录次数，验证码获取次数，单位秒
-    open-captcha-timeout: 3600
 cors:
     mode: strict-whitelist
     whitelist:
