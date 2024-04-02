@@ -46,6 +46,9 @@ func (*DbApi) CheckUpdate(c *gin.Context) {
 			response.Fail(gin.H{"updated": false}, "系统超级管理员才有权限", c)
 			return
 		}
+	} else {
+		response.Fail(gin.H{"updated": false}, "解析令牌信息失败", c)
+		return
 	}
 	if err := updateDBService.CheckUpdate(); err != nil {
 		fmt.Println("[Golang] DB需要升级: " + err.Error())
@@ -64,6 +67,9 @@ func (*DbApi) UpdateDB(c *gin.Context) {
 			response.Fail(nil, "系统超级管理员才有权限", c)
 			return
 		}
+	} else {
+		response.Fail(gin.H{"updated": false}, "解析令牌信息失败", c)
+		return
 	}
 	if err := updateDBService.CheckUpdate(); err != nil {
 		fmt.Println("[Golang] DB需要升级: " + err.Error())

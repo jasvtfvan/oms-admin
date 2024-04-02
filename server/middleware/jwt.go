@@ -53,8 +53,10 @@ func JWTAuth() gin.HandlerFunc {
 			ctx.Abort()
 			return
 		}
+		ctx.Set("claims", claims)
+		ctx.Next()
 		/*
-			过期时间 - 现在时间 < 缓冲时间，就需要换token
+			4.换新token，过期时间 - 现在时间 < 缓冲时间，就需要换token
 		*/
 		if claims.ExpiresAt.Unix()-time.Now().Unix() < claims.BufferTime {
 			exp, _ := utils.ParseDuration(global.OMS_CONFIG.JWT.ExpiresTime)
@@ -63,7 +65,5 @@ func JWTAuth() gin.HandlerFunc {
 			ctx.Header("new-token", newToken)
 			jwtStore.Set(username, newToken)
 		}
-		ctx.Set("claims", claims)
-		ctx.Next()
 	}
 }

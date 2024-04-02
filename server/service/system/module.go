@@ -8,13 +8,15 @@ type ServiceGroup struct {
 	UserService
 	JWTService
 	CasbinApiService
+	OperationRecordService
 }
 
 func NewServiceGroup() *ServiceGroup {
 	group := &ServiceGroup{
-		UserService:      new(UserServiceImpl),
-		JWTService:       new(JWTServiceImpl),
-		CasbinApiService: new(CasbinApiServiceImpl),
+		UserService:            new(UserServiceImpl),
+		JWTService:             new(JWTServiceImpl),
+		CasbinApiService:       new(CasbinApiServiceImpl),
+		OperationRecordService: new(OperationRecordServiceImpl),
 	}
 	return group
 }
