@@ -6,6 +6,7 @@ import (
 	"github.com/jasvtfvan/oms-admin/server/core"
 	"github.com/jasvtfvan/oms-admin/server/global"
 	"github.com/jasvtfvan/oms-admin/server/initialize"
+	initCache "github.com/jasvtfvan/oms-admin/server/initialize/cache"
 	"github.com/jasvtfvan/oms-admin/server/utils"
 	"go.uber.org/zap"
 )
@@ -27,7 +28,11 @@ func main() {
 	initialize.BaseInit()              // 验证基础信息
 	global.OMS_LOG = core.Zap()        // 初始化zap日志库
 	zap.ReplaceGlobals(global.OMS_LOG) // 使用全局log
-	global.OMS_DB = initialize.Gorm()  // gorm连接数据库 [导入initialize包，register_init执行]
+
+	/*
+		连接gorm数据库
+	*/
+	global.OMS_DB = initialize.Gorm() // gorm连接数据库 [导入initialize包，register_init执行]
 	if global.OMS_DB != nil {
 		// 根据系统版本，决定是否AutoMigrate表结构 TODO
 		// 程序结束前关闭数据库链接
@@ -37,13 +42,23 @@ func main() {
 			db.Close()
 		}()
 	}
-	initialize.Redis() // 初始化redis服务
-	if global.OMS_REDIS != nil {
-		rdb := global.OMS_REDIS
+
+	/*
+		创建freecache本机缓存
+	*/
+	global.OMS_FREECACHE = initCache.GetFreecacheClient()
+	/*
+		连接redis缓存
+	*/
+	redisConfig := global.OMS_CONFIG.Redis
+	global.OMS_REDIS = initCache.GetRedisClient(redisConfig) // 初始化redis服务
+	if global.OMS_REDIS != nil && global.OMS_REDIS.Client != nil {
+		rdb := global.OMS_REDIS.Client
 		defer func() {
 			fmt.Println(utils.GetStringWithTime("====== [Golang] main.go 关闭REDIS连接 ======"))
 			rdb.Close()
 		}()
 	}
+
 	core.RunWindowsServer()
 }
