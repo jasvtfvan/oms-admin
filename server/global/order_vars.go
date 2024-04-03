@@ -65,6 +65,7 @@ const (
 	SysGroupWorkerId   = WorkerIdLevel1 + 2
 	SysRoleWorkerId    = WorkerIdLevel1 + 3
 	SysUserWorkerId    = WorkerIdLevel1 + 4
+	SysCasbinWorkerId  = WorkerIdLevel1 + 5
 )
 const (
 	DemoWorkerId = WorkerIdLevel2 + 1

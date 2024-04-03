@@ -15,6 +15,7 @@ type SysUser struct {
 	Avatar       string     `json:"avatar" gorm:"default:https://foruda.gitee.com/avatar/1710471233758250270/2074074_jasvtfvan_1710471233.png!avatar200;comment:头像"`
 	Phone        string     `json:"phone"  gorm:"default:'';comment:手机号"`
 	Email        string     `json:"email"  gorm:"default:'';comment:邮箱"`
+	IsAdmin      bool       `json:"is_admin" gorm:"default:false;comment:是否管理员(各组织都有一个默认管理员)"`
 	LogOperation bool       `json:"Log_Operation" gorm:"default:false;comment:是否记录操作"`
 	Enable       bool       `json:"enable" gorm:"index;default:true;comment:是否可用"`
 	SysGroups    []SysGroup `gorm:"many2many:sys_user_group;"`

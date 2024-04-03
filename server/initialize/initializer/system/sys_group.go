@@ -3,6 +3,7 @@ package system
 import (
 	"context"
 	"errors"
+	"strings"
 
 	"github.com/jasvtfvan/oms-admin/server/global"
 	"github.com/jasvtfvan/oms-admin/server/initialize/initializer"
@@ -22,15 +23,18 @@ func (i *initSysGroup) DataInserted(ctx context.Context) bool {
 
 // InitializeData implements initialize.Initializer.
 func (i *initSysGroup) InitializeData(ctx context.Context) (next context.Context, err error) {
-	// rootUsername := global.OMS_CONFIG.System.Username
+	rootUsername := global.OMS_CONFIG.System.Username
+	var OrgCode = "root"
+	// 如果系统管理员名字以_admin结尾则以_admin前边为根组织的编号
+	if len(rootUsername) > 6 && strings.HasSuffix(rootUsername, "_admin") {
+		OrgCode = strings.TrimSuffix(rootUsername, "_admin")
+	}
+
 	db := global.OMS_DB
 	slices := []systemModel.SysGroup{
 		{
-			// BaseModel: common.BaseModel{
-			// 	ID: 1,
-			// },
 			ShortName: "根组织",
-			OrgCode:   "root",
+			OrgCode:   OrgCode,
 			ParentID:  0,
 			Sort:      0,
 			Enable:    true,

@@ -1,20 +1,28 @@
 package system
 
+import "github.com/jasvtfvan/oms-admin/server/dao"
+
 type ServiceGroup struct {
-	UserService
-	JWTService
 	CasbinApiService
-	OperationRecordService
+	CasbinService
 	GroupService
+	JWTService
+	OperationRecordService
+	UserService
 }
 
 func NewServiceGroup() *ServiceGroup {
 	group := &ServiceGroup{
-		UserService:            new(UserServiceImpl),
-		JWTService:             new(JWTServiceImpl),
 		CasbinApiService:       new(CasbinApiServiceImpl),
-		OperationRecordService: new(OperationRecordServiceImpl),
+		CasbinService:          new(CasbinServiceImpl),
 		GroupService:           new(GroupServiceImpl),
+		JWTService:             new(JWTServiceImpl),
+		OperationRecordService: new(OperationRecordServiceImpl),
+		UserService:            new(UserServiceImpl),
 	}
 	return group
 }
+
+var (
+	CasbinDao = dao.DaoGroupApp.System.CasbinDao
+)

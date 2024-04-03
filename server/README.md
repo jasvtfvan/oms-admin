@@ -68,6 +68,11 @@ user    n<-->n  role        user切换到指定group通过role确定权限
 group   1<-->n  business    user切换到指定group，每条业务数据隶属于group
 ```
 
+#### 权限策略
+1. 通过JWT进行token验证，非cookie以便多客户端兼容
+2. 权限模型使用RBAC with domains的casbin模型，将role、group、http_path、http_method放到
+3. 只将部分api需要权限验证，针对操作基础数据api或特殊权限api，普通api不做严格限制
+
 #### docker-redis启动
 ```sh
 docker run --name oms-redis \
