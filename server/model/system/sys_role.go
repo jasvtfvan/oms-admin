@@ -14,8 +14,8 @@ type SysRole struct {
 	Sort       uint8     `json:"sort" gorm:"index;default:0;comment:排序"`
 	Comment    string    `json:"comment" gorm:"default:'';comment:备注"`
 	Enable     bool      `json:"enable" gorm:"index;default:true;comment:是否可用"`
-	SysGroupID uint      `json:"sysGroupID" gorm:"index;not null;comment:组织ID"`
-	SysUsers   []SysUser `gorm:"many2many:sys_user_role;"`
+	SysGroupID uint      `json:"sysGroupId" gorm:"index;not null;comment:组织ID"`
+	SysUsers   []SysUser `json:"sysUsers" gorm:"many2many:sys_user_role;"`
 }
 
 func (*SysRole) TableName() string {

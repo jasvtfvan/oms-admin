@@ -1,8 +1,8 @@
 package system
 
 type SysUserRole struct {
-	SysUserID uint `json:"sysUserID" gorm:"primaryKey"`
-	SysRoleID uint `json:"sysRoleID" gorm:"primaryKey"`
+	SysUserID uint `json:"sysUserId" gorm:"primaryKey"`
+	SysRoleID uint `json:"sysRoleId" gorm:"primaryKey"`
 }
 
 func (s *SysUserRole) TableName() string {

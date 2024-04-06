@@ -224,6 +224,7 @@ func (u *UserApi) Login(c *gin.Context) {
 			response.Fail(nil, "用户被禁用", c)
 			return
 		}
+		// 获取用户所有群组
 		user.SysGroups, err = groupService.FindGroupsByUserID(user.ID)
 		if err != nil {
 			global.OMS_LOG.Error("登录失败，用户组织查询失败", zap.Error(err))
@@ -231,6 +232,7 @@ func (u *UserApi) Login(c *gin.Context) {
 			response.Fail(nil, "用户组织查询失败", c)
 			return
 		}
+		// TODO 获取用户所有角色
 		// 登录成功，清除验证码次数，创建token，返回正确信息
 		token, err := jwtService.GenerateToken(user)
 		if err != nil {
@@ -242,6 +244,7 @@ func (u *UserApi) Login(c *gin.Context) {
 		global.OMS_LOG.Info("登录成功")
 		captchaBuildCountStore.DelCount(key) // 清除生成次数
 		captchaLoginCountStore.DelCount(key) // 清除验证码次数
+		// TODO 将缩减user字段，不能全部返回
 		response.Success(sysRes.Login{
 			User:  *user,
 			Token: token,

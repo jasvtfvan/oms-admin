@@ -58,10 +58,25 @@ func JWTAuth() gin.HandlerFunc {
 			ctx.Abort()
 			return
 		}
+		/*
+			4.判断用户是否具有x-group权限
+		*/
+		hasGroup := false
+		groups := claims.Groups
+		for _, grp := range groups {
+			if grp.OrgCode == orgCode {
+				hasGroup = true
+			}
+		}
+		if !hasGroup {
+			response.Fail(gin.H{"reload": true}, "没有组织权限", ctx)
+			ctx.Abort()
+			return
+		}
 		ctx.Set("claims", claims)
 		ctx.Next()
 		/*
-			4.换新token，过期时间 - 现在时间 < 缓冲时间，就需要换token
+			5.换新token，过期时间 - 现在时间 < 缓冲时间，就需要换token
 		*/
 		if claims.ExpiresAt.Unix()-time.Now().Unix() < claims.BufferTime {
 			exp, _ := utils.ParseDuration(global.OMS_CONFIG.JWT.ExpiresTime)

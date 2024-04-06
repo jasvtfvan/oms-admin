@@ -13,8 +13,8 @@ type SysVersion struct {
 	VersionCode string    `json:"versionCode" gorm:"uniqueIndex;not null;comment:版本编号"`
 	VersionName string    `json:"versionName" gorm:"index;not null;comment:版本名称"`
 	Version     string    `json:"version" gorm:"default:0.0.1;comment:版本号"`
-	CreatedAt   time.Time // 创建时间
-	UpdatedAt   time.Time // 更新时间
+	CreatedAt   time.Time `json:"createdAt"` // 创建时间
+	UpdatedAt   time.Time `json:"updatedAt"` // 更新时间
 }
 
 func (s *SysVersion) TableName() string {

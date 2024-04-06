@@ -34,7 +34,6 @@ func main() {
 	*/
 	global.OMS_DB = initialize.Gorm() // gorm连接数据库 [导入initialize包，register_init执行]
 	if global.OMS_DB != nil {
-		// 根据系统版本，决定是否AutoMigrate表结构 TODO
 		// 程序结束前关闭数据库链接
 		db, _ := global.OMS_DB.DB()
 		defer func() {
