@@ -28,6 +28,12 @@ type BaseClaims struct {
 	Username     string
 	LogOperation bool
 	Groups       []GroupClaims
+	Roles        []RoleClaims
+}
+
+type RoleClaims struct {
+	RoleCode string
+	RoleName string
 }
 
 type GroupClaims struct {

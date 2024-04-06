@@ -8,6 +8,7 @@ type ServiceGroup struct {
 	GroupService
 	JWTService
 	OperationRecordService
+	RoleService
 	UserService
 }
 
@@ -18,6 +19,7 @@ func NewServiceGroup() *ServiceGroup {
 		GroupService:           new(GroupServiceImpl),
 		JWTService:             new(JWTServiceImpl),
 		OperationRecordService: new(OperationRecordServiceImpl),
+		RoleService:            new(RoleServiceImpl),
 		UserService:            new(UserServiceImpl),
 	}
 	return group
@@ -27,6 +29,8 @@ var (
 	casbinDao          = dao.DaoGroupApp.System.CasbinDao
 	groupDao           = dao.DaoGroupApp.System.GroupDao
 	operationRecordDao = dao.DaoGroupApp.System.OperationRecordDao
+	roleDao            = dao.DaoGroupApp.System.RoleDao
 	userDao            = dao.DaoGroupApp.System.UserDao
 	userGroupDao       = dao.DaoGroupApp.System.UserGroupDao
+	userRoleDao        = dao.DaoGroupApp.System.UserRoleDao
 )

@@ -11,7 +11,7 @@ type GroupService interface {
 type GroupServiceImpl struct{}
 
 func (*GroupServiceImpl) FindGroupsByUserID(userId uint) ([]sysModel.SysGroup, error) {
-	sysUserGroups, err := userGroupDao.FindGroupIdsByUserId(userId)
+	sysUserGroups, err := userGroupDao.FindUserGroupsByUserID(userId)
 	if err != nil {
 		return nil, err
 	}

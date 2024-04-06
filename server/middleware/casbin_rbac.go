@@ -30,25 +30,29 @@ func CasbinHandler() gin.HandlerFunc {
 
 func handler(ctx *gin.Context, claims *utils.CustomClaims) {
 	// 角色
-	sub := ""
+	roles := claims.Roles
 	// 域
 	dom := ctx.Request.Header.Get("x-group")
-	path := ctx.Request.URL.Path
 	// 路径
+	path := ctx.Request.URL.Path
 	obj := strings.TrimPrefix(path, global.OMS_CONFIG.System.RouterPrefix)
 	// 方法
 	act := ctx.Request.Method
 	e := service.ServiceGroupApp.System.CasbinService.Casbin()
-	ok, err := e.Enforce(sub, dom, obj, act)
-	if err != nil {
-		response.Fail(nil, "权限获取失败:"+err.Error(), ctx)
-		ctx.Abort()
-		return
+	isOk := false
+	for _, role := range roles {
+		sub := role.RoleCode
+		ok, _ := e.Enforce(sub, dom, obj, act)
+		if ok {
+			isOk = true
+			break
+		}
 	}
-	if !ok {
+	if isOk {
+		ctx.Next()
+	} else {
 		response.Fail(nil, "权限不足", ctx)
 		ctx.Abort()
 		return
 	}
-	ctx.Next()
 }

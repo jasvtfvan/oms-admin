@@ -28,6 +28,13 @@ func (*JWTServiceImpl) GenerateToken(sysUser *sysModel.SysUser) (string, error) 
 			ShortName: v.ShortName,
 		})
 	}
+	var roleClaims []utils.RoleClaims
+	for _, v := range sysUser.SysRoles {
+		roleClaims = append(roleClaims, utils.RoleClaims{
+			RoleCode: v.RoleCode,
+			RoleName: v.RoleName,
+		})
+	}
 
 	j := utils.NewJWT()
 	claims := j.CreateClaims(utils.BaseClaims{
@@ -35,6 +42,7 @@ func (*JWTServiceImpl) GenerateToken(sysUser *sysModel.SysUser) (string, error) 
 		Username:     sysUser.Username,
 		LogOperation: sysUser.LogOperation,
 		Groups:       groupClaims,
+		Roles:        roleClaims,
 	})
 	token, err := j.CreateToken(claims)
 	if err != nil {

@@ -232,7 +232,14 @@ func (u *UserApi) Login(c *gin.Context) {
 			response.Fail(nil, "用户组织查询失败", c)
 			return
 		}
-		// TODO 获取用户所有角色
+		// 获取用户所有角色
+		user.SysRoles, err = roleService.FindRolesByUserID(user.ID)
+		if err != nil {
+			global.OMS_LOG.Error("登录失败，用户角色查询失败", zap.Error(err))
+			captchaLoginCountStore.AddCount(key) // 验证码次数+1
+			response.Fail(nil, "用户角色查询失败", c)
+			return
+		}
 		// 登录成功，清除验证码次数，创建token，返回正确信息
 		token, err := jwtService.GenerateToken(user)
 		if err != nil {
@@ -244,9 +251,37 @@ func (u *UserApi) Login(c *gin.Context) {
 		global.OMS_LOG.Info("登录成功")
 		captchaBuildCountStore.DelCount(key) // 清除生成次数
 		captchaLoginCountStore.DelCount(key) // 清除验证码次数
-		// TODO 将缩减user字段，不能全部返回
+		// 将group和role返回
+		loginGroups := []sysRes.LoginGroups{}
+		for _, grp := range user.SysGroups { // 迭代group
+			loginRoles := []sysRes.LoginRole{}
+			for _, rl := range user.SysRoles { // 迭代role
+				if rl.SysGroupID == grp.ID {
+					loginRoles = append(loginRoles, sysRes.LoginRole{
+						RoleName: rl.RoleName,
+						RoleCode: rl.RoleCode,
+						Sort:     rl.Sort,
+					})
+				}
+			}
+			loginGroups = append(loginGroups, sysRes.LoginGroups{
+				ShortName: grp.ShortName,
+				OrgCode:   grp.OrgCode,
+				Sort:      grp.Sort,
+				SysRoles:  loginRoles,
+			})
+		}
 		response.Success(sysRes.Login{
-			User:  *user,
+			User: sysRes.LoginUser{
+				Username:     user.Username,
+				NickName:     user.NickName,
+				Avatar:       user.Avatar,
+				Phone:        user.Phone,
+				Email:        user.Email,
+				IsAdmin:      user.IsAdmin,
+				LogOperation: user.LogOperation,
+				SysGroups:    loginGroups,
+			},
 			Token: token,
 		}, "登录成功", c)
 		return
