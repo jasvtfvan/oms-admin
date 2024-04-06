@@ -64,3 +64,7 @@ func (rc *RedisClient) SetWithNoExpire(ctx context.Context, key string, value in
 func (rc *RedisClient) Del(ctx context.Context, key string) *redis.IntCmd {
 	return rc.Client.Del(ctx, key)
 }
+
+func (rc *RedisClient) Clear(ctx context.Context) *redis.StatusCmd {
+	return rc.Client.FlushDB(ctx)
+}

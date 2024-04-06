@@ -29,6 +29,9 @@ func (*DbApi) InitDB(c *gin.Context) {
 			global.OMS_LOG.Fatal("初始化DB失败" + ": " + err.Error())
 			response.Fail(nil, "初始化DB失败", c)
 		} else {
+			// 初始化时清除缓存
+			global.OMS_REDIS.Clear(c)
+			global.OMS_FREECACHE.Clear()
 			fmt.Println("[Golang] 初始化DB成功")
 			response.Success(nil, "初始化DB成功", c)
 		}
@@ -77,6 +80,9 @@ func (*DbApi) UpdateDB(c *gin.Context) {
 			global.OMS_LOG.Error("[Golang] 升级DB失败" + ": " + err.Error())
 			response.Fail(nil, "升级DB失败", c)
 		} else {
+			// 初始化时清除缓存
+			global.OMS_REDIS.Clear(c)
+			global.OMS_FREECACHE.Clear()
 			fmt.Println("[Golang] 升级DB成功")
 			response.Success(nil, "升级DB成功", c)
 		}

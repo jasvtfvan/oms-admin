@@ -90,6 +90,7 @@ func (*InitDBServiceImpl) CheckDB() error {
 	var readyStruct freecache.Bool
 	isReady := cacheStore.Get("DBReady", readyStruct)
 	if cacheStore.Verify("DBReady", true, isReady) {
+		fmt.Println("[Golang] CheckDB from local cache")
 		return nil
 	}
 
@@ -140,15 +141,17 @@ func (s *InitDBServiceImpl) InitDB() (err error) {
 	}
 
 	if err = initHandler.InitTables(ctx, initializers); err != nil {
+		global.OMS_LOG.Error("初始化表结构失败，删除所有表:" + err.Error())
 		if dErr := deleteTables(); dErr != nil {
-			global.OMS_LOG.Error("表删除失败（初始化失败，需要删表重启，重新初始化），请手动删表：" + dErr.Error())
+			global.OMS_LOG.Error("表删除失败（初始化失败，需要删表重启，重新初始化），请手动删表:" + dErr.Error())
 		}
 		return err
 	}
 	global.OMS_LOG.Info("初始化表成功")
 	if err = initHandler.InitData(ctx, initializers); err != nil {
+		global.OMS_LOG.Error("初始化表数据失败，删除所有表:" + err.Error())
 		if dErr := deleteTables(); dErr != nil {
-			global.OMS_LOG.Error("表删除失败（初始化失败，需要删表重启，重新初始化），请手动删表：" + dErr.Error())
+			global.OMS_LOG.Error("表删除失败（初始化失败，需要删表重启，重新初始化），请手动删表:" + dErr.Error())
 		}
 		return err
 	}

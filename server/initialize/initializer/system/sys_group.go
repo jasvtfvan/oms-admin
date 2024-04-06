@@ -36,7 +36,7 @@ func (i *initSysGroup) InitializeData(ctx context.Context) (next context.Context
 			// SysRoles: []systemModel.SysRole{
 			// 	{
 			// 		RoleName: "超级管理员",
-			// 		RoleCode: rootUsername,
+			// 		RoleCode: initializer.GetRootRoleCode(),
 			// 		Sort:     0,
 			// 		Comment:  "超级管理员",
 			// 		Enable:   true,

@@ -45,9 +45,6 @@ const (
 const (
 	InitOrderRegisterTables = InitOrderLevel2 + 1
 )
-const (
-	InitOrderDemo = InitOrderLevel3 + 1
-)
 
 // 升级顺序定义
 const (
@@ -55,9 +52,6 @@ const (
 )
 const (
 	UpdateOrderRegisterTables = UpdateOrderLevel2 + 1
-)
-const (
-	UpdateOrderDemo = UpdateOrderLevel3 + 1
 )
 
 // ID WorkerId
@@ -67,7 +61,4 @@ const (
 	SysRoleWorkerId    = WorkerIdLevel1 + 3
 	SysUserWorkerId    = WorkerIdLevel1 + 4
 	SysCasbinWorkerId  = WorkerIdLevel1 + 5
-)
-const (
-	DemoWorkerId = WorkerIdLevel2 + 1
 )

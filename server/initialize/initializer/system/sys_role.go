@@ -24,11 +24,12 @@ func (i *initSysRole) DataInserted(ctx context.Context) bool {
 // InitializeData implements initialize.Initializer.
 func (i *initSysRole) InitializeData(ctx context.Context) (next context.Context, err error) {
 	rootRoleCode := initializer.GetRootRoleCode()
+	rootOrgCode := initializer.GetRootGroupCode()
 	db := global.OMS_DB
 
 	// group表已经初始化完成
 	sysGroup := &systemModel.SysGroup{}
-	db.Where("org_code = ?", rootRoleCode).First(sysGroup)
+	db.Where("org_code = ?", rootOrgCode).First(sysGroup)
 
 	slices := []systemModel.SysRole{
 		{
