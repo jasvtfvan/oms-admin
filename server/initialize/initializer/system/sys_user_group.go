@@ -18,7 +18,8 @@ type initSysUserGroup struct{}
 
 // DataInserted implements initialize.Initializer.
 func (i *initSysUserGroup) DataInserted(ctx context.Context) bool {
-	rootUsername := global.OMS_CONFIG.System.Username
+	rootUsername := initializer.GetRootUsername()
+	rootOrgCode := initializer.GetRootGroupCode()
 	db := global.OMS_DB
 
 	// user表已经初始化完成
@@ -26,7 +27,7 @@ func (i *initSysUserGroup) DataInserted(ctx context.Context) bool {
 	db.Where("username = ?", rootUsername).First(sysUser)
 	// group表已经初始化完成
 	sysGroup := &systemModel.SysGroup{}
-	db.Where("org_code = ?", "root").First(sysGroup)
+	db.Where("org_code = ?", rootOrgCode).First(sysGroup)
 
 	return initializer.DataInserted(
 		ctx, &systemModel.SysUserGroup{},
@@ -38,7 +39,8 @@ func (i *initSysUserGroup) DataInserted(ctx context.Context) bool {
 
 // InitializeData implements initialize.Initializer.
 func (i *initSysUserGroup) InitializeData(ctx context.Context) (next context.Context, err error) {
-	rootUsername := global.OMS_CONFIG.System.Username
+	rootUsername := initializer.GetRootUsername()
+	rootOrgCode := initializer.GetRootGroupCode()
 	db := global.OMS_DB
 
 	// user表已经初始化完成
@@ -46,7 +48,7 @@ func (i *initSysUserGroup) InitializeData(ctx context.Context) (next context.Con
 	db.Where("username = ?", rootUsername).First(sysUser)
 	// group表已经初始化完成
 	sysGroup := &systemModel.SysGroup{}
-	db.Where("org_code = ?", "root").First(sysGroup)
+	db.Where("org_code = ?", rootOrgCode).First(sysGroup)
 
 	slices := []systemModel.SysUserGroup{
 		{

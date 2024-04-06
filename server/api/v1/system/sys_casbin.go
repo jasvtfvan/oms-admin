@@ -7,5 +7,7 @@ import (
 type CasbinApi struct{}
 
 func (*CasbinApi) GetCasbinApiList() []response.CasbinInfo {
-	return casbinApiService.GetCasbinApiList()
+	roleCode := ""
+	groupCode := ""
+	return casbinApiService.GetCasbinApiList(roleCode, groupCode)
 }

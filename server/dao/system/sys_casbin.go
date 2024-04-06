@@ -8,7 +8,7 @@ import (
 type CasbinDao struct{}
 
 func (*CasbinDao) BatchDelete(tx *gorm.DB, roleCode string, groupCode string) error {
-	return tx.Where("p_type = p and v0 = ? and v1 = ?", roleCode, groupCode).Delete(&system.SysCasbin{}).Error
+	return tx.Where("p_type = 'p' and v0 = ? and v1 = ?", roleCode, groupCode).Delete(&system.SysCasbin{}).Error
 }
 
 func (*CasbinDao) BatchInsert(tx *gorm.DB, casbinRules []system.SysCasbin) error {

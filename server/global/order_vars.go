@@ -40,6 +40,7 @@ const (
 	InitOrderSysUser      = InitOrderLevel1 + 4
 	InitOrderSysUserGroup = InitOrderLevel1 + 5
 	InitOrderSysUserRole  = InitOrderLevel1 + 6
+	InitOrderSysCasbin    = InitOrderLevel1 + 7
 )
 const (
 	InitOrderRegisterTables = InitOrderLevel2 + 1

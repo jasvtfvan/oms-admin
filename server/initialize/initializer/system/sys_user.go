@@ -18,13 +18,13 @@ type initSysUser struct{}
 
 // DataInserted implements initialize.Initializer.
 func (i *initSysUser) DataInserted(ctx context.Context) bool {
-	rootUsername := global.OMS_CONFIG.System.Username
+	rootUsername := initializer.GetRootUsername()
 	return initializer.DataInserted(ctx, &systemModel.SysUser{}, "username = ?", rootUsername)
 }
 
 // InitializeData implements initialize.Initializer.
 func (i *initSysUser) InitializeData(ctx context.Context) (next context.Context, err error) {
-	rootUsername := global.OMS_CONFIG.System.Username
+	rootUsername := initializer.GetRootUsername()
 	rootPassword := global.OMS_CONFIG.System.Password
 	db := global.OMS_DB
 

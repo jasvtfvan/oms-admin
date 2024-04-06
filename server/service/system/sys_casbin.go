@@ -72,21 +72,77 @@ var CasbinServiceApp = &CasbinInstance{
 }
 
 type CasbinService interface {
-	FreshCasbin() error
+	GetPolicyByCasbinInfo(roleCode, groupCode string, casbinInfos []request.CasbinInfo) [][]string
+	GetCasbinInfoByPolicy(rules [][]string) []request.CasbinInfo
+	GetPolicyInEnforcer(roleCode, groupCode string) [][]string
 	Casbin() *casbin.SyncedCachedEnforcer
 }
 
 type CasbinServiceImpl struct{}
 
-func (csi *CasbinApiServiceImpl) BatchSavePolicies(roleCode, groupCode string, casbinInfos []request.CasbinInfo) error {
-	var casbinRules []system.SysCasbin
+// 根据casbinInfo获取policy（去重）
+func (csi *CasbinServiceImpl) GetPolicyByCasbinInfo(roleCode, groupCode string, casbinInfos []request.CasbinInfo) [][]string {
+	rules := [][]string{}
+	//做权限去重处理
+	deduplicateMap := make(map[string]bool)
 	for _, v := range casbinInfos {
-		casbinRules = append(casbinRules, system.SysCasbin{
+		key := roleCode + groupCode + v.Path + v.Method
+		if _, ok := deduplicateMap[key]; !ok {
+			deduplicateMap[key] = true
+			rules = append(rules, []string{roleCode, groupCode, v.Path, v.Method})
+		}
+	}
+	return rules
+}
+
+// 根据policy的rule获取casbinInfo（去重）
+func (csi *CasbinServiceImpl) GetCasbinInfoByPolicy(rules [][]string) []request.CasbinInfo {
+	casbinInfos := []request.CasbinInfo{}
+	// 去重处理
+	deduplicateMap := make(map[string]bool)
+	for _, v := range rules {
+		key := v[0] + v[1] + v[2] + v[3]
+		if _, ok := deduplicateMap[key]; !ok {
+			deduplicateMap[key] = true
+			casbinInfos = append(casbinInfos, request.CasbinInfo{
+				Path:   v[2],
+				Method: v[3],
+			})
+		}
+	}
+	return casbinInfos
+}
+
+// 通过roleCode和groupCode获取policy
+func (csi *CasbinServiceImpl) GetPolicyInEnforcer(roleCode, groupCode string) [][]string {
+	e := csi.Casbin()
+	var target [][]string
+	rules := e.GetFilteredPolicy(0, roleCode)
+	// 去重处理
+	deduplicateMap := make(map[string]bool)
+	for _, v := range rules {
+		key := v[0] + v[1] + v[2] + v[3]
+		if _, ok := deduplicateMap[key]; !ok {
+			deduplicateMap[key] = true
+			if v[1] == groupCode {
+				target = append(target, v)
+			}
+		}
+	}
+	return target
+}
+
+// 批量保存，先删除存在的，再批量插入所有
+func (csi *CasbinServiceImpl) BatchSavePolicies(roleCode, groupCode string, casbinInfos []request.CasbinInfo) error {
+	rules := csi.GetPolicyByCasbinInfo(roleCode, groupCode, casbinInfos)
+	rulesNamed := []system.SysCasbin{}
+	for _, v := range rules {
+		rulesNamed = append(rulesNamed, system.SysCasbin{
 			Ptype: "p",
-			V0:    roleCode,
-			V1:    groupCode,
-			V2:    v.Path,
-			V3:    v.Method,
+			V0:    v[0],
+			V1:    v[1],
+			V2:    v[2],
+			V3:    v[3],
 		})
 	}
 
@@ -103,7 +159,7 @@ func (csi *CasbinApiServiceImpl) BatchSavePolicies(roleCode, groupCode string, c
 		tx.Rollback()
 		return err
 	}
-	if err := casbinDao.BatchInsert(tx, casbinRules); err != nil {
+	if err := casbinDao.BatchInsert(tx, rulesNamed); err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -111,14 +167,22 @@ func (csi *CasbinApiServiceImpl) BatchSavePolicies(roleCode, groupCode string, c
 		return err
 	}
 
-	// 操作 e delete缓存，insert缓存
-	return nil
-}
-
-func (csi *CasbinServiceImpl) FreshCasbin() (err error) {
+	/*
+		更新缓存
+		不通过e.savePolicy，通过上边的事务保存，既确保原子性，又防止整个缓存同步到DB引发性能问题。（savePolicy会将整个缓存同步到DB）
+		不通过e.loadPolicy，通过下边的RemovePolicy和AddPolicy，防止整个DB同步到缓存引发性能问题。（loadPolicy会将整个DB同步到缓存）
+	*/
 	e := csi.Casbin()
-	err = e.LoadPolicy()
-	return err
+	var toRemove [][]string = csi.GetPolicyInEnforcer(roleCode, groupCode)
+	_, err := e.RemovePolicies(toRemove)
+	if err != nil {
+		return err
+	}
+	_, err = e.AddPolicies(rules)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 var (

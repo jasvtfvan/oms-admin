@@ -18,7 +18,8 @@ type initSysUserRole struct{}
 
 // DataInserted implements initialize.Initializer.
 func (i *initSysUserRole) DataInserted(ctx context.Context) bool {
-	rootUsername := global.OMS_CONFIG.System.Username
+	rootUsername := initializer.GetRootUsername()
+	rootRoleCode := initializer.GetRootRoleCode()
 	db := global.OMS_DB
 
 	// user表已经初始化完成
@@ -26,7 +27,7 @@ func (i *initSysUserRole) DataInserted(ctx context.Context) bool {
 	db.Where("username = ?", rootUsername).First(sysUser)
 	// role表已经初始化完成
 	sysRole := &systemModel.SysRole{}
-	db.Where("role_code = ?", rootUsername).First(sysRole)
+	db.Where("role_code = ?", rootRoleCode).First(sysRole)
 
 	return initializer.DataInserted(
 		ctx, &systemModel.SysUserRole{},
@@ -38,7 +39,8 @@ func (i *initSysUserRole) DataInserted(ctx context.Context) bool {
 
 // InitializeData implements initialize.Initializer.
 func (i *initSysUserRole) InitializeData(ctx context.Context) (next context.Context, err error) {
-	rootUsername := global.OMS_CONFIG.System.Username
+	rootUsername := initializer.GetRootUsername()
+	rootRoleCode := initializer.GetRootRoleCode()
 	db := global.OMS_DB
 
 	// user表已经初始化完成
@@ -46,7 +48,7 @@ func (i *initSysUserRole) InitializeData(ctx context.Context) (next context.Cont
 	db.Where("username = ?", rootUsername).First(sysUser)
 	// role表已经初始化完成
 	sysRole := &systemModel.SysRole{}
-	db.Where("role_code = ?", rootUsername).First(sysRole)
+	db.Where("role_code = ?", rootRoleCode).First(sysRole)
 
 	slices := []systemModel.SysUserRole{
 		{

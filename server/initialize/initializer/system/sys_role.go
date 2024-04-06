@@ -17,23 +17,23 @@ type initSysRole struct{}
 
 // DataInserted implements initialize.Initializer.
 func (i *initSysRole) DataInserted(ctx context.Context) bool {
-	rootUsername := global.OMS_CONFIG.System.Username
-	return initializer.DataInserted(ctx, &systemModel.SysRole{}, "role_code = ?", rootUsername)
+	rootRoleCode := initializer.GetRootRoleCode()
+	return initializer.DataInserted(ctx, &systemModel.SysRole{}, "role_code = ?", rootRoleCode)
 }
 
 // InitializeData implements initialize.Initializer.
 func (i *initSysRole) InitializeData(ctx context.Context) (next context.Context, err error) {
-	rootUsername := global.OMS_CONFIG.System.Username
+	rootRoleCode := initializer.GetRootRoleCode()
 	db := global.OMS_DB
 
 	// group表已经初始化完成
 	sysGroup := &systemModel.SysGroup{}
-	db.Where("org_code = ?", "root").First(sysGroup)
+	db.Where("org_code = ?", rootRoleCode).First(sysGroup)
 
 	slices := []systemModel.SysRole{
 		{
 			RoleName:   "超级管理员",
-			RoleCode:   rootUsername,
+			RoleCode:   rootRoleCode,
 			Sort:       0,
 			Comment:    "超级管理员",
 			Enable:     true,
