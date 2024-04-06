@@ -3,7 +3,10 @@ package system
 import (
 	"time"
 
+	"github.com/jasvtfvan/oms-admin/server/global"
 	"github.com/jasvtfvan/oms-admin/server/model/common"
+	"github.com/jasvtfvan/oms-admin/server/utils"
+	"gorm.io/gorm"
 )
 
 // 如果含有time.Time 请自行import time包
@@ -19,5 +22,20 @@ type SysOperationRecord struct {
 	Body         string        `json:"body" form:"body" gorm:"type:text;column:body;comment:请求Body"`                 // 请求Body
 	Resp         string        `json:"resp" form:"resp" gorm:"type:text;column:resp;comment:响应Body"`                 // 响应Body
 	UserID       int           `json:"userId" form:"userId" gorm:"column:user_id;comment:用户id"`                      // 用户id
-	User         SysUser       `json:"user"`
+	User         SysUser       `json:"user"`                                                                         // gorm belongs to
+}
+
+func (s *SysOperationRecord) TableName() string {
+	return "sys_operation_record"
+}
+
+var sysOperationRecordWorkId int64 = global.SysOperationRecordWorkId
+
+// BeforeCreate 钩子，在创建记录前设置自定义的ID
+func (s *SysOperationRecord) BeforeCreate(db *gorm.DB) error {
+	if s.ID == 0 {
+		snowflakeWorker := utils.NewSnowflakeWorker(sysOperationRecordWorkId)
+		s.ID = uint(snowflakeWorker.NextId())
+	}
+	return nil
 }

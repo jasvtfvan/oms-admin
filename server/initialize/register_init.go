@@ -3,7 +3,9 @@ package initialize
 import (
 	"fmt"
 
+	_ "github.com/jasvtfvan/oms-admin/server/initialize/initializer"
 	_ "github.com/jasvtfvan/oms-admin/server/initialize/initializer/system"
+	_ "github.com/jasvtfvan/oms-admin/server/initialize/updater"
 	_ "github.com/jasvtfvan/oms-admin/server/initialize/updater/system"
 	"github.com/jasvtfvan/oms-admin/server/utils"
 )

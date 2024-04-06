@@ -11,4 +11,6 @@ var InitMigrateTables = []interface{}{
 
 // 在updater中没有注册，需要新增的空表；或者已经初始化，但只修改表结构不更新字段的表
 // 这些表同时要复制到[InitMigrateTables]的尾部，但是不能覆盖已经写好的[InitMigrateTables]
-var UpdateMigrateTables = []interface{}{}
+var UpdateMigrateTables = []interface{}{
+	&system.SysOperationRecord{},
+}

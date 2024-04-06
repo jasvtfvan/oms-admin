@@ -56,9 +56,10 @@ const (
 
 // ID WorkerId
 const (
-	SysVersionWorkerId = WorkerIdLevel1 + 1
-	SysGroupWorkerId   = WorkerIdLevel1 + 2
-	SysRoleWorkerId    = WorkerIdLevel1 + 3
-	SysUserWorkerId    = WorkerIdLevel1 + 4
-	SysCasbinWorkerId  = WorkerIdLevel1 + 5
+	SysVersionWorkerId       = WorkerIdLevel1 + 1
+	SysGroupWorkerId         = WorkerIdLevel1 + 2
+	SysRoleWorkerId          = WorkerIdLevel1 + 3
+	SysUserWorkerId          = WorkerIdLevel1 + 4
+	SysCasbinWorkerId        = WorkerIdLevel1 + 5
+	SysOperationRecordWorkId = WorkerIdLevel1 + 6
 )

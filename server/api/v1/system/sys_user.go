@@ -288,5 +288,5 @@ func (u *UserApi) Login(c *gin.Context) {
 	}
 
 	captchaLoginCountStore.AddCount(key) // 验证码次数+1
-	response.Fail(nil, "验证码错误", c)
+	response.Fail(nil, "验证码错误，请重新获取", c)
 }

@@ -72,7 +72,7 @@ func RegisterUpdate(order int, up Updater) {
 /* ------ * service * ------ */
 
 type UpdateDBService interface {
-	CheckUpdate() error
+	CheckUpdate() (string, string, error)
 	ClearUpdater()
 	UpdateDB() error
 }
@@ -80,15 +80,14 @@ type UpdateDBService interface {
 type UpdateDBServiceImpl struct{}
 
 // 检查是否需要升级
-func (*UpdateDBServiceImpl) CheckUpdate() (err error) {
+func (*UpdateDBServiceImpl) CheckUpdate() (oldVersion, newVersion string, err error) {
 	db := global.OMS_DB
 	sysVersion := &system.SysVersion{}
-	db.Where("version_code = ?", "oms_version").First(sysVersion)
-	version := global.OMS_CONFIG.Version
-	if sysVersion.Version != version {
-		return errors.New("需升级为:" + version)
+	err = db.Where("version_code = ?", "oms_version").First(sysVersion).Error
+	if err != nil {
+		return "", "", err
 	}
-	return err
+	return sysVersion.Version, global.OMS_CONFIG.Version, err
 }
 
 // 已经升级，重启服务后，清除 updaters

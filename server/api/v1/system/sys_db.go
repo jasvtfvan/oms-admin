@@ -53,12 +53,17 @@ func (*DbApi) CheckUpdate(c *gin.Context) {
 		response.Fail(gin.H{"updated": false}, "解析令牌信息失败", c)
 		return
 	}
-	if err := updateDBService.CheckUpdate(); err != nil {
-		fmt.Println("[Golang] DB需要升级: " + err.Error())
-		response.Fail(gin.H{"updated": false}, "DB需要升级", c)
+	if v1, v2, err := updateDBService.CheckUpdate(); err != nil {
+		fmt.Println("[Golang] DB查询失败: " + err.Error())
+		response.Fail(gin.H{"updated": false}, "DB查询失败", c)
 	} else {
-		updateDBService.ClearUpdater()
-		response.Success(gin.H{"updated": true}, "DB已升级", c)
+		if v1 == v2 {
+			updateDBService.ClearUpdater()
+			response.Success(gin.H{"updated": true, "oldVersion": v1, "newVersion": v2}, "DB已升级", c)
+		} else {
+			fmt.Println(fmt.Sprintf("[Golang] DB需要升级: %s -> %s", v1, v2))
+			response.Fail(gin.H{"updated": false, "oldVersion": v1, "newVersion": v2}, "DB需要升级", c)
+		}
 	}
 }
 
@@ -74,20 +79,25 @@ func (*DbApi) UpdateDB(c *gin.Context) {
 		response.Fail(gin.H{"updated": false}, "解析令牌信息失败", c)
 		return
 	}
-	if err := updateDBService.CheckUpdate(); err != nil {
-		fmt.Println("[Golang] DB需要升级: " + err.Error())
-		if err := updateDBService.UpdateDB(); err != nil {
-			global.OMS_LOG.Error("[Golang] 升级DB失败" + ": " + err.Error())
-			response.Fail(nil, "升级DB失败", c)
-		} else {
-			// 初始化时清除缓存
-			global.OMS_REDIS.Clear(c)
-			global.OMS_FREECACHE.Clear()
-			fmt.Println("[Golang] 升级DB成功")
-			response.Success(nil, "升级DB成功", c)
-		}
+	if v1, v2, err := updateDBService.CheckUpdate(); err != nil {
+		fmt.Println("[Golang] DB查询失败: " + err.Error())
+		response.Fail(nil, "DB查询失败", c)
 	} else {
-		updateDBService.ClearUpdater()
-		response.Success(nil, "DB已升级", c)
+		if v1 == v2 {
+			updateDBService.ClearUpdater()
+			response.Success(gin.H{"updated": true, "oldVersion": v1, "newVersion": v2}, "DB已升级", c)
+		} else {
+			fmt.Println(fmt.Sprintf("[Golang] DB需要升级: %s -> %s", v1, v2))
+			if err := updateDBService.UpdateDB(); err != nil {
+				global.OMS_LOG.Error("[Golang] 升级DB失败" + ": " + err.Error())
+				response.Fail(gin.H{"updated": false, "oldVersion": v1, "newVersion": v2}, "升级DB失败", c)
+			} else {
+				// 初始化时清除缓存
+				global.OMS_REDIS.Clear(c)
+				global.OMS_FREECACHE.Clear()
+				fmt.Println("[Golang] 升级DB成功")
+				response.Success(gin.H{"updated": true, "oldVersion": v1, "newVersion": v2}, "升级DB成功", c)
+			}
+		}
 	}
 }
