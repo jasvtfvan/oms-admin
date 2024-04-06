@@ -7,7 +7,7 @@ import (
 
 type GroupDao struct{}
 
-func FindGroupsByIds(sysGroupIds []uint) ([]system.SysGroup, error) {
+func (*GroupDao) FindGroupsByIds(sysGroupIds []uint) ([]system.SysGroup, error) {
 	db := global.OMS_DB
 	var sysGroups []system.SysGroup
 	err := db.Where("enable = true and id in ?", sysGroupIds).Order("sort").Find(&sysGroups).Error

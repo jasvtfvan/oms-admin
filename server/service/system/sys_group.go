@@ -1,7 +1,6 @@
 package system
 
 import (
-	"github.com/jasvtfvan/oms-admin/server/dao/system"
 	sysModel "github.com/jasvtfvan/oms-admin/server/model/system"
 )
 
@@ -12,7 +11,7 @@ type GroupService interface {
 type GroupServiceImpl struct{}
 
 func (*GroupServiceImpl) FindGroupsByUserID(userId uint) ([]sysModel.SysGroup, error) {
-	sysUserGroups, err := system.FindGroupIdsByUserId(userId)
+	sysUserGroups, err := userGroupDao.FindGroupIdsByUserId(userId)
 	if err != nil {
 		return nil, err
 	}
@@ -22,5 +21,5 @@ func (*GroupServiceImpl) FindGroupsByUserID(userId uint) ([]sysModel.SysGroup, e
 		sysGroupIds = append(sysGroupIds, v.SysGroupID)
 	}
 
-	return system.FindGroupsByIds(sysGroupIds)
+	return groupDao.FindGroupsByIds(sysGroupIds)
 }

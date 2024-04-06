@@ -43,14 +43,15 @@ mysql:
     prefix: ""
     port: "3306"
     config: charset=utf8mb4&parseTime=True&loc=Local
+    debug-db-name: oms
+    debug-username: mysql_admin
+    debug-password: Mysql123Admin456
+    debug-path: rm-2ze4vq08r30l8n0327o.mysql.rds.aliyuncs.com
     db-name: oms
-    # username: root
     username: mysql_admin
     password: Mysql123Admin456
     # 阿里云举例：ECS服务器和RDS数据库，在同一个区域，使用内网连接地址
-    # path: 127.0.0.1
-    # path: rm-2ze4vq08r30l8n032.mysql.rds.aliyuncs.com
-    path: rm-2ze4vq08r30l8n0327o.mysql.rds.aliyuncs.com
+    path: rm-2ze4vq08r30l8n032.mysql.rds.aliyuncs.com
     engine: InnoDB
     log-mode: error
     max-idle-conns: 10

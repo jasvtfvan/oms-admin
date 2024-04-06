@@ -7,7 +7,7 @@ import (
 
 type OperationRecordDao struct{}
 
-func CreateOperationRecord(sysOperationRecord system.SysOperationRecord) error {
+func (*OperationRecordDao) CreateOperationRecord(sysOperationRecord system.SysOperationRecord) error {
 	db := global.OMS_DB
 	return db.Create(&sysOperationRecord).Error
 }

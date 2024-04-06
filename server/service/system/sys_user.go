@@ -3,7 +3,6 @@ package system
 import (
 	"errors"
 
-	sysDao "github.com/jasvtfvan/oms-admin/server/dao/system"
 	"github.com/jasvtfvan/oms-admin/server/global"
 	sysModel "github.com/jasvtfvan/oms-admin/server/model/system"
 	"github.com/jasvtfvan/oms-admin/server/utils"
@@ -22,11 +21,11 @@ type UserService interface {
 type UserServiceImpl struct{}
 
 func (*UserServiceImpl) FindUser(id uint) (*sysModel.SysUser, error) {
-	return sysDao.FindUserById(id)
+	return userDao.FindUserById(id)
 }
 
 func (*UserServiceImpl) ResetPassword(id uint, newPassword string) (string, string, error) {
-	sysUser, err := sysDao.FindUserById(id)
+	sysUser, err := userDao.FindUserById(id)
 	if err != nil {
 		return "", "", err
 	}
@@ -38,7 +37,7 @@ func (*UserServiceImpl) ResetPassword(id uint, newPassword string) (string, stri
 		newPassword = sysUser.Username + "123456"
 	}
 	password := utils.BcryptHash(newPassword)
-	row, err := sysDao.UpdatePassword(id, password)
+	row, err := userDao.UpdatePassword(id, password)
 	if err != nil {
 		return "", sysUser.Username, err
 	}
@@ -50,7 +49,7 @@ func (*UserServiceImpl) ResetPassword(id uint, newPassword string) (string, stri
 }
 
 func (*UserServiceImpl) EnableUser(id uint) (string, error) {
-	sysUser, err := sysDao.FindUserById(id)
+	sysUser, err := userDao.FindUserById(id)
 	if err != nil {
 		return "", err
 	}
@@ -61,7 +60,7 @@ func (*UserServiceImpl) EnableUser(id uint) (string, error) {
 		return sysUser.Username, errors.New("不能对系统管理员进行操作")
 	}
 
-	row, err := sysDao.EnableUser(id)
+	row, err := userDao.EnableUser(id)
 	if err != nil {
 		return sysUser.Username, err
 	}
@@ -72,7 +71,7 @@ func (*UserServiceImpl) EnableUser(id uint) (string, error) {
 }
 
 func (*UserServiceImpl) DisableUser(id uint) (string, error) {
-	sysUser, err := sysDao.FindUserById(id)
+	sysUser, err := userDao.FindUserById(id)
 	if err != nil {
 		return "", err
 	}
@@ -83,7 +82,7 @@ func (*UserServiceImpl) DisableUser(id uint) (string, error) {
 		return sysUser.Username, errors.New("不能对系统管理员进行操作")
 	}
 
-	row, err := sysDao.DisableUser(id)
+	row, err := userDao.DisableUser(id)
 	if err != nil {
 		return sysUser.Username, err
 	}
@@ -94,7 +93,7 @@ func (*UserServiceImpl) DisableUser(id uint) (string, error) {
 }
 
 func (*UserServiceImpl) DeleteUser(id uint) (string, error) {
-	sysUser, err := sysDao.FindUserById(id)
+	sysUser, err := userDao.FindUserById(id)
 	if err != nil {
 		return "", err
 	}
@@ -105,7 +104,7 @@ func (*UserServiceImpl) DeleteUser(id uint) (string, error) {
 		return sysUser.Username, errors.New("不能对系统管理员进行操作")
 	}
 
-	row, err := sysDao.DeleteUser(id)
+	row, err := userDao.DeleteUser(id)
 	if err != nil {
 		return sysUser.Username, err
 	}
@@ -117,7 +116,7 @@ func (*UserServiceImpl) DeleteUser(id uint) (string, error) {
 
 func (*UserServiceImpl) Login(username string, password string) (*sysModel.SysUser, error) {
 	var sysUser *sysModel.SysUser
-	sysUser, err := sysDao.FindByUsername(username)
+	sysUser, err := userDao.FindByUsername(username)
 	if err != nil {
 		return nil, err
 	}

@@ -99,11 +99,11 @@ func (csi *CasbinApiServiceImpl) BatchSavePolicies(roleCode, groupCode string, c
 	if err := tx.Error; err != nil {
 		return err
 	}
-	if err := CasbinDao.BatchDelete(tx, roleCode, groupCode); err != nil {
+	if err := casbinDao.BatchDelete(tx, roleCode, groupCode); err != nil {
 		tx.Rollback()
 		return err
 	}
-	if err := CasbinDao.BatchInsert(tx, casbinRules); err != nil {
+	if err := casbinDao.BatchInsert(tx, casbinRules); err != nil {
 		tx.Rollback()
 		return err
 	}

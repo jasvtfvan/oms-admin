@@ -115,7 +115,7 @@ tinyint vs int，float vs double，date vs datetime
 * 15、查看连接情况 ```show processlist;```
 * 16、根据用户查看连接情况 ```SELECT * FROM information_schema.processlist WHERE USER='mysql_admin';```
 * 17、查看连接超时时间 ```show global variables like 'wait_timeout'; -- 单位秒```
-* 18、设置连接超时是时间 ```set global wait_timeout = 28800; -- 设置为28800秒，即8小时```
+* 18、设置连接超时是时间 ```set global wait_timeout = 7200; -- 设置为7200秒，即2小时```
 
 #### mysql防止sql注入
 * 1、检查select username from user where username='"+username+"'

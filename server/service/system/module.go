@@ -24,5 +24,9 @@ func NewServiceGroup() *ServiceGroup {
 }
 
 var (
-	CasbinDao = dao.DaoGroupApp.System.CasbinDao
+	casbinDao          = dao.DaoGroupApp.System.CasbinDao
+	groupDao           = dao.DaoGroupApp.System.GroupDao
+	operationRecordDao = dao.DaoGroupApp.System.OperationRecordDao
+	userDao            = dao.DaoGroupApp.System.UserDao
+	userGroupDao       = dao.DaoGroupApp.System.UserGroupDao
 )

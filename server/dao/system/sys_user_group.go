@@ -7,7 +7,7 @@ import (
 
 type UserGroupDao struct{}
 
-func FindGroupIdsByUserId(userId uint) ([]system.SysUserGroup, error) {
+func (*UserGroupDao) FindGroupIdsByUserId(userId uint) ([]system.SysUserGroup, error) {
 	db := global.OMS_DB
 	var sysUserGroups []system.SysUserGroup
 	err := db.Where("sys_user_id = ?", userId).Find(&sysUserGroups).Error
