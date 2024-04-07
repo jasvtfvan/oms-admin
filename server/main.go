@@ -15,13 +15,17 @@ import (
 //go:generate go env -w GOPROXY=https://goproxy.cn,direct
 //go:generate go mod tidy
 
-// @title                       Gin-Vue-Admin Swagger API接口文档
-// @version                     参考config.yaml
-// @description                 使用gin+vue进行极速开发的全栈开发基础平台
+// @title                       Oms-Admin Swagger API接口文档
+// @version                     V1.0.0
+// @description                 使用gin的全栈开发基础平台
+// @host												127.0.0.1:8888
+// @basePath                    /
 // @securityDefinitions.apikey  ApiKeyAuth
 // @in                          header
 // @name                        x-token
-// @BasePath                    /
+// @securityDefinitions.apikey  ApiKeyDomain
+// @in                          header
+// @name												x-group
 func main() {
 	core.WritePIDToFile()              // vscode debug模式下，将pid写入txt文件，停止时可以根据pid进行kill操作
 	global.OMS_VP = core.Viper()       // 加载配置文件

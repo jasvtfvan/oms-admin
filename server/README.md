@@ -70,8 +70,27 @@ group   1<-->n  business    user切换到指定group，每条业务数据隶属�
 
 #### 权限策略
 1. 通过JWT进行token验证，非cookie以便多客户端兼容
-2. 权限模型使用RBAC with domains的casbin模型，将role、group、http_path、http_method放到
-3. 只将部分api需要权限验证，针对操作基础数据api或特殊权限api，普通api不做严格限制
+2. 权限模型使用RBAC with domains的casbin模型，将role、group、http_path、http_method放到policy中
+3. 只将部分api（或资源）需要权限验证，针对操作基础数据api或特殊权限api，普通api不做严格限制
+4. 请求时需要header加入group的code，便于组织隔离
+5. 是否记录操作记录，根据用户的logOption标志
+
+#### swagger
+1. 安装全局swagger命令工具
+```golang
+go install github.com/swaggo/swag/cmd/swag@latest
+```
+2. 查看swagger命令工具版本
+```golang
+swag -v
+```
+3. 修改main.go的注释信息，修改各个接口的注释信息
+4. 在/server目录下，执行一键生成docs命令
+```golang
+swag init
+``` 
+5. 根据控制台输出的文档地址，打开浏览器调试，例如：
+http://127.0.0.1:8888/swagger/index.html
 
 #### docker-redis启动
 ```sh

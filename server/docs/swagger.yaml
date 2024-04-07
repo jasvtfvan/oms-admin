@@ -1,0 +1,115 @@
+basePath: /
+definitions:
+  request.Login:
+    properties:
+      captcha:
+        description: 验证码
+        type: string
+      captchaId:
+        description: 验证码ID
+        type: string
+      secret:
+        description: '由用户名和密码组成，例如: {"username":"oms_admin","password":"Oms123Admin456"}'
+        type: string
+    type: object
+  response.Login:
+    properties:
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/response.LoginUser'
+    type: object
+  response.LoginGroups:
+    properties:
+      orgCode:
+        type: string
+      shortName:
+        type: string
+      sort:
+        type: integer
+      sysRoles:
+        items:
+          $ref: '#/definitions/response.LoginRole'
+        type: array
+    type: object
+  response.LoginRole:
+    properties:
+      roleCode:
+        type: string
+      roleName:
+        type: string
+      sort:
+        type: integer
+    type: object
+  response.LoginUser:
+    properties:
+      avatar:
+        type: string
+      email:
+        type: string
+      isAdmin:
+        type: boolean
+      logOperation:
+        type: boolean
+      nickName:
+        type: string
+      phone:
+        type: string
+      sysGroups:
+        items:
+          $ref: '#/definitions/response.LoginGroups'
+        type: array
+      username:
+        type: string
+    type: object
+  response.Response:
+    properties:
+      code:
+        type: integer
+      data: {}
+      msg:
+        type: string
+    type: object
+host: 127.0.0.1:8888
+info:
+  contact: {}
+  description: 使用gin的全栈开发基础平台
+  title: Oms-Admin Swagger API接口文档
+  version: V1.0.0
+paths:
+  /base/login:
+    post:
+      parameters:
+      - description: 用户名, 密码, 验证码
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.Login'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回包括用户信息,token,过期时间
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.Login'
+                msg:
+                  type: string
+              type: object
+      summary: 用户登录
+      tags:
+      - Base
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: x-token
+    type: apiKey
+  ApiKeyDomain:
+    in: header
+    name: x-group
+    type: apiKey
+swagger: "2.0"

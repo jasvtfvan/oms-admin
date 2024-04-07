@@ -7,9 +7,12 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jasvtfvan/oms-admin/server/docs"
 	"github.com/jasvtfvan/oms-admin/server/global"
 	"github.com/jasvtfvan/oms-admin/server/middleware"
 	"github.com/jasvtfvan/oms-admin/server/router"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"go.uber.org/zap"
 )
 
@@ -84,6 +87,11 @@ func Routers(logger *zap.Logger) *gin.Engine {
 	} else {
 		r.Use(middleware.Cors())
 	}
+
+	// 注册swagger
+	docs.SwaggerInfo.BasePath = global.OMS_CONFIG.System.RouterPrefix
+	r.GET(global.OMS_CONFIG.System.RouterPrefix+"/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	global.OMS_LOG.Info("register swagger handler! swagger 注册成功!")
 
 	// 注册路由-不做鉴权
 	publicGroup := r.Group(global.OMS_CONFIG.System.RouterPrefix)
