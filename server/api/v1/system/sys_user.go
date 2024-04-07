@@ -60,7 +60,7 @@ func (u *UserApi) ResetPassword(c *gin.Context) {
 // @Produce	application/json
 // @Param	id	path	int	true	"用户ID"
 // @Success	200	{object}	response.Response{code=int,data=any,msg=string}
-// @Router	/user/enable/{id} [put]
+// @Router	/user/enable/:{id} [put]
 func (u *UserApi) EnableUser(c *gin.Context) {
 	id := c.Param("id")
 	if id == "" {
@@ -83,7 +83,7 @@ func (u *UserApi) EnableUser(c *gin.Context) {
 // @Produce	application/json
 // @Param	id	path	int	true	"用户ID"
 // @Success	200	{object}	response.Response{code=int,data=any,msg=string}
-// @Router	/user/disable/{id} [put]
+// @Router	/user/disable/:{id} [put]
 func (u *UserApi) DisableUser(c *gin.Context) {
 	id := c.Param("id")
 	if id == "" {
@@ -109,7 +109,7 @@ func (u *UserApi) DisableUser(c *gin.Context) {
 // @Produce	application/json
 // @Param	id	path	int	true	"用户ID"
 // @Success	200	{object}	response.Response{code=int,data=any,msg=string}
-// @Router	/user/disable/{id} [delete]
+// @Router	/user/disable/:{id} [delete]
 func (u *UserApi) DeleteUser(c *gin.Context) {
 	id := c.Param("id")
 	if id == "" {
@@ -131,7 +131,7 @@ func (u *UserApi) DeleteUser(c *gin.Context) {
 
 // Captcha
 // @Tags	base
-// @Summary	重置密码
+// @Summary	获取验证码
 // @Produce	application/json
 // @Success	200	{object}	response.Response{code=int,data=sysRes.SysCaptcha,msg=string}	"返回验证码信息"
 // @Router	/base/captcha [post]

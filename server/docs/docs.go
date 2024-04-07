@@ -23,7 +23,7 @@ const docTemplate = `{
                 "tags": [
                     "base"
                 ],
-                "summary": "重置密码",
+                "summary": "获取验证码",
                 "responses": {
                     "200": {
                         "description": "返回验证码信息",
@@ -88,6 +88,43 @@ const docTemplate = `{
                                         },
                                         "data": {
                                             "$ref": "#/definitions/response.Login"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/cache/test-cache": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "test"
+                ],
+                "summary": "测试local_cache",
+                "responses": {
+                    "200": {
+                        "description": "返回结果信息",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "object"
                                         },
                                         "msg": {
                                             "type": "string"
@@ -248,7 +285,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/disable/{id}": {
+        "/user/disable/:{id}": {
             "put": {
                 "produces": [
                     "application/json"
@@ -338,7 +375,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/enable/{id}": {
+        "/user/enable/:{id}": {
             "put": {
                 "produces": [
                     "application/json"
