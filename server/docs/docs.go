@@ -15,18 +15,55 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/base/captcha": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "base"
+                ],
+                "summary": "重置密码",
+                "responses": {
+                    "200": {
+                        "description": "返回验证码信息",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "$ref": "#/definitions/response.SysCaptcha"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/base/login": {
             "post": {
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Base"
+                    "base"
                 ],
                 "summary": "用户登录",
                 "parameters": [
                     {
-                        "description": "用户名, 密码, 验证码",
+                        "description": "secret（必填），验证码+验证码id（选填）",
                         "name": "data",
                         "in": "body",
                         "required": true,
@@ -37,7 +74,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "返回包括用户信息,token,过期时间",
+                        "description": "返回用户信息,token",
                         "schema": {
                             "allOf": [
                                 {
@@ -46,8 +83,343 @@ const docTemplate = `{
                                 {
                                     "type": "object",
                                     "properties": {
+                                        "code": {
+                                            "type": "integer"
+                                        },
                                         "data": {
                                             "$ref": "#/definitions/response.Login"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/init/check": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "db"
+                ],
+                "summary": "检查DB是否初始化",
+                "responses": {
+                    "200": {
+                        "description": "返回提示信息",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/init/db": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "db"
+                ],
+                "summary": "初始化DB",
+                "responses": {
+                    "200": {
+                        "description": "返回提示信息",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/update/check": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "db"
+                ],
+                "summary": "检查更新",
+                "responses": {
+                    "200": {
+                        "description": "返回提示信息",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "$ref": "#/definitions/response.SysDB"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/update/db": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "db"
+                ],
+                "summary": "升级DB",
+                "responses": {
+                    "200": {
+                        "description": "返回提示信息",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "$ref": "#/definitions/response.SysDB"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/user/disable/{id}": {
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "禁用用户",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "用户ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "删除用户",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "用户ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/user/enable/{id}": {
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "启用用户",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "用户ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/user/reset-pwd": {
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "重置密码",
+                "parameters": [
+                    {
+                        "description": "id（必填），password（必填）",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.ResetUserPassword"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回加密的密码，前端自行解密",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "object"
                                         },
                                         "msg": {
                                             "type": "string"
@@ -64,6 +436,9 @@ const docTemplate = `{
     "definitions": {
         "request.Login": {
             "type": "object",
+            "required": [
+                "secret"
+            ],
             "properties": {
                 "captcha": {
                     "description": "验证码",
@@ -74,7 +449,23 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "secret": {
-                    "description": "由用户名和密码组成，例如: {\"username\":\"oms_admin\",\"password\":\"Oms123Admin456\"}",
+                    "description": "由用户名和密码组成，例如: {\"username\":\"xxx\",\"password\":\"xxxxxx\"}",
+                    "type": "string"
+                }
+            }
+        },
+        "request.ResetUserPassword": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "description": "id",
+                    "type": "integer"
+                },
+                "password": {
+                    "description": "密码，omitempty该字段为空时在序列化时忽略它",
                     "type": "string"
                 }
             }
@@ -83,10 +474,16 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "token": {
+                    "description": "令牌",
                     "type": "string"
                 },
                 "user": {
-                    "$ref": "#/definitions/response.LoginUser"
+                    "description": "用户信息",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.LoginUser"
+                        }
+                    ]
                 }
             }
         },
@@ -94,15 +491,19 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "orgCode": {
+                    "description": "组织编码（唯一）",
                     "type": "string"
                 },
                 "shortName": {
+                    "description": "组织简称",
                     "type": "string"
                 },
                 "sort": {
+                    "description": "排序",
                     "type": "integer"
                 },
                 "sysRoles": {
+                    "description": "组织下的用户绑定的角色",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/response.LoginRole"
@@ -114,12 +515,15 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "roleCode": {
+                    "description": "角色编码（唯一）",
                     "type": "string"
                 },
                 "roleName": {
+                    "description": "角色名",
                     "type": "string"
                 },
                 "sort": {
+                    "description": "排序字段",
                     "type": "integer"
                 }
             }
@@ -128,30 +532,38 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "avatar": {
+                    "description": "头像",
                     "type": "string"
                 },
                 "email": {
+                    "description": "邮箱",
                     "type": "string"
                 },
                 "isAdmin": {
+                    "description": "是否管理员（每个组织的管理员）",
                     "type": "boolean"
                 },
                 "logOperation": {
+                    "description": "是否记录操作记录",
                     "type": "boolean"
                 },
                 "nickName": {
+                    "description": "昵称",
                     "type": "string"
                 },
                 "phone": {
+                    "description": "手机号",
                     "type": "string"
                 },
                 "sysGroups": {
+                    "description": "关联的组织",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/response.LoginGroups"
                     }
                 },
                 "username": {
+                    "description": "用户名",
                     "type": "string"
                 }
             }
@@ -165,6 +577,44 @@ const docTemplate = `{
                 "data": {},
                 "msg": {
                     "type": "string"
+                }
+            }
+        },
+        "response.SysCaptcha": {
+            "type": "object",
+            "properties": {
+                "captchaId": {
+                    "description": "验证码id",
+                    "type": "string"
+                },
+                "captchaLength": {
+                    "description": "验证码长度",
+                    "type": "integer"
+                },
+                "openCaptcha": {
+                    "description": "是否开启验证码验证",
+                    "type": "boolean"
+                },
+                "picPath": {
+                    "description": "验证码图片",
+                    "type": "string"
+                }
+            }
+        },
+        "response.SysDB": {
+            "type": "object",
+            "properties": {
+                "newVersion": {
+                    "description": "新版本",
+                    "type": "string"
+                },
+                "oldVersion": {
+                    "description": "老版本",
+                    "type": "string"
+                },
+                "updated": {
+                    "description": "是否已更新",
+                    "type": "boolean"
                 }
             }
         }

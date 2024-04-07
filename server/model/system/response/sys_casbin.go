@@ -1,9 +1,9 @@
 package response
 
 type CasbinInfo struct {
-	Path    string `json:"path"`
-	Method  string `json:"method"`
-	Checked bool   `json:"checked"`
+	Path    string `json:"path"`    // 路径obj
+	Method  string `json:"method"`  // 方法act
+	Checked bool   `json:"checked"` // 是否已选中（即拥有该权限）
 }
 
 // 需要通过casbin验证的所有资源

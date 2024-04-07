@@ -1,30 +1,30 @@
 package response
 
 type LoginRole struct {
-	RoleName string `json:"roleName"`
-	RoleCode string `json:"roleCode"`
-	Sort     uint8  `json:"sort"`
+	RoleName string `json:"roleName"` // 角色名
+	RoleCode string `json:"roleCode"` // 角色编码（唯一）
+	Sort     uint8  `json:"sort"`     // 排序字段
 }
 
 type LoginGroups struct {
-	ShortName string      `json:"shortName"`
-	OrgCode   string      `json:"orgCode"`
-	Sort      uint8       `json:"sort"`
-	SysRoles  []LoginRole `json:"sysRoles"`
+	ShortName string      `json:"shortName"` // 组织简称
+	OrgCode   string      `json:"orgCode"`   // 组织编码（唯一）
+	Sort      uint8       `json:"sort"`      // 排序
+	SysRoles  []LoginRole `json:"sysRoles"`  // 组织下的用户绑定的角色
 }
 
 type LoginUser struct {
-	Username     string        `json:"username"`
-	NickName     string        `json:"nickName"`
-	Avatar       string        `json:"avatar"`
-	Phone        string        `json:"phone"`
-	Email        string        `json:"email"`
-	IsAdmin      bool          `json:"isAdmin"`
-	LogOperation bool          `json:"logOperation"`
-	SysGroups    []LoginGroups `json:"sysGroups"`
+	Username     string        `json:"username"`     // 用户名
+	NickName     string        `json:"nickName"`     // 昵称
+	Avatar       string        `json:"avatar"`       // 头像
+	Phone        string        `json:"phone"`        // 手机号
+	Email        string        `json:"email"`        // 邮箱
+	IsAdmin      bool          `json:"isAdmin"`      // 是否管理员（每个组织的管理员）
+	LogOperation bool          `json:"logOperation"` // 是否记录操作记录
+	SysGroups    []LoginGroups `json:"sysGroups"`    // 关联的组织
 }
 
 type Login struct {
-	User  LoginUser `json:"user"`
-	Token string    `json:"token"`
+	User  LoginUser `json:"user"`  // 用户信息
+	Token string    `json:"token"` // 令牌
 }

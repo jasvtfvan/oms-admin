@@ -23,6 +23,13 @@ var captchaBuildCountStore = captcha.GetBuildCountStore()
 
 type UserApi struct{}
 
+// ResetPassword
+// @Tags	user
+// @Summary	重置密码
+// @Produce	application/json
+// @Param	data	body	sysReq.ResetUserPassword	true	"id（必填），password（必填）"
+// @Success	200	{object}	response.Response{code=int,data=any,msg=string}	"返回加密的密码，前端自行解密"
+// @Router	/user/reset-pwd [put]
 func (u *UserApi) ResetPassword(c *gin.Context) {
 	var req sysReq.ResetUserPassword
 	err := c.ShouldBindJSON(&req) // 自动绑定
@@ -47,6 +54,13 @@ func (u *UserApi) ResetPassword(c *gin.Context) {
 	response.Success(gin.H{encryptedPassword: encryptedPassword}, "操作成功", c)
 }
 
+// EnableUser
+// @Tags	user
+// @Summary	启用用户
+// @Produce	application/json
+// @Param	id	path	int	true	"用户ID"
+// @Success	200	{object}	response.Response{code=int,data=any,msg=string}
+// @Router	/user/enable/{id} [put]
 func (u *UserApi) EnableUser(c *gin.Context) {
 	id := c.Param("id")
 	if id == "" {
@@ -63,6 +77,13 @@ func (u *UserApi) EnableUser(c *gin.Context) {
 	response.Success(nil, "操作成功", c)
 }
 
+// DisableUser
+// @Tags	user
+// @Summary	禁用用户
+// @Produce	application/json
+// @Param	id	path	int	true	"用户ID"
+// @Success	200	{object}	response.Response{code=int,data=any,msg=string}
+// @Router	/user/disable/{id} [put]
 func (u *UserApi) DisableUser(c *gin.Context) {
 	id := c.Param("id")
 	if id == "" {
@@ -82,6 +103,13 @@ func (u *UserApi) DisableUser(c *gin.Context) {
 	response.Success(nil, "操作成功", c)
 }
 
+// DisableUser
+// @Tags	user
+// @Summary	删除用户
+// @Produce	application/json
+// @Param	id	path	int	true	"用户ID"
+// @Success	200	{object}	response.Response{code=int,data=any,msg=string}
+// @Router	/user/disable/{id} [delete]
 func (u *UserApi) DeleteUser(c *gin.Context) {
 	id := c.Param("id")
 	if id == "" {
@@ -101,6 +129,12 @@ func (u *UserApi) DeleteUser(c *gin.Context) {
 	response.Success(nil, "操作成功", c)
 }
 
+// Captcha
+// @Tags	base
+// @Summary	重置密码
+// @Produce	application/json
+// @Success	200	{object}	response.Response{code=int,data=sysRes.SysCaptcha,msg=string}	"返回验证码信息"
+// @Router	/base/captcha [post]
 func (u *UserApi) Captcha(c *gin.Context) {
 	key := c.ClientIP()                                                       // 使用ip当验证码的key
 	openCaptchaBuildCountMax := global.OMS_CONFIG.Captcha.OpenCaptchaBuildMax // 验证码次数最多可以生成多少次，超过后锁定timeout时长
@@ -142,7 +176,7 @@ func (u *UserApi) Captcha(c *gin.Context) {
 	}
 
 	captchaBuildCountStore.AddCount(key) // 生成验证码次数+1
-	response.Success(sysRes.SysCaptchaResponse{
+	response.Success(sysRes.SysCaptcha{
 		CaptchaId:     id,
 		PicPath:       b64s,
 		CaptchaLength: global.OMS_CONFIG.Captcha.KeyLong,
@@ -151,11 +185,11 @@ func (u *UserApi) Captcha(c *gin.Context) {
 }
 
 // Login
-// @Tags	Base
+// @Tags	base
 // @Summary	用户登录
 // @Produce	application/json
-// @Param	data	body	sysReq.Login	true	"用户名, 密码, 验证码"
-// @Success	200	{object}	response.Response{data=sysRes.Login,msg=string}	"返回包括用户信息,token,过期时间"
+// @Param	data	body	sysReq.Login	true	"secret（必填），验证码+验证码id（选填）"
+// @Success	200	{object}	response.Response{code=int,data=sysRes.Login,msg=string}	"返回用户信息,token"
 // @Router	/base/login [post]
 func (u *UserApi) Login(c *gin.Context) {
 	key := c.ClientIP()                                        // 使用ip当验证码的key

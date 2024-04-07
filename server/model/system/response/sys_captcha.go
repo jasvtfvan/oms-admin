@@ -1,8 +1,8 @@
 package response
 
-type SysCaptchaResponse struct {
-	CaptchaId     string `json:"captchaId"`
-	PicPath       string `json:"picPath"`
-	CaptchaLength int    `json:"captchaLength"`
-	OpenCaptcha   bool   `json:"openCaptcha"`
+type SysCaptcha struct {
+	CaptchaId     string `json:"captchaId"`     // 验证码id
+	PicPath       string `json:"picPath"`       // 验证码图片
+	CaptchaLength int    `json:"captchaLength"` // 验证码长度
+	OpenCaptcha   bool   `json:"openCaptcha"`   // 是否开启验证码验证
 }
