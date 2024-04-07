@@ -26,7 +26,7 @@ func CasbinHandler() gin.HandlerFunc {
 				}
 			}
 		} else {
-			response.Fail(nil, "解析令牌信息失败", ctx)
+			response.NoAuth(nil, "解析令牌信息失败", ctx)
 			ctx.Abort()
 			return
 		}
@@ -73,7 +73,7 @@ func handler(ctx *gin.Context, claims *utils.CustomClaims) {
 		ctx.Next()
 		return
 	} else {
-		response.Fail(nil, "权限不足", ctx)
+		response.Fail(nil, "没有该资源权限", ctx)
 		ctx.Abort()
 		return
 	}

@@ -57,6 +57,8 @@ func (*DbApi) InitDB(c *gin.Context) {
 // CheckUpdate
 // @Tags	db
 // @Summary	检查更新
+// @Security  ApiKeyAuth
+// @Security  ApiKeyDomain
 // @Produce	application/json
 // @Success	200	{object}	response.Response{code=int,data=sysRes.SysDB,msg=string}	"返回提示信息"
 // @Router	/update/check [post]
@@ -109,6 +111,8 @@ func (*DbApi) CheckUpdate(c *gin.Context) {
 // UpdateDB
 // @Tags	db
 // @Summary	升级DB
+// @Security  ApiKeyAuth
+// @Security  ApiKeyDomain
 // @Produce	application/json
 // @Success	200	{object}	response.Response{code=int,data=sysRes.SysDB,msg=string}	"返回提示信息"
 // @Router	/update/db [post]

@@ -26,6 +26,8 @@ type UserApi struct{}
 // ResetPassword
 // @Tags	user
 // @Summary	重置密码
+// @Security  ApiKeyAuth
+// @Security  ApiKeyDomain
 // @Produce	application/json
 // @Param	data	body	sysReq.ResetUserPassword	true	"id（必填），password（必填）"
 // @Success	200	{object}	response.Response{code=int,data=any,msg=string}	"返回加密的密码，前端自行解密"
@@ -57,6 +59,8 @@ func (u *UserApi) ResetPassword(c *gin.Context) {
 // EnableUser
 // @Tags	user
 // @Summary	启用用户
+// @Security  ApiKeyAuth
+// @Security  ApiKeyDomain
 // @Produce	application/json
 // @Param	id	path	int	true	"用户ID"
 // @Success	200	{object}	response.Response{code=int,data=any,msg=string}
@@ -80,6 +84,8 @@ func (u *UserApi) EnableUser(c *gin.Context) {
 // DisableUser
 // @Tags	user
 // @Summary	禁用用户
+// @Security  ApiKeyAuth
+// @Security  ApiKeyDomain
 // @Produce	application/json
 // @Param	id	path	int	true	"用户ID"
 // @Success	200	{object}	response.Response{code=int,data=any,msg=string}
@@ -106,6 +112,8 @@ func (u *UserApi) DisableUser(c *gin.Context) {
 // DisableUser
 // @Tags	user
 // @Summary	删除用户
+// @Security  ApiKeyAuth
+// @Security  ApiKeyDomain
 // @Produce	application/json
 // @Param	id	path	int	true	"用户ID"
 // @Success	200	{object}	response.Response{code=int,data=any,msg=string}

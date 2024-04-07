@@ -21,13 +21,13 @@ func JWTAuth() gin.HandlerFunc {
 		*/
 		token := ctx.Request.Header.Get("x-token")
 		if token == "" {
-			response.Fail(gin.H{"reload": true}, "未携带令牌，非法访问", ctx)
+			response.NoAuth(gin.H{"reload": true}, "未携带令牌，非法访问", ctx)
 			ctx.Abort()
 			return
 		}
 		orgCode := ctx.Request.Header.Get("x-group")
 		if orgCode == "" {
-			response.Fail(gin.H{"reload": true}, "组织编号不能为空", ctx)
+			response.NoAuth(gin.H{"reload": true}, "组织编号不能为空", ctx)
 			ctx.Abort()
 			return
 		}
@@ -39,11 +39,11 @@ func JWTAuth() gin.HandlerFunc {
 		claims, err := j.ParseToken(token)
 		if err != nil {
 			if errors.Is(err, utils.ErrTokenExpired) {
-				response.Fail(gin.H{"reload": true}, "令牌已过期，需重新登录", ctx)
+				response.NoAuth(gin.H{"reload": true}, "令牌已过期，需重新登录", ctx)
 				ctx.Abort()
 				return
 			}
-			response.Fail(gin.H{"reload": true}, err.Error(), ctx)
+			response.NoAuth(gin.H{"reload": true}, err.Error(), ctx)
 			ctx.Abort()
 			return
 		}
@@ -54,7 +54,7 @@ func JWTAuth() gin.HandlerFunc {
 		username := claims.Username
 		var cacheToken string = jwtStore.Get(username, false)
 		if token != cacheToken {
-			response.Fail(gin.H{"reload": true}, "其他客户端登录，令牌已失效", ctx)
+			response.NoAuth(gin.H{"reload": true}, "其他客户端登录，令牌已失效", ctx)
 			ctx.Abort()
 			return
 		}
@@ -69,7 +69,7 @@ func JWTAuth() gin.HandlerFunc {
 			}
 		}
 		if !hasGroup {
-			response.Fail(gin.H{"reload": true}, "没有组织权限", ctx)
+			response.NoAuth(gin.H{"reload": true}, "没有组织权限", ctx)
 			ctx.Abort()
 			return
 		}

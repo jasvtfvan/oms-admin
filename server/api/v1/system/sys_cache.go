@@ -13,6 +13,8 @@ type CacheApi struct{}
 // DoTestCache
 // @Tags	test
 // @Summary	测试local_cache
+// @Security  ApiKeyAuth
+// @Security  ApiKeyDomain
 // @Produce	application/json
 // @Success	200	{object}	response.Response{code=int,data=any,msg=string}	"返回结果信息"
 // @Router	/cache/test-cache [post]

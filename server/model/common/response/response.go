@@ -20,9 +20,9 @@ type Response struct {
 }
 
 const (
-	SUCCESS = 200
-	WARN    = 302
-	ERROR   = 4001
+	SUCCESS = http.StatusOK
+	ERROR   = http.StatusBadRequest
+	UN_AUTH = http.StatusUnauthorized
 )
 
 func Result(code int, data interface{}, msg string, c *gin.Context) {
@@ -38,10 +38,10 @@ func Success(data interface{}, message string, c *gin.Context) {
 	Result(SUCCESS, data, message+"!", c)
 }
 
-func Warn(data interface{}, message string, c *gin.Context) {
-	Result(WARN, data, message+"!", c)
-}
-
 func Fail(data interface{}, message string, c *gin.Context) {
 	Result(ERROR, data, message+"!", c)
+}
+
+func NoAuth(data interface{}, message string, c *gin.Context) {
+	Result(UN_AUTH, data, message+"!", c)
 }
