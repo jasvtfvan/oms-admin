@@ -96,6 +96,14 @@
         },
         "/cache/test-cache": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "ApiKeyDomain": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -207,6 +215,14 @@
         },
         "/update/check": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "ApiKeyDomain": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -244,6 +260,14 @@
         },
         "/update/db": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "ApiKeyDomain": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -281,6 +305,14 @@
         },
         "/user/disable/:{id}": {
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "ApiKeyDomain": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -325,6 +357,14 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "ApiKeyDomain": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -371,6 +411,14 @@
         },
         "/user/enable/:{id}": {
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "ApiKeyDomain": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -417,6 +465,14 @@
         },
         "/user/reset-pwd": {
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "ApiKeyDomain": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],

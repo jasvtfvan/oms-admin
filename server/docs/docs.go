@@ -102,6 +102,14 @@ const docTemplate = `{
         },
         "/cache/test-cache": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "ApiKeyDomain": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -213,6 +221,14 @@ const docTemplate = `{
         },
         "/update/check": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "ApiKeyDomain": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -250,6 +266,14 @@ const docTemplate = `{
         },
         "/update/db": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "ApiKeyDomain": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -287,6 +311,14 @@ const docTemplate = `{
         },
         "/user/disable/:{id}": {
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "ApiKeyDomain": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -331,6 +363,14 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "ApiKeyDomain": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -377,6 +417,14 @@ const docTemplate = `{
         },
         "/user/enable/:{id}": {
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "ApiKeyDomain": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -423,6 +471,14 @@ const docTemplate = `{
         },
         "/user/reset-pwd": {
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "ApiKeyDomain": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
