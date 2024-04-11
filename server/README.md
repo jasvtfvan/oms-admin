@@ -173,3 +173,5 @@ tinyint vs int，float vs double，date vs datetime
 #### 特别鸣谢
 [piexlmax](https://github.com/piexlmax)  https://www.gin-vue-admin.com/
 [ZHOUYI](https://gitee.com/Z568_568)  https://gitee.com/Z568_568/ZY-Admin-template
+[https://www.vue3js.cn/](https://www.vue3js.cn/)
+[https://buqiyuan.github.io/vue3-antdv-admin-docs/](https://buqiyuan.github.io/vue3-antdv-admin-docs/)

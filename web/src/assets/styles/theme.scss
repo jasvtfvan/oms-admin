@@ -1,0 +1,40 @@
+// @import 'ant-design-vue/lib/style/themes/default.less';
+// @import 'ant-design-vue/dist/antd.dark.less';
+
+$white: #fff;
+$black: #000;
+
+html:not(.dark) {
+  $component-background: $white;
+}
+
+
+@mixin setStyle($className, $propName) {
+  html.dark &.#{$className} {
+    #{$propName}: $black;
+  }
+
+  html:not(.dark) &.#{$className} {
+    #{$propName}: $white;
+  }
+}
+
+
+@mixin themeColor($classNames) {
+  @each $className in $classNames {
+    @include setStyle($className, background-color);
+    @include setStyle($className, color);
+  }
+}
+
+@mixin themeTextColor($classNames) {
+  @each $className in $classNames {
+    @include setStyle($className, color);
+  }
+}
+
+@mixin themeBgColor($classNames) {
+  @each $className in $classNames {
+    @include setStyle($className, background-color);
+  }
+}

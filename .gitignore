@@ -1,6 +1,6 @@
 .idea/
-/web/node_modules
-/web/dist
+web/node_modules
+web/dist
 
 .DS_Store
 
@@ -34,3 +34,4 @@ yarn-error.log*
 *.iml
 web/.pnpm-debug.log
 web/pnpm-lock.yaml
+web/package-lock.json
