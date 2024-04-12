@@ -1,12 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Index from '@/views/index.vue'
-
-const moduleDir = import.meta.glob('./modules/*.js')
-const modules = [];
-for (const path in moduleDir) {
-  const module = await moduleDir[path](); // TODO 需要改造成动态router，否则await在build时报错
-  modules.push(...module.default);
-}
+import modules from './modules'
 
 const routes = [
   {
