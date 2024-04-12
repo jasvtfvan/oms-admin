@@ -5,6 +5,6 @@
   </div>
 </template>
 
-<script setup>
+<script lang="js" setup>
 console.log(import.meta.env)
 </script>
