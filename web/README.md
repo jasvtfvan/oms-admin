@@ -33,3 +33,24 @@ npm run build
 ```sh
 npm run lint
 ```
+
+# 测试
+
+### build测试
+1. 安装**Live Server**工具
+2. 修改`vite.config.js`
+```conf
+base: './',
+```
+3. 修改`src/router/index.js`
+```js
+createWebHistory --替换成--> createWebHashHistory
+```
+4. 执行build
+```sh
+npm run build:staging
+```
+5. 打开dist_staging/执行右键index.html
+**Open With Live Server**
+6. 还原代码
+`vite.config.js`和`src/router/index.js`

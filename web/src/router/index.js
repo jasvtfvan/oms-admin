@@ -1,6 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Index from '@/views/index.vue'
-import modules from './modules'
+
+const moduleDir = import.meta.glob('./modules/*.js', { eager: true })
+const modules = [];
+for (const path in moduleDir) {
+  const module = moduleDir[path];
+  modules.push(...module.default);
+}
 
 const routes = [
   {
