@@ -6,8 +6,11 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 
+import Components from 'unplugin-vue-components/vite';
+import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers';
+
 // https://vitejs.dev/config/
-export default ({command, mode}) => {
+export default ({ command, mode }) => {
   const NODE_ENV = mode || 'development'
   const envConfig = dotenv.parse(fs.readFileSync(`.env.${NODE_ENV}`))
   for (const k in envConfig) {
@@ -15,7 +18,17 @@ export default ({command, mode}) => {
   }
 
   return defineConfig({
-    plugins: [vue(), vueJsx()],
+    plugins: [
+      vue(),
+      vueJsx(),
+      Components({
+        resolvers: [
+          AntDesignVueResolver({
+            importStyle: false, // css in js
+          }),
+        ],
+      }),
+    ],
     base: '/oms-admin/',
     server: {
       //本地服务器主机名 配置后可以使用本地网络访问
