@@ -12,6 +12,9 @@ import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers';
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 import path from 'path'
 
+import { visualizer } from 'rollup-plugin-visualizer'
+import vueSetupExtend from 'vite-plugin-vue-setup-extend'
+
 // https://vitejs.dev/config/
 export default ({ command, mode }) => {
   const NODE_ENV = mode || 'development'
@@ -24,9 +27,9 @@ export default ({ command, mode }) => {
     plugins: [
       vue(),
       vueJsx(),
-      // ant-design-vue 按需加载，页面直接引用即可
       Components({
         resolvers: [
+          // ant-design-vue 按需加载，页面直接引用即可
           AntDesignVueResolver({
             importStyle: false, // css in js
           }),
@@ -36,6 +39,10 @@ export default ({ command, mode }) => {
       createSvgIconsPlugin({
         iconDirs: [path.resolve(process.cwd(), 'src/assets/icons')],
       }),
+      // 打开分析
+      visualizer({ open: true, gzipSize: true }),
+      // <script setup name="home"> setup支持name
+      vueSetupExtend(),
     ],
     base: '/oms-admin/',
     server: {

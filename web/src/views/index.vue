@@ -1,19 +1,34 @@
 <template>
   <div>
-    <home-outlined />
-    <div class="svg-wrap">
-      <svg-icon name="logo" color="red"></svg-icon>
+    <div>
+      <a-button type="primary">占位</a-button>
+    </div>
+    <div>
+      <a-button type="primary">占位</a-button>
+    </div>
+    <div>
+      <a-button type="primary">占位</a-button>
+    </div>
+    <div>
+      <a-button type="primary">占位</a-button>
+    </div>
+    <div>
+      <a-button type="primary" @click="onSubmit">登录</a-button>
     </div>
   </div>
 </template>
 
 <script setup>
 import { onMounted } from 'vue'
-import { HomeOutlined } from '@ant-design/icons-vue'
+import { login } from '@/api/common/user'
 
 onMounted(() => {
   console.log('onMounted')
 })
+
+const onSubmit = () => {
+  login({ username: 'nihao' })
+}
 </script>
 
 <style lang="scss" scoped>
