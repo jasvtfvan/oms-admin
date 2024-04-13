@@ -58,7 +58,8 @@ function doShowLoading() {
 function doHideLoading() {
   activeLoadingCount--
   if (activeLoadingCount <= 0) {
-    clearTimeout(loadingTimer); // 0.4秒全部返回不需要loading
+    activeLoadingCount = 0;
+    if (loadingTimer) clearTimeout(loadingTimer); // 0.4秒全部返回不需要loading
     hideLoading();
   }
 }
@@ -147,7 +148,9 @@ class HttpRequest {
 
   static setInterceptors(instance, url, method) {
     instance.interceptors.request.use((config) => {
-      doShowLoading();
+      if (config.loading) {
+        doShowLoading();
+      }
       const conf = config;
       const { authorization } = conf;
       if (!conf.headers) {
@@ -160,13 +163,17 @@ class HttpRequest {
       }
       return conf;
     }, (err) => {
-      doHideLoading();
+      if (err.config.loading) {
+        doHideLoading();
+      }
       removePending(url, method);
       return Promise.reject(err);
     });
 
     instance.interceptors.response.use((res) => {
-      doHideLoading();
+      if (res.config.loading) {
+        doHideLoading();
+      }
       removePending(url, method);
       /** 下载请求 */
       const contentType = res.headers['content-type'];
@@ -187,7 +194,9 @@ class HttpRequest {
         return Promise.reject(data);
       }
     }, (err) => {
-      doHideLoading();
+      if (err.config.loading) {
+        doHideLoading();
+      }
       removePending(url, method);
       return handleRequestError(err);
     });

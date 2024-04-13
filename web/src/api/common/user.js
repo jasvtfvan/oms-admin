@@ -6,6 +6,7 @@ export function login(data) {
     url: '/api/GameLogin/Login',
     data,
     authorization: false,
+    loading: true,
   });
 }
 
@@ -14,5 +15,6 @@ export function logout() {
   return request.get({
     url: '/api/GameLogin/Logout',
     authorization: true,
+    loading: true,
   });
 }
