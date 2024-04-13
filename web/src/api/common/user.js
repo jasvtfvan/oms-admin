@@ -1,9 +1,9 @@
 import request from '@/api/request';
 
 // 登录接口
-export function login(data) {
+export function postLogin(data) {
   return request.post({
-    url: '/api/GameLogin/Login',
+    url: '/base/login',
     data,
     authorization: false,
     loading: true,
@@ -11,9 +11,9 @@ export function login(data) {
 }
 
 // 退出接口
-export function logout() {
-  return request.get({
-    url: '/api/GameLogin/Logout',
+export function postLogout() {
+  return request.post({
+    url: '/base/logout',
     authorization: true,
     loading: true,
   });

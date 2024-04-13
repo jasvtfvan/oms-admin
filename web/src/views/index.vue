@@ -1,16 +1,16 @@
 <template>
   <div>
     <div>
-      <a-button type="primary">占位</a-button>
+      <a-button>占位</a-button>
     </div>
     <div>
-      <a-button type="primary">占位</a-button>
+      <a-button danger @click="onLogout">退出</a-button>
     </div>
     <div>
-      <a-button type="primary">占位</a-button>
+      <a-button>占位</a-button>
     </div>
     <div>
-      <a-button type="primary">占位</a-button>
+      <a-button>占位</a-button>
     </div>
     <div>
       <a-button type="primary" @click="onSubmit">登录</a-button>
@@ -20,14 +20,18 @@
 
 <script setup>
 import { onMounted } from 'vue'
-import { login } from '@/api/common/user'
+import { useUserStore } from '@/stores/user'
+const userStore = useUserStore()
 
 onMounted(() => {
   console.log('onMounted')
 })
 
-const onSubmit = () => {
-  login({ username: 'nihao' })
+const onSubmit = async () => {
+  await userStore.Login({})
+}
+const onLogout = async () => {
+  await userStore.Logout()
 }
 </script>
 

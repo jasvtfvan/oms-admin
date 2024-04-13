@@ -1,10 +1,11 @@
 import axios from 'axios';
-import localCache from '@/utils/localCache';
-// import $store from '@/store'; // TODO 改成 useStore('user')
+import { useUserStore } from '@/stores/user';
 import { message } from 'ant-design-vue';
 import { useLoading } from '@/hooks/useLoading';
 
-const [messageApi, _] = message.useMessage()
+const userStore = useUserStore();
+const [messageApi, _] = message.useMessage();
+const { showLoading, hideLoading } = useLoading();
 
 const STATUS_MAP = {
   200: '请求成功',
@@ -41,7 +42,6 @@ function isPending(url, method) {
   return pending.includes(completeUrl);
 }
 
-const { showLoading, hideLoading } = useLoading();
 let activeLoadingCount = 0
 let loadingTimer
 // 执行loading
@@ -67,10 +67,11 @@ function doHideLoading() {
 // 提示信息关闭后
 function onToastClose(status) {
   if (status && /^401|425|429$/.test(status)) { // 401 425 429
-    // $store.dispatch('user/Logout').then(() => {
-    //   // window.location.href = url;
-    //   window.location.reload(); // 为了重新实例化vue-router对象 避免bug
-    // });
+    userStore.Logout.then(() => {
+      // window.location.href = url;
+      // 为了重新实例化vue-router对象 避免bug
+      window.location.reload();
+    })
   }
 }
 
@@ -78,11 +79,11 @@ function onToastClose(status) {
 function authorizationInvalidate(status, message) {
   if (status == 401) {
     messageApi.warning('连接超时，请重新登录', 2, () => {
-      // $store.dispatch('user/Logout').then(() => {
-      //   // window.location.href = url;
-      //   // 为了重新实例化vue-router对象 避免bug
-      //   window.location.reload();
-      // });
+      userStore.Logout.then(() => {
+        // window.location.href = url;
+        // 为了重新实例化vue-router对象 避免bug
+        window.location.reload();
+      })
     });
   } else {
     messageApi.warning(message || '请求数据失败', 2);
@@ -156,10 +157,11 @@ class HttpRequest {
       if (!conf.headers) {
         conf.headers = { Accept: 'application/json, text/plain, */*' };
       }
-      const token = localCache.get('token');
+      const token = userStore.token;
+      const group = userStore.group;
       if (authorization && token) {
         conf.headers['x-token'] = token;
-        conf.headers['x-group'] = 'group';
+        conf.headers['x-group'] = group;
       }
       return conf;
     }, (err) => {
