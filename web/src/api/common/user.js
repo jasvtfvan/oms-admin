@@ -6,7 +6,7 @@ export function postLogin(data) {
     url: '/base/login',
     data,
     authorization: false,
-    loading: true,
+    loading: false,
   });
 }
 

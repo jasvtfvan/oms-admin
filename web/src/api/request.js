@@ -3,7 +3,6 @@ import { useUserStore } from '@/stores/user';
 import { message } from 'ant-design-vue';
 import { useLoading } from '@/hooks/useLoading';
 
-const userStore = useUserStore();
 const [messageApi, _] = message.useMessage();
 const { showLoading, hideLoading } = useLoading();
 
@@ -67,6 +66,7 @@ function doHideLoading() {
 // 提示信息关闭后
 function onToastClose(status) {
   if (status && /^401|425|429$/.test(status)) { // 401 425 429
+    const userStore = useUserStore();
     userStore.Logout.then(() => {
       // window.location.href = url;
       // 为了重新实例化vue-router对象 避免bug
@@ -79,6 +79,7 @@ function onToastClose(status) {
 function authorizationInvalidate(status, message) {
   if (status == 401) {
     messageApi.warning('连接超时，请重新登录', 2, () => {
+      const userStore = useUserStore();
       userStore.Logout.then(() => {
         // window.location.href = url;
         // 为了重新实例化vue-router对象 避免bug
@@ -149,6 +150,7 @@ class HttpRequest {
 
   static setInterceptors(instance, url, method) {
     instance.interceptors.request.use((config) => {
+      const userStore = useUserStore();
       if (config.loading) {
         doShowLoading();
       }
