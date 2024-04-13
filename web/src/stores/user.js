@@ -44,10 +44,17 @@ export const useUserStore = defineStore('user', () => {
       postLogin(data)
         .then(res => {
           let { user, token } = res.data;
+          // token登录凭证
           if (!token) token = '';
           setToken(token);
+          // user用户信息
           if (!user) user = {};
           setUserInfo(user);
+          // group默认群组
+          let sysGroups = user.sysGroups || [];
+          if (sysGroups[0]) {
+            SetGroup(sysGroups[0].orgCode);
+          }
           resolve(user);
         })
         .catch(error => {
