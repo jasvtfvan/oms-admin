@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
-	"encoding/base64"
+	"encoding/hex"
 	"errors"
 	"fmt"
 )
@@ -30,15 +30,11 @@ func AesEncryptCBC(orig string, key string) (string, error) {
 	encrypted := make([]byte, len(origData))
 	// 加密
 	blockMode.CryptBlocks(encrypted, origData)
-	//使用RawURLEncoding 不要使用StdEncoding
-	//不要使用StdEncoding  放在url参数中回导致错误
-	return base64.RawURLEncoding.EncodeToString(encrypted), nil
+	return hex.EncodeToString(encrypted), nil
 }
 
 func AesDecryptCBC(encrypted string, key string) (string, error) {
-	//使用RawURLEncoding 不要使用StdEncoding
-	//不要使用StdEncoding  放在url参数中回导致错误
-	encryptedByte, _ := base64.RawURLEncoding.DecodeString(encrypted)
+	encryptedByte, _ := hex.DecodeString(encrypted)
 	k := []byte(key)
 
 	// 分组秘钥

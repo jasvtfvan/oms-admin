@@ -33,12 +33,16 @@
 import { onMounted } from 'vue'
 import { HomeOutlined } from '@ant-design/icons-vue'
 import { rsaEncrypt } from '@/utils/rsaEncryptOAEP'
+import { aesEncryptCBC, aesDecryptCBC } from '@/utils/crypto'
 
-onMounted(async() => {
+console.log(aesEncryptCBC('hello world ga ga'))
+console.log(aesDecryptCBC('012f7bf73e5b190d135f878514dbab2a44f6db23dd0e6f1b7319bbcd149ab94f'))
+
+onMounted(async () => {
   console.log('onMounted')
   // generateKeyPair()
   const user = '{"username":"oms_admin","password":"Oms123Admin456"}'
-  const res = await rsaEncrypt(user);
+  const res = await rsaEncrypt(user)
   console.log(res)
 })
 

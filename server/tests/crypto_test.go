@@ -19,7 +19,7 @@ func TestAesEncrypt(t *testing.T) {
 }
 
 func TestAesDecrypt(t *testing.T) {
-	encrypted := "_z-3AUtYLGL4yGQiB0LjTBBQWhzPaiNp-GLDoFxSuKs"
+	encrypted := "012f7bf73e5b190d135f878514dbab2a44f6db23dd0e6f1b7319bbcd149ab94f"
 	decrypted := crypto.AesDecrypt(encrypted)
 	fmt.Println(decrypted)
 }
