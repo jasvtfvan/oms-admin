@@ -18,3 +18,13 @@ export function postLogout() {
     loading: true,
   });
 }
+
+// 获取验证码
+export function postCaptcha(data) {
+  return request.post({
+    url: '/base/captcha',
+    data,
+    authorization: false,
+    loading: false,
+  });
+}

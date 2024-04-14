@@ -5,11 +5,12 @@
         <div class="svg-wrap">
           <svg-icon name="logo"></svg-icon>
         </div>
-        <div class="title">全域运营管理系统</div>
+        <div class="title">{{ fullName }}</div>
       </div>
+      <div class="brand">{{ brand }}</div>
       <a-form layout="horizontal" :model="loginFormModel" @submit.prevent="handleSubmit">
         <a-form-item>
-          <a-input v-model="loginFormModel.username" size="large" placeholder="admin">
+          <a-input v-model="loginFormModel.username" size="large" placeholder="用户名">
             <template #prefix> <user-outlined /> </template>
           </a-input>
         </a-form-item>
@@ -18,15 +19,15 @@
             v-model="loginFormModel.password"
             size="large"
             type="password"
-            placeholder="a123456"
+            placeholder="密码"
             autocomplete="new-password"
           >
             <template #prefix> <lock-outlined /></template>
           </a-input>
         </a-form-item>
-        <a-form-item>
+        <a-form-item v-if="loginFormModel.openCaptcha">
           <a-input
-            v-model="loginFormModel.verifyCode"
+            v-model="loginFormModel.captcha"
             placeholder="验证码"
             :maxlength="4"
             size="large"
@@ -34,7 +35,7 @@
             <template #prefix> <safety-outlined /> </template>
             <template #suffix>
               <img
-                :src="captcha"
+                :src="picPath"
                 class="absolute right-0 h-full cursor-pointer"
                 @click="updateCaptcha"
               />
@@ -48,60 +49,83 @@
         </a-form-item>
       </a-form>
     </section>
+    <footer class="login-footer">
+      <div>{{ footerInfo }}</div>
+    </footer>
   </article>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
 import { useUserStore } from '@/stores/user'
 import { UserOutlined, LockOutlined, SafetyOutlined } from '@ant-design/icons-vue'
+import setting from '@/setting.js'
 
+// use
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
 
+/** 网站信息 */
+const fullName = ref(setting.websiteInfo.fullName)
+const brand = ref(setting.websiteInfo.brand)
+const copyright = ref(setting.websiteInfo.copyright)
+const forTheRecord = ref(setting.websiteInfo.forTheRecord)
+const footerInfo = computed(() => `${copyright.value} | ${forTheRecord.value}`)
+
+/** 表单数据 */
 const loading = ref(false)
-const captcha = ref('')
 const loginFormModel = ref({
-  username: 'admin',
-  password: 'a123456',
-  verifyCode: '',
-  captchaId: ''
+  username: '',
+  password: '',
+  picPath: '',
+  openCaptcha: false,
+  captchaLength: 0,
+  captchaId: '',
+  captcha: '',
 })
 
 const updateCaptcha = async () => {
-  // const data = await Api.captcha.captchaCaptchaByImg({ width: 100, height: 50 })
-  // captcha.value = data.img
-  // loginFormModel.value.captchaId = data.id
+  const { captchaId, picPath, captchaLength, openCaptcha } = await userStore.Captcha({ width: 100, height: 50 })
+  loginFormModel.value.captchaId = captchaId;
+  loginFormModel.value.picPath = picPath;
+  loginFormModel.value.captchaLength = captchaLength;
+  loginFormModel.value.openCaptcha = openCaptcha;
 }
 updateCaptcha()
 
+// 登录方法
 const handleSubmit = async () => {
-  const { username, password, verifyCode } = loginFormModel.value
+  const { username, password, captcha, captchaId, openCaptcha } = loginFormModel.value
   if (username.trim() == '' || password.trim() == '') {
     return message.warning('用户名或密码不能为空！')
   }
-  if (!verifyCode) {
-    return message.warning('请输入验证码！')
+  if (openCaptcha) {
+    if (!captcha) {
+      return message.warning('请输入验证码！')
+    }
+    if (!captchaId) {
+      return message.warning('验证码ID丢失，请重新获取！', () => {
+        loginFormModel.value.captcha = ''
+      })
+    }
   }
   message.loading('登录中...', 0)
   loading.value = true
 
-  userStore
-    .Login(loginFormModel.value)
-    .then((res) => {
-      message.success('登录成功！')
-      setTimeout(() => router.replace(route.query.redirect || '/'))
-    })
-    .catch((_) => {
-      updateCaptcha()
-    })
-    .finally(() => {
-      loading.value = false
-      message.destroy()
-    })
+  try {
+    const {captcha, captchaId, username, password} = loginFormModel.value
+    await userStore.Login({captcha, captchaId, username, password})
+    message.success('登录成功！')
+    setTimeout(() => router.replace(route.query.redirect || '/home'))
+  } catch (_) {
+    updateCaptcha()
+  } finally {
+    loading.value = false
+    message.destroy()
+  }
 }
 </script>
 
@@ -122,7 +146,7 @@ const handleSubmit = async () => {
       display: flex;
       justify-content: center;
       align-items: center;
-      margin-bottom: 30px;
+      margin-bottom: 9px;
       .svg-wrap {
         width: 45px;
         height: 45px;
@@ -131,6 +155,12 @@ const handleSubmit = async () => {
         margin-left: 8px;
         font-size: 30px;
       }
+    }
+    .brand {
+      text-align: center;
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.45);
+      margin-bottom: 30px;
     }
     :deep(.ant-form) {
       width: 400px;
@@ -144,6 +174,13 @@ const handleSubmit = async () => {
         margin-right: 10px;
       }
     }
+  }
+  .login-footer {
+    position: absolute;
+    bottom: 0;
+    padding: 25px;
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.45);
   }
 }
 </style>

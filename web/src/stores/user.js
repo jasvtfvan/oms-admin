@@ -2,7 +2,8 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import localCache from '@/utils/localCache'
 import sessionCache from '@/utils/sessionCache'
-import { postLogin, postLogout } from '@/api/common/user'
+import { postLogin, postLogout, postCaptcha } from '@/api/common/user'
+import { rsaEncrypt } from '@/utils/rsaEncryptOAEP'
 
 export const useUserStore = defineStore('user', () => {
   // token登录凭证
@@ -41,7 +42,9 @@ export const useUserStore = defineStore('user', () => {
   // 登录
   const Login = async (data) => {
     return new Promise((resolve, reject) => {
-      postLogin(data)
+      const { username, password, captcha, captchaId } = data
+      const secret = rsaEncrypt(JSON.stringify({ username, password }))
+      postLogin({ secret, captcha, captchaId })
         .then(res => {
           let { user, token } = res.data;
           // token登录凭证
@@ -75,6 +78,29 @@ export const useUserStore = defineStore('user', () => {
       });
     });
   }
+  // 获取验证码
+  const Captcha = async (data) => {
+    return new Promise((resolve, reject) => {
+      postCaptcha(data)
+        .then(res => {
+          const {
+            captchaId,
+            picPath,
+            captchaLength,
+            openCaptcha,
+          } = res.data;
+          resolve({
+            captchaId,
+            picPath,
+            captchaLength,
+            openCaptcha,
+          });
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
+  }
 
   return {
     token, // 小写开头，getter
@@ -83,5 +109,6 @@ export const useUserStore = defineStore('user', () => {
     SetGroup, // 大写Set开头，对外暴露的action
     Login, // 大写开头，对外暴露的action
     Logout, // 大写开头，对外暴露的action
+    Captcha, // 大写开头，对外暴露的action
   }
 })
