@@ -2,7 +2,7 @@
   <div>
     <section class="error-page">
       <div class="info">
-        <img src="@/assets/images/empty.png" />
+        <img src="@/assets/images/empty.svg" />
         <h2 class="error-title">404 ERROR</h2>
         <p>您所访问的页面不存在，它或已被移动，删除或者重命名。</p>
         <p>请访问其他页面</p>

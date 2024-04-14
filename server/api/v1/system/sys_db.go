@@ -2,6 +2,7 @@ package system
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jasvtfvan/oms-admin/server/global"
@@ -11,6 +12,11 @@ import (
 )
 
 type DbApi struct{}
+
+// 这里是单机，如果是集群则需要分布式锁，比如使用redis
+var (
+	dbOnce sync.Once
+)
 
 // CheckInit
 // @Tags	db
@@ -36,17 +42,25 @@ func (*DbApi) CheckInit(c *gin.Context) {
 // @Router	/init/db [post]
 func (*DbApi) InitDB(c *gin.Context) {
 	if err := initDBService.CheckDB(); err != nil {
-		fmt.Println("[Golang] DB尚未初始化: " + err.Error())
-		if err := initDBService.InitDB(); err != nil {
-			// 初始化失败，写入fatal日志，因为代码错误，会导致程序不能正确运行
-			global.OMS_LOG.Fatal("初始化DB失败" + ": " + err.Error())
-			response.Fail(nil, "初始化DB失败", c)
-		} else {
-			// 初始化时清除缓存
-			global.OMS_REDIS.Clear(c)
-			global.OMS_FREECACHE.Clear()
-			fmt.Println("[Golang] 初始化DB成功")
-			response.Success(nil, "初始化DB成功", c)
+		var firstGoroutine bool = false
+		// 这里是单机，如果是集群则需要分布式锁
+		dbOnce.Do(func() {
+			fmt.Println("[Golang] DB尚未初始化: " + err.Error())
+			if err := initDBService.InitDB(); err != nil {
+				// 初始化失败，写入fatal日志，因为代码错误，会导致程序不能正确运行
+				global.OMS_LOG.Fatal("初始化DB失败" + ": " + err.Error())
+				response.Fail(nil, "初始化DB失败，检查服务后重启", c)
+			} else {
+				// 初始化时清除缓存
+				global.OMS_REDIS.Clear(c)
+				global.OMS_FREECACHE.Clear()
+				fmt.Println("[Golang] 初始化DB成功")
+				response.Success(nil, "初始化DB成功", c)
+			}
+			firstGoroutine = true
+		})
+		if !firstGoroutine {
+			response.Fail(gin.H{"needRefresh": true}, "初始化进行中", c)
 		}
 	} else {
 		fmt.Println("[Golang] DB已准备就绪")

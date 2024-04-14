@@ -43,7 +43,7 @@
           </a-input>
         </a-form-item>
         <a-form-item>
-          <a-button type="primary" html-type="submit" size="large" :loading="loading" block>
+          <a-button type="primary" html-type="submit" size="large" :loading="loginLoading" block>
             登录
           </a-button>
         </a-form-item>
@@ -58,15 +58,18 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { message } from 'ant-design-vue'
+import { message, Modal } from 'ant-design-vue'
 import { useUserStore } from '@/stores/user'
 import { UserOutlined, LockOutlined, SafetyOutlined } from '@ant-design/icons-vue'
+import { postInitCheck, postInitDb } from '@/api/common/db'
 import setting from '@/setting.js'
+import { useLoading } from '@/hooks/useLoading'
 
 // use
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
+const { showLoading, hideLoading } = useLoading()
 
 /** 网站信息 */
 const fullName = ref(setting.websiteInfo.fullName)
@@ -76,7 +79,7 @@ const forTheRecord = ref(setting.websiteInfo.forTheRecord)
 const footerInfo = computed(() => `${copyright.value} | ${forTheRecord.value}`)
 
 /** 表单数据 */
-const loading = ref(false)
+const loginLoading = ref(false)
 const loginFormModel = ref({
   username: '',
   password: '',
@@ -84,30 +87,115 @@ const loginFormModel = ref({
   openCaptcha: false,
   captchaLength: 0,
   captchaId: '',
-  captcha: '',
+  captcha: ''
 })
 
-const updateCaptcha = async () => {
-  const { captchaId, picPath, captchaLength, openCaptcha } = await userStore.Captcha({ width: 100, height: 50 })
-  loginFormModel.value.captchaId = captchaId;
-  loginFormModel.value.picPath = picPath;
-  loginFormModel.value.captchaLength = captchaLength;
-  loginFormModel.value.openCaptcha = openCaptcha;
+// 已经初始化
+const initReady = ref(false)
+// 全局loadingTimer
+let loadingTimer // 不需要响应式
+
+// 弹出提示框
+const openModal = () => {
+  Modal.confirm({
+    title: '尚未初始化，请选择操作',
+    content: '点击【开始】开始初始化，点击【检查】重新检查',
+    okText: '开始',
+    cancelText: '检查',
+    onOk: () => {
+      initDb()
+    },
+    onCancel: () => {
+      initCheck()
+    }
+  })
 }
-updateCaptcha()
+
+// 检查初始化
+const initCheck = async () => {
+  try {
+    if (loadingTimer) clearTimeout(loadingTimer)
+    showLoading()
+    await postInitCheck()
+    initReady.value = true
+    updateCaptcha()
+  } catch (error) {
+    initReady.value = false
+    openModal()
+  } finally {
+    loadingTimer = setTimeout(() => {
+      hideLoading()
+    }, 200)
+  }
+}
+initCheck()
+// 执行初始化
+const initDb = async () => {
+  try {
+    if (loadingTimer) clearTimeout(loadingTimer)
+    showLoading()
+    const { msg } = await postInitDb()
+    message.success(msg || '初始化成功')
+    initReady.value = true
+    updateCaptcha()
+  } catch (error) {
+    initReady.value = false
+    const { needRefresh } = error.data || {}
+    message.error({
+      content: error.msg || '初始化失败',
+      onClose: () => {
+        if (needRefresh) {
+          initCheck()
+        } else {
+          openModal()
+        }
+      }
+    })
+  } finally {
+    loadingTimer = setTimeout(() => {
+      hideLoading()
+    }, 200)
+  }
+}
+
+// 获取验证码
+const getCaptcha = async () => {
+  try {
+    const data = await userStore.Captcha({
+      width: 100,
+      height: 50
+    })
+    const { captchaId, picPath, captchaLength, openCaptcha } = data
+    loginFormModel.value.captchaId = captchaId
+    loginFormModel.value.picPath = picPath
+    loginFormModel.value.captchaLength = captchaLength
+    loginFormModel.value.openCaptcha = openCaptcha
+  } catch (error) {
+    message.error(error.msg || '获取验证码失败')
+  }
+}
+const updateCaptcha = async () => {
+  if (!initReady.value) {
+    return message.warning('系统尚未初始化')
+  }
+  getCaptcha()
+}
 
 // 登录方法
 const handleSubmit = async () => {
+  if (!initReady.value) {
+    return message.warning('系统尚未初始化')
+  }
   const { username, password, captcha, captchaId, openCaptcha } = loginFormModel.value
   if (username.trim() == '' || password.trim() == '') {
-    return message.warning('用户名或密码不能为空！')
+    return message.warning('用户名或密码不能为空')
   }
   if (openCaptcha) {
     if (!captcha) {
-      return message.warning('请输入验证码！')
+      return message.warning('请输入验证码')
     }
     if (!captchaId) {
-      return message.warning('验证码ID丢失，请重新获取！', () => {
+      return message.warning('验证码ID丢失，请重新获取', () => {
         loginFormModel.value.captcha = ''
       })
     }
@@ -116,9 +204,9 @@ const handleSubmit = async () => {
   loading.value = true
 
   try {
-    const {captcha, captchaId, username, password} = loginFormModel.value
-    await userStore.Login({captcha, captchaId, username, password})
-    message.success('登录成功！')
+    const { captcha, captchaId, username, password } = loginFormModel.value
+    await userStore.Login({ captcha, captchaId, username, password })
+    message.success('登录成功')
     setTimeout(() => router.replace(route.query.redirect || '/home'))
   } catch (_) {
     updateCaptcha()

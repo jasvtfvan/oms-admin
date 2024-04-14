@@ -76,8 +76,8 @@ function onToastClose(status) {
 }
 
 // 处理失败
-function authorizationInvalidate(status, message) {
-  if (status == 401) {
+function authorizationInvalidate(code, message) {
+  if (code == 401) {
     messageApi.warning('连接超时，请重新登录', 2, () => {
       const userStore = useUserStore();
       userStore.Logout.then(() => {
@@ -105,7 +105,7 @@ function handleRequestError(err) {
       messageApi.error(statusText || '服务器响应错误', 2, () => onToastClose(status));
     }
     return Promise.reject({
-      status: data.status == null ? status : data.status,
+      status: data.code == null ? status : data.code,
       message: dataMessage || statusText,
     });
   } else if (err.request) {
@@ -191,10 +191,10 @@ class HttpRequest {
         if (!data) {
           return Promise.reject({ status, message: statusText, statusText });
         }
-        if (/^[2-3]0\d$/.test(status) && data.status > 0) {
+        if (/^[2-3]0\d$/.test(status) && /^[2-3]0\d$/.test(data.code)) {
           return Promise.resolve(data);
         }
-        authorizationInvalidate(data.status, (data.message || statusText));
+        authorizationInvalidate(data.code, (data.message || statusText));
         return Promise.reject(data);
       }
     }, (err) => {

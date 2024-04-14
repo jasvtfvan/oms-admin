@@ -58,6 +58,7 @@ services:
       MYSQL_USER: 'root'
     volumes:
       - mysql:/var/lib/mysql
+      - init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - db_network
 

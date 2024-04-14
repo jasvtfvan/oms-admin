@@ -158,6 +158,15 @@ func (u *UserApi) Captcha(c *gin.Context) {
 		return
 	}
 
+	var req sysReq.SysCaptcha
+	err := c.ShouldBindJSON(&req) // 自动绑定
+	if err != nil {
+		captchaBuildCountStore.AddCount(key) // 生成验证码次数+1
+		global.OMS_LOG.Error("验证码获取失败:", zap.Error(err))
+		response.Fail(nil, "验证码获取失败", c)
+		return
+	}
+
 	openCaptcha := global.OMS_CONFIG.Captcha.OpenCaptcha // 防爆次数
 	captchaLoginCountStore = captchaLoginCountStore.UseWithCtx(c)
 	count := captchaLoginCountStore.GetCount(key) // 验证码次数
@@ -170,8 +179,16 @@ func (u *UserApi) Captcha(c *gin.Context) {
 		isOpen = true
 	}
 
-	height := global.OMS_CONFIG.Captcha.ImgHeight                                      // 验证码高度
-	width := global.OMS_CONFIG.Captcha.ImgWidth                                        // 验证码宽度
+	// 给高度和宽度赋值
+	var height int
+	var width int
+	if req.Height != 0 && req.Width != 0 {
+		height = req.Height
+		width = req.Width
+	} else {
+		height = global.OMS_CONFIG.Captcha.ImgHeight // 验证码高度
+		width = global.OMS_CONFIG.Captcha.ImgWidth   // 验证码宽度
+	}
 	keyLong := global.OMS_CONFIG.Captcha.KeyLong                                       // 验证码长度
 	driver := base64Captcha.NewDriverDigit(height, width, keyLong, 0.7, 80)            // 初始化driver
 	captcha := base64Captcha.NewCaptcha(driver, captchaBuildBase64Store.UseWithCtx(c)) // 新建验证码对象
@@ -320,6 +337,10 @@ func (u *UserApi) Login(c *gin.Context) {
 				SysRoles:  loginRoles,
 			})
 		}
+		isRootAdmin := false
+		if user.Username == global.OMS_CONFIG.System.Username {
+			isRootAdmin = true
+		}
 		response.Success(sysRes.Login{
 			User: sysRes.LoginUser{
 				Username:     user.Username,
@@ -328,6 +349,7 @@ func (u *UserApi) Login(c *gin.Context) {
 				Phone:        user.Phone,
 				Email:        user.Email,
 				IsAdmin:      user.IsAdmin,
+				IsRootAdmin:  isRootAdmin,
 				LogOperation: user.LogOperation,
 				SysGroups:    loginGroups,
 			},

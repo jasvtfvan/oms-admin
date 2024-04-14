@@ -5,8 +5,8 @@ export function postLogin(data) {
   return request.post({
     url: '/base/login',
     data,
-    authorization: false,
-    loading: false,
+    authorization: false, // 不使用该字段 == false
+    loading: false, // 不使用该字段 == false
   });
 }
 
@@ -24,7 +24,7 @@ export function postCaptcha(data) {
   return request.post({
     url: '/base/captcha',
     data,
-    authorization: false,
-    loading: false,
+    authorization: false, // 不使用该字段 == false
+    loading: false, // 不使用该字段 == false
   });
 }
