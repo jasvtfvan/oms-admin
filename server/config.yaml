@@ -67,6 +67,8 @@ system:
     username: oms_admin
     # 超级管理员初始密码
     password: Oms123Admin456
+    # 初始化系统的密码init/db接口
+    init-pwd: Oms123Admin456
     # debug、release、test，生产环境使用release
     env: debug
     db-type: mysql
@@ -80,7 +82,7 @@ system:
     use-tls: false
     tls-cert: ./resource/cert/server.pem
     tls-key: ./resource/cert/server.key
-version: v0.0.2
+version: v0.0.1
 zap:
     # debug、info、warn等等，生产环境使用info，如果查看请求信息使用debug
     level: debug

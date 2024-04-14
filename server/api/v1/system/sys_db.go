@@ -1,6 +1,7 @@
 package system
 
 import (
+	"encoding/json"
 	"fmt"
 	"sync"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/jasvtfvan/oms-admin/server/model/common/response"
 	sysRes "github.com/jasvtfvan/oms-admin/server/model/system/response"
 	"github.com/jasvtfvan/oms-admin/server/utils"
+	"github.com/jasvtfvan/oms-admin/server/utils/crypto"
 )
 
 type DbApi struct{}
@@ -41,6 +43,32 @@ func (*DbApi) CheckInit(c *gin.Context) {
 // @Success	200	{object}	response.Response{code=int,data=any,msg=string}	"返回提示信息"
 // @Router	/init/db [post]
 func (*DbApi) InitDB(c *gin.Context) {
+	/*
+		先判断初始化密码是否正确
+	*/
+	params, err := c.GetRawData()
+	if err != nil {
+		response.Fail(nil, "请求参数错误", c)
+		return
+	}
+	var req map[string]interface{}
+	err = json.Unmarshal(params, &req) // 反序列化
+	if err != nil {
+		response.Fail(nil, "请求参数错误", c)
+		return
+	}
+	if initPwdInput, ok := req["initPwd"].(string); ok {
+		initPwd := global.OMS_CONFIG.System.InitPwd
+		initPwdInputDecrypted := crypto.AesDecrypt(initPwdInput) // 对称解密
+		if initPwd != initPwdInputDecrypted {
+			response.Fail(nil, "初始化密码错误", c)
+			return
+		} // 不需要else，如果没有错误，就向下执行了
+	} else {
+		response.Fail(nil, "请求参数错误", c)
+		return
+	}
+
 	if err := initDBService.CheckDB(); err != nil {
 		var firstGoroutine bool = false
 		// 这里是单机，如果是集群则需要分布式锁

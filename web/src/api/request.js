@@ -76,7 +76,7 @@ function onToastClose(status) {
 }
 
 // 处理失败
-function authorizationInvalidate(code, message) {
+function authorizationInvalidate(code, msg) {
   if (code == 401) {
     messageApi.warning('连接超时，请重新登录', 2, () => {
       const userStore = useUserStore();
@@ -87,7 +87,7 @@ function authorizationInvalidate(code, message) {
       })
     });
   } else {
-    messageApi.warning(message || '请求数据失败', 2);
+    messageApi.warning(msg || '请求数据失败', 2);
   }
 }
 
@@ -96,18 +96,31 @@ function handleRequestError(err) {
   if (err.response) {
     console.error('请求失败:', err.response)
     const { status, data, statusText } = err.response;
-    const dataMessage = data.message || data.ErrorMessage;
-    if (data && dataMessage) {
-      messageApi.error(dataMessage, 2, () => onToastClose(status));
-    } else if (Object.hasOwnProperty.call(STATUS_MAP, status)) {
-      messageApi.error(statusText || STATUS_MAP[status], 2, () => onToastClose(status));
-    } else {
-      messageApi.error(statusText || '服务器响应错误', 2, () => onToastClose(status));
+    let code
+    let msg
+    if (data) { // data存在
+      if (typeof data == 'object') {
+        const retMsg = data.msg || data.message || data.ErrorMessage || statusText;
+        code = data.code == null ? status : data.code
+        msg = retMsg
+        messageApi.error(retMsg, 2, () => onToastClose(status));
+      } else {
+        code = status
+        msg = data
+        messageApi.error(data, 2, () => onToastClose(status));
+      }
+    } else { // data不存在
+      if (Object.hasOwnProperty.call(STATUS_MAP, status)) { // 已经定义了错误状态
+        code = status
+        msg = statusText || STATUS_MAP[status]
+        messageApi.error(statusText || STATUS_MAP[status], 2, () => onToastClose(status));
+      } else { // 未定义错误状态
+        code = status
+        msg = statusText || '服务器响应错误'
+        messageApi.error(statusText || '服务器响应错误', 2, () => onToastClose(status));
+      }
     }
-    return Promise.reject({
-      status: data.code == null ? status : data.code,
-      message: dataMessage || statusText,
-    });
+    return Promise.reject({ code, msg, });
   } else if (err.request) {
     console.error('请求没有响应:', err.request)
     messageApi.error('请求没有响应', 2);
@@ -189,12 +202,12 @@ class HttpRequest {
         /** 非下载请求 */
         const { status, data, statusText } = res;
         if (!data) {
-          return Promise.reject({ status, message: statusText, statusText });
+          return Promise.reject({ code: status, msg: statusText });
         }
         if (/^[2-3]0\d$/.test(status) && /^[2-3]0\d$/.test(data.code)) {
           return Promise.resolve(data);
         }
-        authorizationInvalidate(data.code, (data.message || statusText));
+        authorizationInvalidate(data.code, (data.msg || statusText));
         return Promise.reject(data);
       }
     }, (err) => {

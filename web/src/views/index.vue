@@ -134,7 +134,7 @@ const initDb = async () => {
   try {
     if (loadingTimer) clearTimeout(loadingTimer)
     showLoading()
-    const { msg } = await postInitDb()
+    const { msg } = await postInitDb({initPwd: '123'})
     message.success(msg || '初始化成功')
     initReady.value = true
     updateCaptcha()
