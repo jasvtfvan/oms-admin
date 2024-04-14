@@ -32,9 +32,14 @@
 <script setup>
 import { onMounted } from 'vue'
 import { HomeOutlined } from '@ant-design/icons-vue'
+import { rsaEncrypt } from '@/utils/rsaEncryptOAEP'
 
-onMounted(() => {
+onMounted(async() => {
   console.log('onMounted')
+  // generateKeyPair()
+  const user = '{"username":"oms_admin","password":"Oms123Admin456"}'
+  const res = await rsaEncrypt(user);
+  console.log(res)
 })
 
 const description = 'This is a description.'
