@@ -41,9 +41,9 @@ export const useUserStore = defineStore('user', () => {
 
   // 登录
   const Login = async (data) => {
+    const { username, password, captcha, captchaId } = data
+    const secret = await rsaEncrypt(JSON.stringify({ username, password }))
     return new Promise((resolve, reject) => {
-      const { username, password, captcha, captchaId } = data
-      const secret = rsaEncrypt(JSON.stringify({ username, password }))
       postLogin({ secret, captcha, captchaId })
         .then(res => {
           let { user, token } = res.data;

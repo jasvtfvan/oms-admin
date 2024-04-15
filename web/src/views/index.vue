@@ -10,33 +10,38 @@
       <div class="brand">{{ brand }}</div>
       <a-form layout="horizontal" :model="loginFormModel" @submit.prevent="handleSubmit">
         <a-form-item>
-          <a-input v-model="loginFormModel.username" size="large" placeholder="用户名">
+          <a-input
+            v-model:value="loginFormModel.username"
+            size="large"
+            placeholder="用户名"
+            :maxlength="20"
+          >
             <template #prefix> <user-outlined /> </template>
           </a-input>
         </a-form-item>
         <a-form-item>
-          <a-input
-            v-model="loginFormModel.password"
+          <a-input-password
+            v-model:value="loginFormModel.password"
             size="large"
-            type="password"
             placeholder="密码"
             autocomplete="new-password"
+            :maxlength="20"
           >
             <template #prefix> <lock-outlined /></template>
-          </a-input>
+          </a-input-password>
         </a-form-item>
         <a-form-item v-if="loginFormModel.openCaptcha">
           <a-input
-            v-model="loginFormModel.captcha"
+            v-model:value="loginFormModel.captcha"
             placeholder="验证码"
-            :maxlength="4"
+            :maxlength="loginFormModel.captchaLength"
             size="large"
           >
             <template #prefix> <safety-outlined /> </template>
             <template #suffix>
               <img
-                :src="picPath"
-                class="absolute right-0 h-full cursor-pointer"
+                :src="loginFormModel.picPath"
+                style="position: absolute; right: 0; height: 100%; cursor: pointer"
                 @click="updateCaptcha"
               />
             </template>
@@ -52,15 +57,34 @@
     <footer class="login-footer">
       <div>{{ footerInfo }}</div>
     </footer>
+
+    <a-modal
+      :open="openDbPwd"
+      :closable="false"
+      :maskClosable="false"
+      title="DB初始化"
+      okText="开始"
+      @cancel="closeInitDb"
+      @ok="beginInitDb"
+    >
+      <p style="margin-top: 8px">输入DB初始化密码，点击开始</p>
+      <p style="margin-top: 8px">
+        <a-input-password v-model:value="initDbPwd" placeholder="初始化密码">
+          <template #prefix>
+            <KeyOutlined style="padding-right: 6px" />
+          </template>
+        </a-input-password>
+      </p>
+    </a-modal>
   </article>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { message, Modal } from 'ant-design-vue'
 import { useUserStore } from '@/stores/user'
-import { UserOutlined, LockOutlined, SafetyOutlined } from '@ant-design/icons-vue'
+import { UserOutlined, LockOutlined, SafetyOutlined, KeyOutlined } from '@ant-design/icons-vue'
 import { postInitCheck, postInitDb } from '@/api/common/db'
 import setting from '@/setting.js'
 import { useLoading } from '@/hooks/useLoading'
@@ -90,21 +114,39 @@ const loginFormModel = ref({
   captchaId: '',
   captcha: ''
 })
+// 初始化DB的密码
+const initDbPwd = ref('')
+const openDbPwd = ref(false)
 
 // 已经初始化
 const initReady = ref(false)
 // 全局loadingTimer
 let loadingTimer // 不需要响应式
+// 进入后销毁
+message.destroy()
+
+// DB初始化开始
+const beginInitDb = () => {
+  openDbPwd.value = false
+  initDb()
+}
+// DB初始化操控
+const closeInitDb = () => {
+  openDbPwd.value = false
+  nextTick(() => {
+    openModal()
+  })
+}
 
 // 弹出提示框
 const openModal = () => {
   Modal.confirm({
-    title: '尚未初始化，请选择操作',
-    content: '点击【开始】开始初始化，点击【检查】重新检查',
-    okText: '开始',
-    cancelText: '检查',
+    title: 'DB尚未初始化',
+    content: '可选择【初始化DB】或【重新检查】',
+    okText: '初始化DB',
+    cancelText: '重新检查',
     onOk: () => {
-      initDb()
+      openDbPwd.value = true
     },
     onCancel: () => {
       initCheck()
@@ -132,27 +174,29 @@ const initCheck = async () => {
 initCheck()
 // 执行初始化
 const initDb = async () => {
+  const initDbPwdVal = initDbPwd.value
+  if (!initDbPwdVal) {
+    openDbPwd.value = true
+    return message.warning('初始化DB密码不能为空')
+  }
   try {
     if (loadingTimer) clearTimeout(loadingTimer)
     showLoading()
-    const param = aesEncryptCBC('{"initPwd": "Oms123Admin456"}')
+    const param = aesEncryptCBC('{"initPwd": "' + initDbPwdVal + '"}')
     const { msg } = await postInitDb({ secret: param })
     message.success(msg || '初始化成功')
+    initDbPwd.value = ''
     initReady.value = true
     updateCaptcha()
   } catch (error) {
+    initDbPwd.value = ''
     initReady.value = false
     const { needRefresh } = error.data || {}
-    message.error({
-      content: error.msg || '初始化失败',
-      onClose: () => {
-        if (needRefresh) {
-          initCheck()
-        } else {
-          openModal()
-        }
-      }
-    })
+    if (needRefresh) {
+      initCheck()
+    } else {
+      openModal()
+    }
   } finally {
     loadingTimer = setTimeout(() => {
       hideLoading()
@@ -172,9 +216,7 @@ const getCaptcha = async () => {
     loginFormModel.value.picPath = picPath
     loginFormModel.value.captchaLength = captchaLength
     loginFormModel.value.openCaptcha = openCaptcha
-  } catch (error) {
-    message.error(error.msg || '获取验证码失败')
-  }
+  } catch (_) {}
 }
 const updateCaptcha = async () => {
   if (!initReady.value) {
@@ -188,7 +230,8 @@ const handleSubmit = async () => {
   if (!initReady.value) {
     return message.warning('系统尚未初始化')
   }
-  const { username, password, captcha, captchaId, openCaptcha } = loginFormModel.value
+  const { username, password, captcha, captchaId, openCaptcha, captchaLength } =
+    loginFormModel.value
   if (username.trim() == '' || password.trim() == '') {
     return message.warning('用户名或密码不能为空')
   }
@@ -201,9 +244,12 @@ const handleSubmit = async () => {
         loginFormModel.value.captcha = ''
       })
     }
+    if (captcha.length != captchaLength) {
+      return message.warning('验证码长度不对')
+    }
   }
   message.loading('登录中...', 0)
-  loading.value = true
+  loginLoading.value = true
 
   try {
     const { captcha, captchaId, username, password } = loginFormModel.value
@@ -211,9 +257,11 @@ const handleSubmit = async () => {
     message.success('登录成功')
     setTimeout(() => router.replace(route.query.redirect || '/home'))
   } catch (_) {
-    updateCaptcha()
+    nextTick(() => {
+      updateCaptcha()
+    })
   } finally {
-    loading.value = false
+    loginLoading.value = false
     message.destroy()
   }
 }

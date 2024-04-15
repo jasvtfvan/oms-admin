@@ -3,7 +3,6 @@ import { useUserStore } from '@/stores/user';
 import { message } from 'ant-design-vue';
 import { useLoading } from '@/hooks/useLoading';
 
-const [messageApi, _] = message.useMessage();
 const { showLoading, hideLoading } = useLoading();
 
 const STATUS_MAP = {
@@ -78,7 +77,7 @@ function onToastClose(status) {
 // 处理失败
 function authorizationInvalidate(code, msg) {
   if (code == 401) {
-    messageApi.warning('连接超时，请重新登录', 2, () => {
+    message.error('连接超时，请重新登录', 2, () => {
       const userStore = useUserStore();
       userStore.Logout.then(() => {
         // window.location.href = url;
@@ -87,48 +86,52 @@ function authorizationInvalidate(code, msg) {
       })
     });
   } else {
-    messageApi.warning(msg || '请求数据失败', 2);
+    message.error(msg || '请求数据失败', 2);
   }
 }
 
 // 统一处理错误
 function handleRequestError(err) {
+  let code
+  let msg
   if (err.response) {
     console.error('请求失败:', err.response)
     const { status, data, statusText } = err.response;
-    let code
-    let msg
     if (data) { // data存在
       if (typeof data == 'object') {
         const retMsg = data.msg || data.message || data.ErrorMessage || statusText;
         code = data.code == null ? status : data.code
         msg = retMsg
-        messageApi.error(retMsg, 2, () => onToastClose(status));
+        message.error(retMsg, 2, () => onToastClose(status));
       } else {
         code = status
         msg = data
-        messageApi.error(data, 2, () => onToastClose(status));
+        message.error(data, 2, () => onToastClose(status));
       }
     } else { // data不存在
       if (Object.hasOwnProperty.call(STATUS_MAP, status)) { // 已经定义了错误状态
         code = status
         msg = statusText || STATUS_MAP[status]
-        messageApi.error(statusText || STATUS_MAP[status], 2, () => onToastClose(status));
+        message.error(statusText || STATUS_MAP[status], 2, () => onToastClose(status));
       } else { // 未定义错误状态
         code = status
         msg = statusText || '服务器响应错误'
-        messageApi.error(statusText || '服务器响应错误', 2, () => onToastClose(status));
+        message.error(statusText || '服务器响应错误', 2, () => onToastClose(status));
       }
     }
     return Promise.reject({ code, msg, });
   } else if (err.request) {
+    msg = '请求没有响应'
     console.error('请求没有响应:', err.request)
-    messageApi.error('请求没有响应', 2);
+    message.error(msg, 2);
   } else {
+    msg = '请求配置出错'
     console.error('请求配置出错:', err.message)
-    messageApi.error('请求配置出错', 2);
+    message.error(msg, 2);
   }
-  return Promise.reject(err);
+  code = -1;
+  msg = `${err.code} | ${err.message}`;
+  return Promise.reject({ code, msg, });
 }
 
 // 下载blob二进制文件

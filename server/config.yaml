@@ -1,5 +1,5 @@
 captcha:
-    key-long: 6
+    key-long: 4
     img-width: 240
     img-height: 80
     # 0代表直接开启，3代表登录失败3次之后开启

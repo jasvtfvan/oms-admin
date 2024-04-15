@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Index from '@/views/index.vue'
+import Nprogress from 'nprogress'
 
 const moduleDir = import.meta.glob('./modules/*.js', { eager: true })
 const modules = [];
@@ -30,7 +31,13 @@ const router = createRouter({
 
 
 router.beforeEach(async (to, from, next) => {
+  // 可以跳转后，开启Nprogress，并且执行next
+  Nprogress.start()
   next()
+})
+
+router.afterEach(async () => {
+  Nprogress.done()
 })
 
 router.onError((error) => {

@@ -26,5 +26,6 @@ module.exports = {
     'prefer-promise-reject-errors': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-else-return': 'off',
     "vue/multi-word-component-names": 'off',
+    // 'vue/no-v-model-argument': 'off',
   },
 }
