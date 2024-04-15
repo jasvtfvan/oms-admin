@@ -2,6 +2,7 @@
   <div>
     <section>
       <img src="@/assets/images/empty.svg" />
+      <img src="@/assets/images/empty.svg" />
     </section>
   </div>
 </template>

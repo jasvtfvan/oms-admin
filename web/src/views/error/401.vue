@@ -7,7 +7,7 @@
         <p>你没有权限去该页面。</p>
         <p>请访问其他页面</p>
         <nav>
-          <RouterLink :to="{ path: '/home', replace: true }">Back To Home</RouterLink>
+          <RouterLink :to="{ path: '/', replace: true }">Back To Home</RouterLink>
         </nav>
       </div>
     </section>

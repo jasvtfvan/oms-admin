@@ -7,7 +7,7 @@
         <p>您所访问的页面不存在，它或已被移动，删除或者重命名。</p>
         <p>请访问其他页面</p>
         <nav>
-          <RouterLink :to="{ path: '/home', replace: true }">Back To Home</RouterLink>
+          <RouterLink :to="{ path: '/', replace: true }">Back To Home</RouterLink>
         </nav>
       </div>
     </section>

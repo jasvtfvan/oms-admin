@@ -1,24 +1,25 @@
 export default [
   {
     path: '/organize',
+    redirect: '/organize/group',
     component: () => import('@/views/organize/index.vue'),
     children: [
       {
-        path: 'group',
+        path: '/group',
         component: () => import('@/views/organize/group.vue'),
         meta: {
           title: '企业管理',
         },
       },
       {
-        path: 'role',
+        path: '/role',
         component: () => import('@/views/organize/role.vue'),
         meta: {
           title: '角色管理',
         },
       },
       {
-        path: 'user',
+        path: '/user',
         component: () => import('@/views/organize/user.vue'),
         meta: {
           title: '用户管理',

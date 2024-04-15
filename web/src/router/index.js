@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Index from '@/views/index.vue'
 import Nprogress from 'nprogress'
 import { useUserStore } from '@/stores/user'
 
@@ -10,6 +9,7 @@ for (const path in moduleDir) {
   modules.push(...module.default);
 }
 
+const LOGIN_NAME = 'login'; // 第一个页面，通常是登录
 const routes = [
   {
     path: '/401',
@@ -28,11 +28,22 @@ const routes = [
     },
   },
   {
-    path: '/',
-    name: 'Index',
-    component: Index,
+    path: '/login',
+    name: LOGIN_NAME,
+    component: () => import('@/views/login/index.vue'),
+    meta: {
+      title: '登录',
+    },
   },
-  ...modules,
+  {
+    path: '/',
+    name: 'Layout',
+    redirect: '/dashboard',
+    component: () => import('@/layout/index.vue'),
+    children: [
+      ...modules,
+    ],
+  },
 ]
 
 const router = createRouter({
@@ -44,6 +55,9 @@ const router = createRouter({
 /**
  * 路由守卫
  */
+const whiteList = [
+  '/login',
+]
 
 function hasPermission(to) {
   // 获取用户权限列表
@@ -55,42 +69,30 @@ function hasPermission(to) {
   }
 }
 
-const whiteList = [
-  '/',
-]
-
 router.beforeEach(async (to, from, next) => {
-  if (whiteList.includes(to.path)) { // 白名单
-    Nprogress.start()
-    return next()
-  }
+  Nprogress.start()
   const userStore = useUserStore()
   const { token } = userStore; // 获取token
   if (token) { // token存在
     if (hasPermission(to)) { // 有权限
-      Nprogress.start()
-      return next()
+      next()
     } else { // 没有权限
-      Nprogress.start()
-      return next({ name: '401' })
+      next({ name: '401' })
     }
-  } else { // token不存在,跳到/根路径
-    let queryStr = '';
-    if (to.query && Object.keys(to.query).length > 0) {
-      Object.keys(to.query).forEach(key => {
-        queryStr += `&${key}=${to.query[key]}`;
-      });
+  } else { // token不存在
+    if (whiteList.includes(to.path)) { // 白名单
+      next()
+    } else {
+      next({ name: LOGIN_NAME, query: { redirect: to.fullPath }, replace: true });
     }
-    Nprogress.start()
-    return next(`/?redirect=${to.path}${queryStr}`);
   }
 })
 
 router.afterEach(async (to) => {
+  Nprogress.done();
   if (to.meta && to.meta.title) {
     document.title = to.meta.title;
   }
-  Nprogress.done();
 })
 
 router.onError((error) => {
