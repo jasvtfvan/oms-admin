@@ -1,7 +1,7 @@
 <template>
   <div>
     <section>
-      home页面
+      <img src="@/assets/images/empty.svg" />
     </section>
   </div>
 </template>

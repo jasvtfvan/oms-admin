@@ -1,5 +1,15 @@
 import request from '@/api/request';
 
+// 获取用户信息
+export function getUserInfo(data) {
+  return request.get({
+    url: '/base/userInfo',
+    params: data,
+    authorization: true,
+    loading: false, // 不使用该字段 == false
+  });
+}
+
 // 登录接口
 export function postLogin(data) {
   return request.post({

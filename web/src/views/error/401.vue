@@ -2,20 +2,20 @@
   <div>
     <section class="error-page">
       <div class="info">
-        <img src="@/assets/images/empty.svg" />
-        <h2 class="error-title">404 ERROR</h2>
-        <p>您所访问的页面不存在，它或已被移动，删除或者重命名。</p>
+        <img src="@/assets/images/401.svg" />
+        <h2 class="error-title">401 暂无权限</h2>
+        <p>你没有权限去该页面。</p>
         <p>请访问其他页面</p>
         <nav>
-          <RouterLink :to="{ path: '/', replace: true }">Back To Home</RouterLink>
+          <RouterLink :to="{ path: '/home', replace: true }">Back To Home</RouterLink>
         </nav>
       </div>
     </section>
   </div>
 </template>
-
 <script setup>
 </script>
+
 
 <style lang="scss" scoped>
 .error-page {
