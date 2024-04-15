@@ -14,12 +14,12 @@ func TestRsaGenerate(t *testing.T) {
 }
 
 func TestAesEncrypt(t *testing.T) {
-	encrypted := crypto.AesEncrypt("hello world ga ga")
+	encrypted := crypto.AesEncrypt("{\"initPwd\":\"Oms123Admin456\"}")
 	fmt.Printf("%s 长度: %d\n", encrypted, len(encrypted))
 }
 
 func TestAesDecrypt(t *testing.T) {
-	encrypted := "012f7bf73e5b190d135f878514dbab2a44f6db23dd0e6f1b7319bbcd149ab94f"
+	encrypted := "6794879eafffe1feea550af7c9fd7b7f9286e73ed23c634832c6c7246d5a9fb3"
 	decrypted := crypto.AesDecrypt(encrypted)
 	fmt.Println(decrypted)
 }

@@ -64,6 +64,7 @@ import { UserOutlined, LockOutlined, SafetyOutlined } from '@ant-design/icons-vu
 import { postInitCheck, postInitDb } from '@/api/common/db'
 import setting from '@/setting.js'
 import { useLoading } from '@/hooks/useLoading'
+import { aesEncryptCBC } from '@/utils/aesCrypto'
 
 // use
 const route = useRoute()
@@ -134,7 +135,8 @@ const initDb = async () => {
   try {
     if (loadingTimer) clearTimeout(loadingTimer)
     showLoading()
-    const { msg } = await postInitDb({initPwd: '123'})
+    const param = aesEncryptCBC('{"initPwd": "Oms123Admin456"}')
+    const { msg } = await postInitDb({ secret: param })
     message.success(msg || '初始化成功')
     initReady.value = true
     updateCaptcha()

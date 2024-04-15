@@ -46,25 +46,55 @@ func (*DbApi) InitDB(c *gin.Context) {
 	/*
 		先判断初始化密码是否正确
 	*/
+	var isParamsOk bool = true
 	params, err := c.GetRawData()
 	if err != nil {
-		response.Fail(nil, "请求参数错误", c)
-		return
+		isParamsOk = false
 	}
+	// 反序列化入参{"secret": "xxxxxxxxxx"}
 	var req map[string]interface{}
-	err = json.Unmarshal(params, &req) // 反序列化
-	if err != nil {
-		response.Fail(nil, "请求参数错误", c)
-		return
+	if isParamsOk {
+		err = json.Unmarshal(params, &req) // 反序列化
+		if err != nil {
+			isParamsOk = false
+		}
 	}
-	if initPwdInput, ok := req["initPwd"].(string); ok {
+	// 拿到secret值
+	var secret string
+	if isParamsOk {
+		var ok bool
+		secret, ok = req["secret"].(string)
+		if !ok {
+			isParamsOk = false
+		}
+	}
+	// 根据secret反序列化{"initPwd":"Oms123Admin456"}
+	var jsonObj map[string]interface{}
+	if isParamsOk {
+		secretDecrypted := crypto.AesDecrypt(secret)            // 对称解密
+		err = json.Unmarshal([]byte(secretDecrypted), &jsonObj) // 反序列化
+		if err != nil {
+			isParamsOk = false
+		}
+	}
+	// 拿到initPwd值
+	var initPwdStr string
+	if isParamsOk {
+		var ok bool
+		initPwdStr, ok = jsonObj["initPwd"].(string)
+		if !ok {
+			isParamsOk = false
+		}
+	}
+	// 判断initPwd和系统配置的密码是否相等
+	if isParamsOk {
 		initPwd := global.OMS_CONFIG.System.InitPwd
-		initPwdInputDecrypted := crypto.AesDecrypt(initPwdInput) // 对称解密
-		if initPwd != initPwdInputDecrypted {
+		if initPwd != initPwdStr {
 			response.Fail(nil, "初始化密码错误", c)
 			return
 		} // 不需要else，如果没有错误，就向下执行了
-	} else {
+	}
+	if !isParamsOk {
 		response.Fail(nil, "请求参数错误", c)
 		return
 	}
