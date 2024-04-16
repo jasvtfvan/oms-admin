@@ -1,7 +1,6 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import localCache from '@/utils/localCache'
-import sessionCache from '@/utils/sessionCache'
+import { localCache, sessionCache } from '@/utils/cache'
 import { postLogin, postLogout, postCaptcha } from '@/api/common/user'
 import { rsaEncrypt } from '@/utils/rsaEncryptOAEP'
 
