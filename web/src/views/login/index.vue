@@ -254,6 +254,7 @@ const handleSubmit = async () => {
   try {
     const { captcha, captchaId, username, password } = loginFormModel.value
     await userStore.Login({ captcha, captchaId, username, password })
+    await userStore.GetMenus()
     message.success('登录成功')
     setTimeout(() => router.replace(route.query.redirect || '/home'))
   } catch (_) {
@@ -316,8 +317,10 @@ const handleSubmit = async () => {
   .login-footer {
     position: absolute;
     bottom: 0;
-    padding: 25px;
-    font-size: 12px;
+    height: var(--app-footer-height);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: rgba(0, 0, 0, 0.45);
   }
 }

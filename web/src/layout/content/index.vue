@@ -9,5 +9,8 @@
 <style lang="scss" scoped>
 .layout-content {
   flex: none;
+  height: calc(100vh - var(--app-header-height) - var(--app-footer-height));
+  overflow: hidden;
+  overflow-y: auto;
 }
 </style>

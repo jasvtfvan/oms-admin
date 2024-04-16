@@ -1,8 +1,10 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { localCache, sessionCache } from '@/utils/cache'
-import { postLogin, postLogout, postCaptcha } from '@/api/common/user'
+import { postLogin, postLogout, postCaptcha } from '@/api/common/base'
+import { getMenus } from '@/api/common/user'
 import { rsaEncrypt } from '@/utils/rsaEncryptOAEP'
+import { addDynamicRoutes } from '@/router/helper/routeHelper'
 
 export const useUserStore = defineStore('user', () => {
   // token登录凭证
@@ -37,7 +39,37 @@ export const useUserStore = defineStore('user', () => {
     sessionCache.remove('userInfo')
     userInfo.value = {}
   }
+  // 菜单
+  const menus = ref([])
+  const setMenus = (val) => {
+    sessionCache.set('menus', val)
+    menus.value = val
+  }
+  const removeMenus = () => {
+    sessionCache.remove('menus')
+    menus.value = []
+  }
 
+  // 清空当前登录状态(userInfo,token,....)
+  const ClearLoginStatus = () => {
+    removeGroup();
+    removeMenus();
+    removeToken();
+    removeUserInfo();
+  };
+  // 获取菜单
+  const GetMenus = async () => {
+    try {
+      const res = await getMenus();
+      const menus = res.data || [];
+      addDynamicRoutes(menus);
+      setMenus(menus);
+      return menus;
+    } catch (error) {
+      addDynamicRoutes();
+      return error
+    }
+  };
   // 登录
   const Login = async (data) => {
     const { username, password, captcha, captchaId } = data
@@ -68,9 +100,7 @@ export const useUserStore = defineStore('user', () => {
   const Logout = async () => {
     return new Promise((resolve) => {
       postLogout().then(() => {
-        removeToken();
-        removeGroup();
-        removeUserInfo();
+        ClearLoginStatus();
         resolve();
       }).catch(() => {
         resolve();
@@ -102,12 +132,15 @@ export const useUserStore = defineStore('user', () => {
   }
 
   return {
-    token, // 小写开头，getter
-    group, // 小写开头，getter
+    group,
+    menus,
+    token,
     userInfo, // 小写开头，getter
-    SetGroup, // 大写Set开头，对外暴露的action
-    Login, // 大写开头，对外暴露的action
-    Logout, // 大写开头，对外暴露的action
-    Captcha, // 大写开头，对外暴露的action
+    Captcha,
+    ClearLoginStatus,
+    GetMenus,
+    Login,
+    Logout,
+    SetGroup, // 大写开头，对外暴露的action
   }
 })
