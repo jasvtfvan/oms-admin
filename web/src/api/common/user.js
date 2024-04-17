@@ -7,7 +7,7 @@ export function getMenus(data) {
     data: [
       'organize',
       'organizeGroup',
-      'demo',
+      '401',
     ],
     msg: 'ok',
   })

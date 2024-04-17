@@ -87,7 +87,7 @@ export const useUserStore = defineStore('user', () => {
   const GetMenus = async () => {
     let menuNames = [];
     let adminMenuNames = [];
-    if (isRootAdmin || isAdmin) {
+    if (isRootAdmin.value || isAdmin.value) {
       adminMenuNames = getAdminMenuNames();
     }
     try {

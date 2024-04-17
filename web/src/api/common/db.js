@@ -2,12 +2,17 @@ import request from '@/api/request';
 
 // 判断是否需要初始化
 export function postInitCheck(data) {
-  return request.post({
-    url: '/init/check',
-    data,
-    authorization: false, // 不使用该字段 == false
-    loading: false, // 不使用该字段 == false
-  });
+  // return request.post({
+  //   url: '/init/check',
+  //   data,
+  //   authorization: false, // 不使用该字段 == false
+  //   loading: false, // 不使用该字段 == false
+  // });
+  return Promise.resolve({
+    code: 200,
+    data: { ready: true },
+    msg: 'DB已准备就绪',
+  })
 }
 
 // 初始化数据库

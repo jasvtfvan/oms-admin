@@ -1,3 +1,5 @@
+import dayjs from 'dayjs'
+
 const DEFAULT_EXPIRE_TIME = 6 * 24 * 60 * 60; // 缓存单位秒，缓存6天
 const DEFAULT_LOCAL_PREFIX_KEY = '_local_cache_';
 const DEFAULT_SESSION_PREFIX_KEY = '_session_cache_';
@@ -41,6 +43,7 @@ export const createStorage = ({ prefixKey = '', storage = localStorage } = {}) =
       const stringData = JSON.stringify({
         value,
         expire: expireValue,
+        setTime: dayjs().format('YYYY/MM/DD HH:mm:ss'),
       })
       this[_storage].setItem(this[_getKey](key), stringData);
     }

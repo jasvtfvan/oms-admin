@@ -5,14 +5,13 @@ import { dynamicModules, rootLayout, defaultModules } from '@/router/layout'
 const _getAdminMenuNames = (modules = []) => {
   return modules.reduce((prev, curt) => {
     if (curt.children && curt.children.length) {
-      return prev.concat(_getAdminMenuNames(curt.children))
-    } else {
-      if (curt.meta && curt.meta.notAdminDefault) { // 非admin默认选中的
-        return prev
-      } else {
-        return prev.concat(curt.name)
-      }
+      prev = prev.concat(_getAdminMenuNames(curt.children), prev)
     }
+    // admin默认选中，如果notAdminDefault则默认不选中
+    if (!curt.meta || !curt.meta.notAdminDefault) {
+      prev = prev.concat(curt.name)
+    }
+    return prev
   }, []);
 }
 
@@ -25,9 +24,9 @@ export const getAdminMenuNames = () => {
 const _sortMenus = (menus) => {
   return menus
     .filter((m) => {
-      meta = m.meta || {};
+      const meta = m.meta || {};
       const isShow = !meta.hideInMenu; // 选出不隐藏的
-      children = m.children || [];
+      const children = m.children || [];
       if (isShow && children.length) {
         m.children = _sortMenus(children);
       }
@@ -51,13 +50,29 @@ const _getLayoutMenus = (modules = [], menuNames = []) => {
       name: module.name || '', // 菜单名称
       meta: module.meta || {}, // 菜单属性
     }
-    if (!target.name && !target.meta.hideInMenu) target.meta.hideInMenu = true
-    if (!menuNames.includes(target.meta.name)) target.meta.hideInMenu = true
-
+    if (!target.name) target.meta.hideInMenu = true
+    if (!menuNames.includes(target.name)) target.meta.hideInMenu = true
     if (module.children && module.children.length) {
       target.children = _getLayoutMenus(module.children, menuNames)
     }
+    menus.push(target)
+  })
+  return menus
+}
 
+// 递归子方法，去掉所有component
+const _getLayoutMenusDefault = (modules = []) => {
+  const menus = []
+  modules.forEach(module => {
+    const target = {
+      path: module.path || '/', // 菜单路径
+      name: module.name || '', // 菜单名称
+      meta: module.meta || {}, // 菜单属性
+    }
+    if (!target.name) target.meta.hideInMenu = true
+    if (module.children && module.children.length) {
+      target.children = _getLayoutMenus(module.children, menuNames)
+    }
     menus.push(target)
   })
   return menus
@@ -65,9 +80,11 @@ const _getLayoutMenus = (modules = [], menuNames = []) => {
 
 // 根据menuNames（不包含/home等默认路由）获取菜单
 export const getLayoutMenus = (menuNames = []) => {
-  const modules = [...defaultModules, ...dynamicModules]
-  const menus = _getLayoutMenus(modules, menuNames)
-  return _sortMenus(menus)
+  const menusDefault = _getLayoutMenusDefault(defaultModules)
+  const menusDynamic = _getLayoutMenus(dynamicModules, menuNames)
+  const menus = [...menusDefault, ...menusDynamic]
+  const sortedMenus = _sortMenus(menus)
+  return sortedMenus
 }
 
 // 把menu转成路由，menuNames不包含则隐藏，虽然包含如何本身隐藏的继续隐藏，通过跳转时判断权限
@@ -75,8 +92,8 @@ const _transformMenuToRoutes = (modules = [], menuNames = []) => {
   modules.forEach(route => {
     if (!route.meta) route.meta = {}
     if (!route.meta.name) route.meta.name = ''
-    if (!route.name && !route.meta.hideInMenu) route.meta.hideInMenu = true
-    if (!menuNames.includes(route.meta.name)) route.meta.hideInMenu = true
+    if (!route.name) route.meta.hideInMenu = true
+    if (!menuNames.includes(route.name)) route.meta.hideInMenu = true
     if (route.children && route.children.length) {
       _transformMenuToRoutes(route.children, menuNames);
     }

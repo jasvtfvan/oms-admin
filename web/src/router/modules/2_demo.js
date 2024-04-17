@@ -6,7 +6,6 @@ export default [
     meta: {
       title: 'demo',
       sortMenu: 102,
-      notAdminDefault: true, // 管理员默认不选中
     },
   },
   {
