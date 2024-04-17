@@ -13,6 +13,7 @@ export const defaultModules = [{
   name: 'home',
   component: () => import('@/views/home/index.vue'),
   meta: {
+    icon: 'HomeOutlined',
     title: '首页',
     sortMenu: 0,
   },

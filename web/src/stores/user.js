@@ -41,7 +41,7 @@ export const useUserStore = defineStore('user', () => {
     userInfo.value = {}
   }
   // 菜单，没有权限则隐藏，有权限原来隐藏的依然隐藏
-  const menus = ref([])
+  const menus = ref(sessionCache.get('menus') || [])
   const setMenus = (val = []) => {
     sessionCache.set('menus', val)
     menus.value = val
@@ -51,7 +51,7 @@ export const useUserStore = defineStore('user', () => {
     menus.value = []
   }
   // 菜单名，包含则有权访问路由，跟隐藏无关
-  const menuNames = ref([])
+  const menuNames = ref(sessionCache.get('menuNames') || [])
   const setMenuNames = (val = []) => {
     sessionCache.set('menuNames', val)
     menuNames.value = val
@@ -61,14 +61,16 @@ export const useUserStore = defineStore('user', () => {
     menuNames.value = []
   }
 
+  const groups = computed(() => {
+    return userInfo.value.sysGroups || [];
+  })
   // 是否超级管理员
   const isRootAdmin = computed(() => {
     return userInfo.value.isRootAdmin
   })
   // 根据group，判断是否为管理员
   const isAdmin = computed(() => {
-    const sysGroups = userInfo.sysGroups || [];
-    const foundGroup = sysGroups.find(grp => grp.orgCode == group);
+    const foundGroup = groups.find(grp => grp.orgCode == group);
     if (foundGroup && foundGroup.sysRoles && foundGroup.sysRoles.length) {
       return foundGroup.sysRoles.some(role => role.isAdmin == true);
     }
@@ -166,6 +168,7 @@ export const useUserStore = defineStore('user', () => {
 
   return {
     group,
+    groups,
     isAdmin,
     isRootAdmin,
     menus,
