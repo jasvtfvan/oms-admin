@@ -256,7 +256,7 @@ const handleSubmit = async () => {
     await userStore.Login({ captcha, captchaId, username, password })
     await userStore.GetMenus()
     message.success('登录成功')
-    setTimeout(() => router.replace(route.query.redirect || '/home'))
+    nextTick(() => router.replace(route.query.redirect || '/home'))
   } catch (_) {
     nextTick(() => {
       updateCaptcha()

@@ -95,6 +95,7 @@ export const useUserStore = defineStore('user', () => {
       menuNames = res.data || []; // 不包含/home等默认路由
       menuNames = mergeArray(adminMenuNames, menuNames);
     } catch (_) {
+      console.log('获取菜单失败')
     }
     setMenuNames(menuNames);
     const menus = getLayoutMenus(menuNames) // 包含/home等默认路由（去掉component引入）

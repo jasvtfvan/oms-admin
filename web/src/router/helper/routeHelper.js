@@ -106,7 +106,7 @@ export const addDynamicRoutes = (menuNames) => {
   if (menuNames && menuNames.length) { // 获取到菜单名后，才需要添加
     const transRoutes = _transformMenuToRoutes(dynamicModules, menuNames)
     // 根据menuNames把dynamicModules添加到路由中
-    rootLayout.children.push(transRoutes)
+    rootLayout.children.push(...transRoutes)
     router.addRoute(rootLayout)
   }
 };
