@@ -7,8 +7,7 @@ export function getMenus(data) {
     data: [
       'organize',
       'organizeGroup',
-      'organizeRole',
-      'organizeUser',
+      'demo',
     ],
     msg: 'ok',
   })

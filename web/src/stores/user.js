@@ -1,15 +1,16 @@
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { localCache, sessionCache } from '@/utils/cache'
 import { postLogin, postLogout, postCaptcha } from '@/api/common/base'
 import { getMenus } from '@/api/common/user'
 import { rsaEncrypt } from '@/utils/rsaEncryptOAEP'
-import { addDynamicRoutes } from '@/router/helper/routeHelper'
+import { addDynamicRoutes, getAdminMenuNames, getLayoutMenus } from '@/router/helper/routeHelper'
+import { mergeArray } from '@/utils/util'
 
 export const useUserStore = defineStore('user', () => {
   // token登录凭证
   const token = ref(localCache.get('token') || '')
-  const setToken = (val) => {
+  const setToken = (val = '') => {
     localCache.set('token', val)
     token.value = val
   }
@@ -20,7 +21,7 @@ export const useUserStore = defineStore('user', () => {
   // group当前选中的组织
   const group = ref(sessionCache.get('group') || '')
   // 大写开头action，对外暴露
-  const SetGroup = (val) => {
+  const SetGroup = (val = '') => {
     sessionCache.set('group', val)
     group.value = val
   }
@@ -31,7 +32,7 @@ export const useUserStore = defineStore('user', () => {
   }
   // userInfo用户信息
   const userInfo = ref(sessionCache.get('userInfo') || {})
-  const setUserInfo = (val) => {
+  const setUserInfo = (val = {}) => {
     sessionCache.set('userInfo', val)
     userInfo.value = val
   }
@@ -39,36 +40,67 @@ export const useUserStore = defineStore('user', () => {
     sessionCache.remove('userInfo')
     userInfo.value = {}
   }
-  // 菜单
+  // 菜单，没有权限则隐藏，有权限原来隐藏的依然隐藏
   const menus = ref([])
-  const setMenus = (val) => {
+  const setMenus = (val = []) => {
     sessionCache.set('menus', val)
     menus.value = val
   }
   const removeMenus = () => {
-    sessionCache.remove('menus')
+    sessionCache.remove('menuNames')
     menus.value = []
   }
+  // 菜单名，包含则有权访问路由，跟隐藏无关
+  const menuNames = ref([])
+  const setMenuNames = (val = []) => {
+    sessionCache.set('menuNames', val)
+    menuNames.value = val
+  }
+  const removeMenuNames = () => {
+    sessionCache.remove('menuNames')
+    menuNames.value = []
+  }
+
+  // 是否超级管理员
+  const isRootAdmin = computed(() => {
+    return userInfo.value.isRootAdmin
+  })
+  // 根据group，判断是否为管理员
+  const isAdmin = computed(() => {
+    const sysGroups = userInfo.sysGroups || [];
+    const foundGroup = sysGroups.find(grp => grp.orgCode == group);
+    if (foundGroup && foundGroup.sysRoles && foundGroup.sysRoles.length) {
+      return foundGroup.sysRoles.some(role => role.isAdmin == true);
+    }
+    return false;
+  })
 
   // 清空当前登录状态(userInfo,token,....)
   const ClearLoginStatus = () => {
     removeGroup();
     removeMenus();
+    removeMenuNames();
     removeToken();
     removeUserInfo();
   };
   // 获取菜单
   const GetMenus = async () => {
+    let menuNames = [];
+    let adminMenuNames = [];
+    if (isRootAdmin || isAdmin) {
+      adminMenuNames = getAdminMenuNames();
+    }
     try {
       const res = await getMenus();
-      const menus = res.data || [];
-      addDynamicRoutes(menus);
-      setMenus(menus);
-      return menus;
-    } catch (error) {
-      addDynamicRoutes();
-      return error
+      menuNames = res.data || []; // 不包含/home等默认路由
+      menuNames = mergeArray(adminMenuNames, menuNames);
+    } catch (_) {
     }
+    setMenuNames(menuNames);
+    const menus = getLayoutMenus(menuNames) // 包含/home等默认路由（去掉component引入）
+    setMenus(menus)
+    addDynamicRoutes(menuNames); // 添加动态路由
+    return { menus, menuNames }
   };
   // 登录
   const Login = async (data) => {
@@ -133,7 +165,10 @@ export const useUserStore = defineStore('user', () => {
 
   return {
     group,
+    isAdmin,
+    isRootAdmin,
     menus,
+    menuNames,
     token,
     userInfo, // 小写开头，getter
     Captcha,

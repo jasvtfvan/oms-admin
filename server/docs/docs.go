@@ -609,6 +609,10 @@ const docTemplate = `{
         "response.LoginRole": {
             "type": "object",
             "properties": {
+                "isAdmin": {
+                    "description": "是否管理员",
+                    "type": "boolean"
+                },
                 "roleCode": {
                     "description": "角色编码（唯一）",
                     "type": "string"
@@ -634,8 +638,8 @@ const docTemplate = `{
                     "description": "邮箱",
                     "type": "string"
                 },
-                "isAdmin": {
-                    "description": "是否管理员（每个组织的管理员）",
+                "isRootAdmin": {
+                    "description": "是否系统管理员",
                     "type": "boolean"
                 },
                 "logOperation": {

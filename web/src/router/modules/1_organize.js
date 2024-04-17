@@ -4,7 +4,7 @@ export default [
     name: 'organize',
     meta: {
       title: '组织管理',
-      sortMenu: 1,
+      sortMenu: 101,
     },
     redirect: '/organize/group',
     component: () => import('@/views/organize/index.vue'),
@@ -15,7 +15,7 @@ export default [
         component: () => import('@/views/organize/group.vue'),
         meta: {
           title: '企业管理',
-          sortMenu: 0,
+          sortMenu: 10001,
         },
       },
       {
@@ -24,7 +24,7 @@ export default [
         component: () => import('@/views/organize/role.vue'),
         meta: {
           title: '角色管理',
-          sortMenu: 1,
+          sortMenu: 10002,
         },
       },
       {
@@ -33,7 +33,7 @@ export default [
         component: () => import('@/views/organize/user.vue'),
         meta: {
           title: '用户管理',
-          sortMenu: 2,
+          sortMenu: 10003,
         },
       },
     ],

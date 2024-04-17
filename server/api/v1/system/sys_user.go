@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jasvtfvan/oms-admin/server/global"
@@ -326,6 +327,7 @@ func (u *UserApi) Login(c *gin.Context) {
 					loginRoles = append(loginRoles, sysRes.LoginRole{
 						RoleName: rl.RoleName,
 						RoleCode: rl.RoleCode,
+						IsAdmin:  strings.HasSuffix(rl.RoleCode, "_admin"),
 						Sort:     rl.Sort,
 					})
 				}
@@ -348,7 +350,6 @@ func (u *UserApi) Login(c *gin.Context) {
 				Avatar:       user.Avatar,
 				Phone:        user.Phone,
 				Email:        user.Email,
-				IsAdmin:      user.IsAdmin,
 				IsRootAdmin:  isRootAdmin,
 				LogOperation: user.LogOperation,
 				SysGroups:    loginGroups,

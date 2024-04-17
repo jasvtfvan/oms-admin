@@ -2,10 +2,10 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Nprogress from 'nprogress'
 import { useUserStore } from '@/stores/user'
 import { rootLayout } from './layout'
-import globRoutes, { LOGIN_NAME } from './unLayout'
+import unLayoutRoutes, { LOGIN_NAME } from './unLayout'
 
 export const routes = [
-  ...globRoutes,
+  ...unLayoutRoutes,
   rootLayout,
 ]
 
@@ -23,21 +23,21 @@ const whiteList = [ // 白名单不需token验证
 ]
 
 // 是否跳转权限
-function hasRoute(to, menus = []) {
-  const passedRoutes = ['/', '/home', '/404'];
+function hasRoute(to, menuNames = []) {
+  const passedRoutes = ['/', '/home', '/404']; // 所有默认加载的路由path
   if (passedRoutes.includes(to.path)) return true
-  return menus.includes(to.name)
+  return menuNames.includes(to.name)
 }
 
 router.beforeEach(async (to, from, next) => {
   Nprogress.start()
   const userStore = useUserStore()
-  const { token, menus } = userStore; // 获取token,menus
+  const { token, menuNames } = userStore; // 获取token,menuNames
   if (token) { // token存在
     if (to.name == LOGIN_NAME) { // 登录页面直接跳到home
       next({ path: '/', replace: true });
     } else {
-      if (hasRoute(to, menus)) { // 有权限
+      if (hasRoute(to, menuNames)) { // 有权限
         next()
       } else { // 没有权限
         next({ name: '404' })
