@@ -24,6 +24,85 @@ var captchaBuildCountStore = captcha.GetBuildCountStore()
 
 type UserApi struct{}
 
+// getUserProfile
+// @Tags	user
+// @Summary	获取登录用户信息
+// @Produce	application/json
+// @Success	200	{object}	response.Response{code=int,data=sysRes.Login,msg=string}	"返回登录用户信息"
+// @Router	/user/profile [get]
+func (u *UserApi) GetUserProfile(c *gin.Context) {
+	v := c.Value("claims")
+	var claims *utils.CustomClaims
+	claims, ok := v.(*utils.CustomClaims)
+	if !ok {
+		response.Fail(nil, "解析令牌信息失败", c)
+		return
+	}
+	user, err := userService.FindUser(claims.BaseClaims.ID)
+	if err != nil {
+		global.OMS_LOG.Error("查询失败", zap.Error(err))
+		response.Fail(nil, "查询失败", c)
+		return
+	}
+	if !user.Enable {
+		global.OMS_LOG.Error("查询失败，用户被禁用", zap.Error(err))
+		response.Fail(nil, "用户被禁用", c)
+		return
+	}
+	// 获取用户所有群组
+	user.SysGroups, err = groupService.FindGroupsByUserID(user.ID)
+	if err != nil {
+		global.OMS_LOG.Error("用户组织查询失败", zap.Error(err))
+		response.Fail(nil, "用户组织查询失败", c)
+		return
+	}
+	// 获取用户所有角色
+	user.SysRoles, err = roleService.FindRolesByUserID(user.ID)
+	if err != nil {
+		global.OMS_LOG.Error("用户角色查询失败", zap.Error(err))
+		response.Fail(nil, "用户角色查询失败", c)
+		return
+	}
+	// 将group和role返回
+	loginGroups := []sysRes.LoginGroups{}
+	for _, grp := range user.SysGroups { // 迭代group
+		loginRoles := []sysRes.LoginRole{}
+		for _, rl := range user.SysRoles { // 迭代role
+			if rl.SysGroupID == grp.ID {
+				loginRoles = append(loginRoles, sysRes.LoginRole{
+					RoleName: rl.RoleName,
+					RoleCode: rl.RoleCode,
+					IsAdmin:  strings.HasSuffix(rl.RoleCode, "_admin"),
+					Sort:     rl.Sort,
+				})
+			}
+		}
+		loginGroups = append(loginGroups, sysRes.LoginGroups{
+			ShortName: grp.ShortName,
+			OrgCode:   grp.OrgCode,
+			Sort:      grp.Sort,
+			SysRoles:  loginRoles,
+		})
+	}
+	isRootAdmin := false
+	if user.Username == global.OMS_CONFIG.System.Username {
+		isRootAdmin = true
+	}
+	response.Success(sysRes.Login{
+		User: sysRes.LoginUser{
+			Username:     user.Username,
+			NickName:     user.NickName,
+			Avatar:       user.Avatar,
+			Phone:        user.Phone,
+			Email:        user.Email,
+			IsRootAdmin:  isRootAdmin,
+			LogOperation: user.LogOperation,
+			SysGroups:    loginGroups,
+		},
+		Token: "token",
+	}, "登录成功", c)
+}
+
 // ResetPassword
 // @Tags	user
 // @Summary	重置密码

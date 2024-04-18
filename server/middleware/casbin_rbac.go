@@ -62,7 +62,7 @@ func handler(ctx *gin.Context, claims *utils.CustomClaims) {
 	e := service.ServiceGroupApp.System.CasbinService.Casbin()
 	isOk := false
 	for _, role := range roles {
-		sub := role.RoleCode
+		sub := role
 		ok, _ := e.Enforce(sub, dom, obj, act)
 		if ok {
 			isOk = true

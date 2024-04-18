@@ -64,7 +64,7 @@ func JWTAuth() gin.HandlerFunc {
 		hasGroup := false
 		groups := claims.Groups
 		for _, grp := range groups {
-			if grp.OrgCode == orgCode {
+			if grp == orgCode {
 				hasGroup = true
 			}
 		}

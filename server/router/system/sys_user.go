@@ -16,7 +16,13 @@ func (*UserRouter) InitUserPublicRouter(router *gin.RouterGroup) {
 	}
 }
 
-func (*UserRouter) InitUserPrivateRouter(router *gin.RouterGroup) {}
+func (*UserRouter) InitUserPrivateRouter(router *gin.RouterGroup) {
+	r := router.Group("user")
+	userApi := v1.ApiGroupApp.System.UserApi
+	{
+		r.GET("profile", userApi.GetUserProfile)
+	}
+}
 
 func (*UserRouter) InitUserCasbinRouter(router *gin.RouterGroup) {
 	r := router.Group("user")

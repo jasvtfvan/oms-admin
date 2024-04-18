@@ -21,19 +21,13 @@ func (*JWTServiceImpl) DelStore(username string) error {
 // sysUser 使用结构体对象，会创建一个副本；使用指针，会复用对象，只创建一个指针变量
 func (*JWTServiceImpl) GenerateToken(sysUser *sysModel.SysUser) (string, error) {
 	var jwtStore = jwtRedis.GetRedisStore()
-	var groupClaims []utils.GroupClaims
+	var groups []string
 	for _, v := range sysUser.SysGroups {
-		groupClaims = append(groupClaims, utils.GroupClaims{
-			OrgCode:   v.OrgCode,
-			ShortName: v.ShortName,
-		})
+		groups = append(groups, v.OrgCode)
 	}
-	var roleClaims []utils.RoleClaims
+	var roles []string
 	for _, v := range sysUser.SysRoles {
-		roleClaims = append(roleClaims, utils.RoleClaims{
-			RoleCode: v.RoleCode,
-			RoleName: v.RoleName,
-		})
+		roles = append(roles, v.RoleCode)
 	}
 
 	j := utils.NewJWT()
@@ -41,8 +35,8 @@ func (*JWTServiceImpl) GenerateToken(sysUser *sysModel.SysUser) (string, error) 
 		ID:           sysUser.ID,
 		Username:     sysUser.Username,
 		LogOperation: sysUser.LogOperation,
-		Groups:       groupClaims,
-		Roles:        roleClaims,
+		Groups:       groups,
+		Roles:        roles,
 	})
 	token, err := j.CreateToken(claims)
 	if err != nil {

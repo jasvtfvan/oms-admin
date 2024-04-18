@@ -20,8 +20,9 @@ type LoginUser struct {
 	Avatar       string        `json:"avatar"`       // 头像
 	Phone        string        `json:"phone"`        // 手机号
 	Email        string        `json:"email"`        // 邮箱
-	IsRootAdmin  bool          `json:"isRootAdmin"`  // 是否系统管理员
 	LogOperation bool          `json:"logOperation"` // 是否记录操作记录
+	Enable       bool          `json:"enable"`       // 是否可用
+	IsRootAdmin  bool          `json:"isRootAdmin"`  // 是否系统管理员
 	SysGroups    []LoginGroups `json:"sysGroups"`    // 关联的组织
 }
 
