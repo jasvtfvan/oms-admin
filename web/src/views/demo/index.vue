@@ -34,7 +34,6 @@ import { onMounted } from 'vue'
 import { HomeOutlined } from '@ant-design/icons-vue'
 import { rsaEncrypt } from '@/utils/rsaEncryptOAEP'
 import { aesEncryptCBC, aesDecryptCBC } from '@/utils/aesCrypto'
-import { layoutModules } from '@/router/layout'
 
 console.log(aesEncryptCBC('hello world ga ga'))
 console.log(aesDecryptCBC('012f7bf73e5b190d135f878514dbab2a44f6db23dd0e6f1b7319bbcd149ab94f'))
@@ -45,8 +44,6 @@ onMounted(async () => {
   const user = '{"username":"oms_admin","password":"Oms123Admin456"}'
   const res = await rsaEncrypt(user)
   console.log(res)
-
-  console.log('-----layoutModules-----', layoutModules)
 })
 
 const description = 'This is a description.'

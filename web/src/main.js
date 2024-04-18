@@ -7,6 +7,7 @@ import App from './App.vue'
 import router from './router'
 // 引入svg-icons
 import 'virtual:svg-icons-register'
+import AIcon from '@/components/AIcon/index.vue'
 
 // 导入加载进度条，防止首屏加载时间过长
 import Nprogress from 'nprogress'
@@ -15,6 +16,8 @@ Nprogress.configure({ showSpinner: false, ease: 'ease', speed: 500 })
 Nprogress.start()
 
 const app = createApp(App)
+
+app.component('a-icon', AIcon)
 
 app.use(createPinia())
 app.use(router)

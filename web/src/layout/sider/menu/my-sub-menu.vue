@@ -1,8 +1,8 @@
 <template>
   <a-sub-menu v-if="showSubMenu(item)" :key="`${item.name}_1`">
-    <!-- <template v-if="item.meta.icon" #icon>
-      <icon-font :type="`icon-${item.meta.icon}`" />
-    </template> -->
+    <template v-if="item.meta.icon" #icon>
+      <a-icon :name="item.meta.icon" />
+    </template>
     <template #title>
       <span>{{ item.meta.title }}</span>
     </template>
@@ -11,14 +11,13 @@
     </template>
   </a-sub-menu>
   <a-menu-item v-else :key="`${item.name}_2`">
-    <iCon />
-    <!-- <icon-font v-if="item.meta.icon" :type="`icon-${item.meta.icon}`" /> -->
+    <a-icon v-if="item.meta.icon" :name="item.meta.icon" />
     <span>{{ item.meta.title }}</span>
   </a-menu-item>
 </template>
 
 <script setup>
-import iCon from '@/components/IconFont/index.vue'
+import { defineOptions, defineProps } from 'vue';
 
 defineOptions({
   name: 'MySubMenu'

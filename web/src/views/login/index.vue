@@ -16,7 +16,9 @@
             placeholder="用户名"
             :maxlength="20"
           >
-            <template #prefix> <user-outlined /> </template>
+            <template #prefix>
+              <a-icon name="UserOutlined" />
+            </template>
           </a-input>
         </a-form-item>
         <a-form-item>
@@ -27,7 +29,9 @@
             autocomplete="new-password"
             :maxlength="20"
           >
-            <template #prefix> <lock-outlined /></template>
+            <template #prefix>
+              <a-icon name="LockOutlined" />
+            </template>
           </a-input-password>
         </a-form-item>
         <a-form-item v-if="loginFormModel.openCaptcha">
@@ -37,7 +41,9 @@
             :maxlength="loginFormModel.captchaLength"
             size="large"
           >
-            <template #prefix> <safety-outlined /> </template>
+            <template #prefix>
+              <a-icon name="SafetyOutlined" />
+            </template>
             <template #suffix>
               <img
                 :src="loginFormModel.picPath"
@@ -71,7 +77,7 @@
       <p style="margin-top: 8px">
         <a-input-password v-model:value="initDbPwd" placeholder="初始化密码">
           <template #prefix>
-            <KeyOutlined style="padding-right: 6px" />
+            <a-icon name="KeyOutlined" style="padding-right: 6px" />
           </template>
         </a-input-password>
       </p>
