@@ -294,7 +294,7 @@ paths:
       summary: 升级DB
       tags:
       - db
-  /user/delete/:id:
+  /user/delete/{id}:
     delete:
       parameters:
       - description: 用户ID
@@ -324,7 +324,7 @@ paths:
       summary: 删除用户
       tags:
       - user
-  /user/disable/:id:
+  /user/disable/{id}:
     put:
       parameters:
       - description: 用户ID
@@ -354,7 +354,7 @@ paths:
       summary: 禁用用户
       tags:
       - user
-  /user/enable/:id:
+  /user/enable/{id}:
     put:
       parameters:
       - description: 用户ID

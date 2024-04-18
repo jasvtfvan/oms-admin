@@ -15,6 +15,8 @@ import (
 // group白名单
 var GroupWhiteList = []string{
 	"/user/profile",
+	"/update/check",
+	"/update/db",
 }
 
 func JWTAuth() gin.HandlerFunc {

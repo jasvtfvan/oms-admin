@@ -303,7 +303,7 @@
                 }
             }
         },
-        "/user/delete/:id": {
+        "/user/delete/{id}": {
             "delete": {
                 "security": [
                     {
@@ -357,7 +357,7 @@
                 }
             }
         },
-        "/user/disable/:id": {
+        "/user/disable/{id}": {
             "put": {
                 "security": [
                     {
@@ -411,7 +411,7 @@
                 }
             }
         },
-        "/user/enable/:id": {
+        "/user/enable/{id}": {
             "put": {
                 "security": [
                     {

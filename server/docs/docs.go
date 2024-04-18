@@ -309,7 +309,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/delete/:id": {
+        "/user/delete/{id}": {
             "delete": {
                 "security": [
                     {
@@ -363,7 +363,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/disable/:id": {
+        "/user/disable/{id}": {
             "put": {
                 "security": [
                     {
@@ -417,7 +417,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/enable/:id": {
+        "/user/enable/{id}": {
             "put": {
                 "security": [
                     {
