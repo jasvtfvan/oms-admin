@@ -27,6 +27,8 @@ type UserApi struct{}
 // getUserProfile
 // @Tags	user
 // @Summary	获取登录用户信息
+// @Security  ApiKeyAuth
+// @Security  ApiKeyDomain
 // @Produce	application/json
 // @Success	200	{object}	response.Response{code=int,data=sysRes.UserProfile,msg=string}	"返回登录用户信息"
 // @Router	/user/profile [get]

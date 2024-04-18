@@ -64,6 +64,6 @@ async function encryptMessage(pem, message) {
   }
 }
 
-export function rsaEncrypt(data, publicKeyStr) {
+export function rsaEncryptOAEP(data, publicKeyStr) {
   return encryptMessage(publicKeyStr || publicKeyPem, data) || "";
 }

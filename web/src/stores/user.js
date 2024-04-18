@@ -2,10 +2,12 @@ import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { localCache, sessionCache } from '@/utils/cache'
 import { postLogin, postLogout, postCaptcha } from '@/api/common/base'
-import { getMenus } from '@/api/common/user'
-import { rsaEncrypt } from '@/utils/rsaEncryptOAEP'
+import { getMenus, getUserProfile } from '@/api/common/user'
 import { addDynamicRoutes, getAdminMenuNames, getLayoutMenus } from '@/router/helper/routeHelper'
 import { mergeArray } from '@/utils/util'
+import { aesEncryptCBC, aesDecryptCBC } from '@/utils/aesCrypto'
+
+const USER_STORE_AES_KEY = "abcdefgh12345678abcdefgh12345678"
 
 export const useUserStore = defineStore('user', () => {
   // token登录凭证
@@ -17,6 +19,16 @@ export const useUserStore = defineStore('user', () => {
   const removeToken = () => {
     localCache.remove('token')
     token.value = ''
+  }
+  // 登录成功后的账号密码加密
+  const encryptedSecret = ref(localCache.get('encryptedSecret') || '')
+  const setEncryptedSecret = (val = '') => {
+    localCache.set('encryptedSecret', val)
+    encryptedSecret.value = val
+  }
+  const removeEncryptedSecret = () => {
+    localCache.remove('encryptedSecret')
+    encryptedSecret.value = ''
   }
   // group当前选中的组织
   const group = ref(sessionCache.get('group') || '')
@@ -30,15 +42,15 @@ export const useUserStore = defineStore('user', () => {
     sessionCache.remove('group')
     group.value = ''
   }
-  // userInfo用户信息
-  const userInfo = ref(sessionCache.get('userInfo') || {})
-  const setUserInfo = (val = {}) => {
-    sessionCache.set('userInfo', val)
-    userInfo.value = val
+  // userProfile用户信息
+  const userProfile = ref(sessionCache.get('userProfile') || {})
+  const setUserProfile = (val = {}) => {
+    sessionCache.set('userProfile', val)
+    userProfile.value = val
   }
-  const removeUserInfo = () => {
-    sessionCache.remove('userInfo')
-    userInfo.value = {}
+  const removeUserProfile = () => {
+    sessionCache.remove('userProfile')
+    userProfile.value = {}
   }
   // 菜单，没有权限则隐藏，有权限原来隐藏的依然隐藏
   const menus = ref(sessionCache.get('menus') || [])
@@ -62,11 +74,11 @@ export const useUserStore = defineStore('user', () => {
   }
 
   const groups = computed(() => {
-    return userInfo.value.sysGroups || [];
+    return userProfile.value.sysGroups || [];
   })
   // 是否超级管理员
   const isRootAdmin = computed(() => {
-    return userInfo.value.isRootAdmin
+    return userProfile.value.isRootAdmin
   })
   // 根据group，判断是否为管理员
   const isAdmin = computed(() => {
@@ -77,14 +89,26 @@ export const useUserStore = defineStore('user', () => {
     return false;
   })
 
-  // 清空当前登录状态(userInfo,token,....)
+  // 清空当前登录状态(userProfile,token,....)
   const ClearLoginStatus = () => {
+    removeEncryptedSecret();
     removeGroup();
     removeMenus();
     removeMenuNames();
     removeToken();
-    removeUserInfo();
+    removeUserProfile();
   };
+  // 重新获取权限
+  const RefreshAuth = async () => {
+    try {
+      const secret = aesDecryptCBC(encryptedSecret.value)
+      await Login({ secret, captcha: '', captchaId: '' })
+      await GetUserProfile()
+      await GetMenus()
+    } catch (error) {
+      return error
+    }
+  }
   // 获取菜单
   const GetMenus = async () => {
     let menuNames = [];
@@ -105,26 +129,36 @@ export const useUserStore = defineStore('user', () => {
     addDynamicRoutes(menuNames); // 添加动态路由
     return { menus, menuNames }
   };
-  // 登录
-  const Login = async (data) => {
-    const { username, password, captcha, captchaId } = data
-    const secret = await rsaEncrypt(JSON.stringify({ username, password }))
+  // 获取用户信息
+  const GetUserProfile = async () => {
     return new Promise((resolve, reject) => {
-      postLogin({ secret, captcha, captchaId })
+      getUserProfile()
         .then(res => {
-          let { user, token } = res.data;
-          // token登录凭证
-          if (!token) token = '';
-          setToken(token);
-          // user用户信息
-          if (!user) user = {};
-          setUserInfo(user);
+          const profile = res.data || {};
+          setUserProfile(profile);
           // group默认群组
-          let sysGroups = user.sysGroups || [];
+          let sysGroups = profile.sysGroups || [];
           if (sysGroups[0]) {
             SetGroup(sysGroups[0].orgCode);
           }
-          resolve(user);
+          resolve(profile);
+        })
+        .catch(error => {
+          reject(error);
+        });
+    })
+  }
+  // 登录
+  const Login = async (data) => {
+    const { secret, captcha, captchaId } = data
+    return new Promise((resolve, reject) => {
+      postLogin({ secret, captcha, captchaId })
+        .then(res => {
+          let token = res.data;
+          if (!token) token = '';
+          setToken(token);
+          setEncryptedSecret(aesEncryptCBC(secret)); // 把账号密码加密保存起来
+          resolve(token);
         })
         .catch(error => {
           reject(error);
@@ -174,12 +208,14 @@ export const useUserStore = defineStore('user', () => {
     menus,
     menuNames,
     token,
-    userInfo, // 小写开头，getter
+    userProfile, // 小写开头，getter
     Captcha,
     ClearLoginStatus,
     GetMenus,
+    GetUserProfile,
     Login,
     Logout,
+    RefreshAuth,
     SetGroup, // 大写开头，对外暴露的action
   }
 })

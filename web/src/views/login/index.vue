@@ -93,6 +93,7 @@ import { useUserStore } from '@/stores/user'
 import { postInitCheck, postInitDb } from '@/api/common/db'
 import setting from '@/setting.js'
 import { useLoading } from '@/hooks/useLoading'
+import { rsaEncryptOAEP } from '@/utils/rsaEncrypt'
 import { aesEncryptCBC } from '@/utils/aesCrypto'
 
 // use
@@ -258,13 +259,18 @@ const handleSubmit = async () => {
 
   try {
     const { captcha, captchaId, username, password } = loginFormModel.value
-    await userStore.Login({ captcha, captchaId, username, password })
+    const secret = await rsaEncryptOAEP(JSON.stringify({ username, password }))
+    await userStore.Login({ captcha, captchaId, secret })
+    await userStore.GetUserProfile()
     await userStore.GetMenus()
     message.success('登录成功')
     nextTick(() => router.replace(route.query.redirect || '/home'))
-  } catch (_) {
+  } catch (error) {
     nextTick(() => {
-      updateCaptcha()
+      message.error(error.msg, 2, () => {
+        loginFormModel.value.captcha = '';
+        updateCaptcha()
+      })
     })
   } finally {
     loginLoading.value = false

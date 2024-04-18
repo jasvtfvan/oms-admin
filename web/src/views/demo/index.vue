@@ -32,7 +32,7 @@
 <script setup>
 import { onMounted } from 'vue'
 import { HomeOutlined } from '@ant-design/icons-vue'
-import { rsaEncrypt } from '@/utils/rsaEncryptOAEP'
+import { rsaEncryptOAEP } from '@/utils/rsaEncrypt'
 import { aesEncryptCBC, aesDecryptCBC } from '@/utils/aesCrypto'
 
 console.log(aesEncryptCBC('hello world ga ga'))
@@ -42,7 +42,7 @@ onMounted(async () => {
   console.log('onMounted')
   // generateKeyPair()
   const user = '{"username":"oms_admin","password":"Oms123Admin456"}'
-  const res = await rsaEncrypt(user)
+  const res = await rsaEncryptOAEP(user)
   console.log(res)
 })
 

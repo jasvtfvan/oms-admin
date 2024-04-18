@@ -1,9 +1,9 @@
 import CryptoJS from 'crypto-js';
 
-const aesKey = "12345678123456781234567812345678"
+const AES_KEY = "12345678123456781234567812345678"
 
 // 加密函数
-export function aesEncryptCBC(plaintText, key = aesKey) {
+export function aesEncryptCBC(plaintText, key = AES_KEY) {
   const len = key.length
   if (len != 16 && len != 24 && len != 32) {
     console.error('key 长度必须 16/24/32长度')
@@ -19,7 +19,7 @@ export function aesEncryptCBC(plaintText, key = aesKey) {
 }
 
 // 解密函数
-export function aesDecryptCBC(encrypted, key = aesKey) {
+export function aesDecryptCBC(encrypted, key = AES_KEY) {
   const len = key.length
   if (len != 16 && len != 24 && len != 32) {
     console.error('key 长度必须 16/24/32长度')

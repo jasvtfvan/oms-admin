@@ -473,6 +473,14 @@ const docTemplate = `{
         },
         "/user/profile": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "ApiKeyDomain": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
