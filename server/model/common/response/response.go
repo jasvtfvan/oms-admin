@@ -19,29 +19,48 @@ type Response struct {
 	Msg  string      `json:"msg"`
 }
 
+// 通过了middleware
 const (
 	SUCCESS = http.StatusOK
 	ERROR   = http.StatusBadRequest
-	UN_AUTH = http.StatusUnauthorized
 )
 
-func Result(code int, data interface{}, msg string, c *gin.Context) {
-	// 开始时间
+// 未通过middleware
+const (
+	UN_AUTH = http.StatusUnauthorized
+	BAD     = http.StatusBadRequest
+)
+
+/*
+通过了middleware的result
+*/
+func result(code int, data interface{}, msg string, c *gin.Context) {
 	c.JSON(http.StatusOK, Response{
 		code,
 		data,
 		msg,
 	})
 }
-
 func Success(data interface{}, message string, c *gin.Context) {
-	Result(SUCCESS, data, message+"!", c)
+	result(SUCCESS, data, message+"!", c)
 }
-
 func Fail(data interface{}, message string, c *gin.Context) {
-	Result(ERROR, data, message+"!", c)
+	result(ERROR, data, message+"!", c)
 }
 
-func NoAuth(data interface{}, message string, c *gin.Context) {
-	Result(UN_AUTH, data, message+"!", c)
+/*
+没通过middleware的result
+*/
+func resultJwt(status int, data interface{}, msg string, c *gin.Context) {
+	c.AbortWithStatusJSON(status, Response{
+		status,
+		data,
+		msg,
+	})
+}
+func Unauthorized(data interface{}, message string, c *gin.Context) {
+	resultJwt(UN_AUTH, data, message+"!", c)
+}
+func BadReq(data interface{}, message string, c *gin.Context) {
+	resultJwt(BAD, data, message+"!", c)
 }

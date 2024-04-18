@@ -26,8 +26,7 @@ func CasbinHandler() gin.HandlerFunc {
 				}
 			}
 		} else {
-			response.NoAuth(nil, "解析令牌信息失败", ctx)
-			ctx.Abort()
+			response.Unauthorized(nil, "解析令牌信息失败", ctx)
 			return
 		}
 	}
@@ -54,6 +53,10 @@ func handler(ctx *gin.Context, claims *utils.CustomClaims) {
 	roles := claims.Roles
 	// 域
 	dom := ctx.Request.Header.Get("x-group")
+	if dom == "" {
+		response.BadReq(nil, "组织编号不能为空", ctx)
+		return
+	}
 	// 路径
 	path := ctx.Request.URL.Path
 	obj := strings.TrimPrefix(path, global.OMS_CONFIG.System.RouterPrefix)
@@ -73,8 +76,7 @@ func handler(ctx *gin.Context, claims *utils.CustomClaims) {
 		ctx.Next()
 		return
 	} else {
-		response.Fail(nil, "没有该资源权限", ctx)
-		ctx.Abort()
+		response.BadReq(nil, "没有该资源权限", ctx)
 		return
 	}
 }

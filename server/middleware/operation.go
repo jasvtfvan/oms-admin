@@ -42,8 +42,7 @@ func OperationRecord() gin.HandlerFunc {
 				ctx.Next()
 			}
 		} else {
-			response.Fail(nil, "解析令牌信息失败", ctx)
-			ctx.Abort()
+			response.Unauthorized(nil, "解析令牌信息失败", ctx)
 			return
 		}
 	}
