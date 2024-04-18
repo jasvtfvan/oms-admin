@@ -236,10 +236,21 @@ const handleSubmit = async () => {
   if (!initReady.value) {
     return message.warning('系统尚未初始化')
   }
-  const { username, password, captcha, captchaId, openCaptcha, captchaLength } =
-    loginFormModel.value
-  if (username.trim() == '' || password.trim() == '') {
-    return message.warning('用户名或密码不能为空')
+  let { username, password } = loginFormModel.value
+  const { captcha, captchaId, openCaptcha, captchaLength } = loginFormModel.value
+  if (!username || !password) {
+    return message.warning('用户名和密码不能为空')
+  }
+  username = username.trim()
+  password = password.trim()
+  if (username == '' || password == '') {
+    return message.warning('用户名和密码不能为空')
+  }
+  if (username.length < 2) {
+    return message.warning('用户名太短')
+  }
+  if (password.length < 6) {
+    return message.warning('密码太短')
   }
   if (openCaptcha) {
     if (!captcha) {
@@ -268,7 +279,7 @@ const handleSubmit = async () => {
   } catch (error) {
     nextTick(() => {
       message.error(error.msg, 2, () => {
-        loginFormModel.value.captcha = '';
+        loginFormModel.value.captcha = ''
         updateCaptcha()
       })
     })

@@ -5,9 +5,7 @@ import { postLogin, postLogout, postCaptcha } from '@/api/common/base'
 import { getMenus, getUserProfile } from '@/api/common/user'
 import { addDynamicRoutes, getAdminMenuNames, getLayoutMenus } from '@/router/helper/routeHelper'
 import { mergeArray } from '@/utils/util'
-import { aesEncryptCBC, aesDecryptCBC } from '@/utils/aesCrypto'
-
-const USER_STORE_AES_KEY = "abcdefgh12345678abcdefgh12345678"
+import { decryptSecret, encryptSecret } from '@/utils/cryptoLoginSecret'
 
 export const useUserStore = defineStore('user', () => {
   // token登录凭证
@@ -101,7 +99,7 @@ export const useUserStore = defineStore('user', () => {
   // 重新获取权限
   const RefreshAuth = async () => {
     try {
-      const secret = aesDecryptCBC(encryptedSecret.value, USER_STORE_AES_KEY)
+      const secret = decryptSecret(encryptedSecret.value)
       await Login({ secret, captcha: '', captchaId: '' })
       await GetAuthWithoutLogin()
     } catch (error) {
@@ -166,7 +164,7 @@ export const useUserStore = defineStore('user', () => {
           let token = res.data;
           if (!token) token = '';
           setToken(token);
-          setEncryptedSecret(aesEncryptCBC(secret, USER_STORE_AES_KEY)); // 把账号密码加密保存起来
+          setEncryptedSecret(encryptSecret(secret)); // 把账号密码加密保存起来
           resolve(token);
         })
         .catch(error => {

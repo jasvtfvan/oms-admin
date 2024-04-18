@@ -130,7 +130,7 @@ func (u *UserApi) ResetPassword(c *gin.Context) {
 	encryptedPassword, username, err := userService.ResetPassword(uint(req.ID), newPassword)
 	if err != nil {
 		global.OMS_LOG.Error("重置用户密码失败:"+username, zap.Error(err))
-		response.Fail(gin.H{encryptedPassword: encryptedPassword}, "操作失败:"+err.Error(), c)
+		response.Fail(nil, "操作失败:"+err.Error(), c)
 		return
 	}
 	if err = jwtService.DelStore(username); err != nil {

@@ -36,6 +36,9 @@ func (*UserServiceImpl) ResetPassword(id uint, newPassword string) (string, stri
 		// 默认密码举例：zhangsan123456
 		newPassword = sysUser.Username + "123456"
 	}
+	if len(newPassword) < 6 {
+		return "", sysUser.Username, errors.New("密码不能低于6位")
+	}
 	password := utils.BcryptHash(newPassword)
 	row, err := userDao.UpdatePassword(id, password)
 	if err != nil {
