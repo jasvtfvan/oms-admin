@@ -14,7 +14,7 @@ import { useUserStore } from '@/stores/user'
 const userStore = useUserStore()
 
 const doSubmit = () => {
-  userStore.GetUserProfile()
+  userStore.RefreshAuth()
 }
 </script>
 

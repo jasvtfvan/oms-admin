@@ -21,10 +21,39 @@ export function getMenus(data) {
 
 // 获取登录用户信息
 export function getUserProfile(data) {
-  return request.get({
-    url: '/user/profile',
-    params: data,
-    authorization: true,
-    loading: false, // 不使用该字段 == false
-  });
+  return Promise.resolve({
+    "code": 200,
+    "data": {
+      "username": "oms_admin",
+      "nickName": "超级管理员",
+      "avatar": "https://foruda.gitee.com/avatar/1710471233758250270/2074074_jasvtfvan_1710471233.png!avatar200",
+      "phone": "",
+      "email": "",
+      "logOperation": true,
+      "enable": false,
+      "isRootAdmin": true,
+      "sysGroups": [
+        {
+          "shortName": "根组织",
+          "orgCode": "oms",
+          "sort": 0,
+          "sysRoles": [
+            {
+              "roleName": "超级管理员",
+              "roleCode": "oms_admin",
+              "isAdmin": true,
+              "sort": 0
+            }
+          ]
+        }
+      ]
+    },
+    "msg": "查询成功!"
+  })
+  // return request.get({
+  //   url: '/user/profile',
+  //   params: data,
+  //   authorization: true,
+  //   loading: false, // 不使用该字段 == false
+  // });
 }
