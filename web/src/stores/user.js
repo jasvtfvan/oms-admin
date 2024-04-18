@@ -210,6 +210,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   return {
+    encryptedSecret,
     group,
     groups,
     isAdmin,

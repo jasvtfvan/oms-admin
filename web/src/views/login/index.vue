@@ -95,6 +95,7 @@ import setting from '@/setting.js'
 import { useLoading } from '@/hooks/useLoading'
 import { rsaEncryptOAEP } from '@/utils/rsaEncrypt'
 import { aesEncryptCBC } from '@/utils/aesCrypto'
+import { encryptPwd } from '@/utils/cryptoLoginSecret'
 
 // use
 const route = useRoute()
@@ -275,6 +276,7 @@ const handleSubmit = async () => {
     await userStore.GetUserProfile()
     await userStore.GetMenus()
     message.success('登录成功')
+    encryptPwd(password) // 把密码加密存起来，登录后判断是否简单密码，简单密码强制修改
     nextTick(() => router.replace(route.query.redirect || '/home'))
   } catch (error) {
     nextTick(() => {
