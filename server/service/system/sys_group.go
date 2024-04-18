@@ -6,9 +6,14 @@ import (
 
 type GroupService interface {
 	FindGroupsByUserID(uint) ([]sysModel.SysGroup, error)
+	FindGroupsByCodes([]string) ([]sysModel.SysGroup, error)
 }
 
 type GroupServiceImpl struct{}
+
+func (*GroupServiceImpl) FindGroupsByCodes(sysGroupCodes []string) ([]sysModel.SysGroup, error) {
+	return groupDao.FindGroupsByCodes(sysGroupCodes)
+}
 
 func (*GroupServiceImpl) FindGroupsByUserID(userId uint) ([]sysModel.SysGroup, error) {
 	sysUserGroups, err := userGroupDao.FindUserGroupsByUserID(userId)

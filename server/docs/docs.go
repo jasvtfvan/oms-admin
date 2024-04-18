@@ -87,7 +87,7 @@ const docTemplate = `{
                                             "type": "integer"
                                         },
                                         "data": {
-                                            "$ref": "#/definitions/response.Login"
+                                            "type": "string"
                                         },
                                         "msg": {
                                             "type": "string"
@@ -471,6 +471,43 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/profile": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "获取登录用户信息",
+                "responses": {
+                    "200": {
+                        "description": "返回登录用户信息",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "$ref": "#/definitions/response.UserProfile"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/user/reset-pwd": {
             "put": {
                 "security": [
@@ -565,24 +602,7 @@ const docTemplate = `{
                 }
             }
         },
-        "response.Login": {
-            "type": "object",
-            "properties": {
-                "token": {
-                    "description": "令牌",
-                    "type": "string"
-                },
-                "user": {
-                    "description": "用户信息",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/response.LoginUser"
-                        }
-                    ]
-                }
-            }
-        },
-        "response.LoginGroups": {
+        "response.ProfileGroup": {
             "type": "object",
             "properties": {
                 "orgCode": {
@@ -601,12 +621,12 @@ const docTemplate = `{
                     "description": "组织下的用户绑定的角色",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/response.LoginRole"
+                        "$ref": "#/definitions/response.ProfileRole"
                     }
                 }
             }
         },
-        "response.LoginRole": {
+        "response.ProfileRole": {
             "type": "object",
             "properties": {
                 "isAdmin": {
@@ -624,46 +644,6 @@ const docTemplate = `{
                 "sort": {
                     "description": "排序字段",
                     "type": "integer"
-                }
-            }
-        },
-        "response.LoginUser": {
-            "type": "object",
-            "properties": {
-                "avatar": {
-                    "description": "头像",
-                    "type": "string"
-                },
-                "email": {
-                    "description": "邮箱",
-                    "type": "string"
-                },
-                "isRootAdmin": {
-                    "description": "是否系统管理员",
-                    "type": "boolean"
-                },
-                "logOperation": {
-                    "description": "是否记录操作记录",
-                    "type": "boolean"
-                },
-                "nickName": {
-                    "description": "昵称",
-                    "type": "string"
-                },
-                "phone": {
-                    "description": "手机号",
-                    "type": "string"
-                },
-                "sysGroups": {
-                    "description": "关联的组织",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/response.LoginGroups"
-                    }
-                },
-                "username": {
-                    "description": "用户名",
-                    "type": "string"
                 }
             }
         },
@@ -714,6 +694,50 @@ const docTemplate = `{
                 "updated": {
                     "description": "是否已更新",
                     "type": "boolean"
+                }
+            }
+        },
+        "response.UserProfile": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "description": "头像",
+                    "type": "string"
+                },
+                "email": {
+                    "description": "邮箱",
+                    "type": "string"
+                },
+                "enable": {
+                    "description": "是否可用",
+                    "type": "boolean"
+                },
+                "isRootAdmin": {
+                    "description": "是否系统管理员",
+                    "type": "boolean"
+                },
+                "logOperation": {
+                    "description": "是否记录操作记录",
+                    "type": "boolean"
+                },
+                "nickName": {
+                    "description": "昵称",
+                    "type": "string"
+                },
+                "phone": {
+                    "description": "手机号",
+                    "type": "string"
+                },
+                "sysGroups": {
+                    "description": "关联的组织",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.ProfileGroup"
+                    }
+                },
+                "username": {
+                    "description": "用户名",
+                    "type": "string"
                 }
             }
         }

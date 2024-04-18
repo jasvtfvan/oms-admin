@@ -28,7 +28,7 @@ type UserApi struct{}
 // @Tags	user
 // @Summary	获取登录用户信息
 // @Produce	application/json
-// @Success	200	{object}	response.Response{code=int,data=sysRes.Login,msg=string}	"返回登录用户信息"
+// @Success	200	{object}	response.Response{code=int,data=sysRes.UserProfile,msg=string}	"返回登录用户信息"
 // @Router	/user/profile [get]
 func (u *UserApi) GetUserProfile(c *gin.Context) {
 	v := c.Value("claims")
@@ -49,27 +49,29 @@ func (u *UserApi) GetUserProfile(c *gin.Context) {
 		response.Fail(nil, "用户被禁用", c)
 		return
 	}
-	// 获取用户所有群组
-	user.SysGroups, err = groupService.FindGroupsByUserID(user.ID)
+	// 获取jwt对应的所有群组
+	sysGroupCodes := claims.BaseClaims.Groups
+	user.SysGroups, err = groupService.FindGroupsByCodes(sysGroupCodes)
 	if err != nil {
 		global.OMS_LOG.Error("用户组织查询失败", zap.Error(err))
 		response.Fail(nil, "用户组织查询失败", c)
 		return
 	}
-	// 获取用户所有角色
-	user.SysRoles, err = roleService.FindRolesByUserID(user.ID)
+	// 获取jwt对应所有角色
+	sysRoleCodes := claims.BaseClaims.Roles
+	user.SysRoles, err = roleService.FindRolesByCodes(sysRoleCodes)
 	if err != nil {
 		global.OMS_LOG.Error("用户角色查询失败", zap.Error(err))
 		response.Fail(nil, "用户角色查询失败", c)
 		return
 	}
 	// 将group和role返回
-	loginGroups := []sysRes.LoginGroups{}
+	loginGroups := []sysRes.ProfileGroup{}
 	for _, grp := range user.SysGroups { // 迭代group
-		loginRoles := []sysRes.LoginRole{}
+		loginRoles := []sysRes.ProfileRole{}
 		for _, rl := range user.SysRoles { // 迭代role
 			if rl.SysGroupID == grp.ID {
-				loginRoles = append(loginRoles, sysRes.LoginRole{
+				loginRoles = append(loginRoles, sysRes.ProfileRole{
 					RoleName: rl.RoleName,
 					RoleCode: rl.RoleCode,
 					IsAdmin:  strings.HasSuffix(rl.RoleCode, "_admin"),
@@ -77,7 +79,7 @@ func (u *UserApi) GetUserProfile(c *gin.Context) {
 				})
 			}
 		}
-		loginGroups = append(loginGroups, sysRes.LoginGroups{
+		loginGroups = append(loginGroups, sysRes.ProfileGroup{
 			ShortName: grp.ShortName,
 			OrgCode:   grp.OrgCode,
 			Sort:      grp.Sort,
@@ -88,8 +90,8 @@ func (u *UserApi) GetUserProfile(c *gin.Context) {
 	if user.Username == global.OMS_CONFIG.System.Username {
 		isRootAdmin = true
 	}
-	response.Success(sysRes.Login{
-		User: sysRes.LoginUser{
+	response.Success(
+		sysRes.UserProfile{
 			Username:     user.Username,
 			NickName:     user.NickName,
 			Avatar:       user.Avatar,
@@ -99,8 +101,7 @@ func (u *UserApi) GetUserProfile(c *gin.Context) {
 			LogOperation: user.LogOperation,
 			SysGroups:    loginGroups,
 		},
-		Token: "token",
-	}, "登录成功", c)
+		"查询成功", c)
 }
 
 // ResetPassword
@@ -294,7 +295,7 @@ func (u *UserApi) Captcha(c *gin.Context) {
 // @Summary	用户登录
 // @Produce	application/json
 // @Param	data	body	sysReq.Login	true	"secret（必填），验证码+验证码id（选填）"
-// @Success	200	{object}	response.Response{code=int,data=sysRes.Login,msg=string}	"返回用户信息,token"
+// @Success	200	{object}	response.Response{code=int,data=string,msg=string}	"返回用户信息,token"
 // @Router	/base/login [post]
 func (u *UserApi) Login(c *gin.Context) {
 	key := c.ClientIP()                                        // 使用ip当验证码的key
@@ -397,44 +398,7 @@ func (u *UserApi) Login(c *gin.Context) {
 		global.OMS_LOG.Info("登录成功")
 		captchaBuildCountStore.DelCount(key) // 清除生成次数
 		captchaLoginCountStore.DelCount(key) // 清除验证码次数
-		// 将group和role返回
-		loginGroups := []sysRes.LoginGroups{}
-		for _, grp := range user.SysGroups { // 迭代group
-			loginRoles := []sysRes.LoginRole{}
-			for _, rl := range user.SysRoles { // 迭代role
-				if rl.SysGroupID == grp.ID {
-					loginRoles = append(loginRoles, sysRes.LoginRole{
-						RoleName: rl.RoleName,
-						RoleCode: rl.RoleCode,
-						IsAdmin:  strings.HasSuffix(rl.RoleCode, "_admin"),
-						Sort:     rl.Sort,
-					})
-				}
-			}
-			loginGroups = append(loginGroups, sysRes.LoginGroups{
-				ShortName: grp.ShortName,
-				OrgCode:   grp.OrgCode,
-				Sort:      grp.Sort,
-				SysRoles:  loginRoles,
-			})
-		}
-		isRootAdmin := false
-		if user.Username == global.OMS_CONFIG.System.Username {
-			isRootAdmin = true
-		}
-		response.Success(sysRes.Login{
-			User: sysRes.LoginUser{
-				Username:     user.Username,
-				NickName:     user.NickName,
-				Avatar:       user.Avatar,
-				Phone:        user.Phone,
-				Email:        user.Email,
-				IsRootAdmin:  isRootAdmin,
-				LogOperation: user.LogOperation,
-				SysGroups:    loginGroups,
-			},
-			Token: token,
-		}, "登录成功", c)
+		response.Success(token, "登录成功", c)
 		return
 	}
 

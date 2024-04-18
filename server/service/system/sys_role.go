@@ -14,9 +14,14 @@ var RoleServiceApp = &RoleInstance{
 
 type RoleService interface {
 	FindRolesByUserID(uint) ([]sysModel.SysRole, error)
+	FindRolesByCodes([]string) ([]sysModel.SysRole, error)
 }
 
 type RoleServiceImpl struct{}
+
+func (*RoleServiceImpl) FindRolesByCodes(sysRoleCodes []string) ([]sysModel.SysRole, error) {
+	return roleDao.FindRolesByCodes(sysRoleCodes)
+}
 
 func (*RoleServiceImpl) FindRolesByUserID(userId uint) ([]sysModel.SysRole, error) {
 	sysUserRoles, err := userRoleDao.FindUserRolesByUserId(userId)
