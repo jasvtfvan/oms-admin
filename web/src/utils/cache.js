@@ -21,9 +21,9 @@ export const createStorage = ({ prefixKey = '', storage = localStorage } = {}) =
     // 删除
     remove(key) {
       let storageType = 'unknown storage'
-      if (this[_storage] instanceof localStorage) {
+      if (this[_storage] == localStorage) {
         storageType = 'localStorage'
-      } else if (this[_storage] instanceof localStorage) {
+      } else if (this[_storage] == sessionStorage) {
         storageType = 'sessionStorage'
       }
       console.warn(`${storageType}.remove:`, this[_getKey](key))

@@ -3,7 +3,7 @@
 </template>
 
 <script setup>
-import { defineOptions, defineProps, defineComponent, h } from 'vue'
+import { defineComponent, h } from 'vue'
 import * as Icons from '@ant-design/icons-vue'
 
 defineOptions({

@@ -3,6 +3,7 @@ import Nprogress from 'nprogress'
 import { useUserStore } from '@/stores/user'
 import { rootLayout } from './layout'
 import unLayoutRoutes, { LOGIN_NAME } from './unLayout'
+import { message } from 'ant-design-vue'
 
 export const routes = [
   ...unLayoutRoutes,
@@ -32,11 +33,25 @@ function hasRoute(to, menuNames = []) {
 router.beforeEach(async (to, from, next) => {
   Nprogress.start()
   const userStore = useUserStore()
-  const { token, menuNames } = userStore; // 获取token,menuNames
+  // menuNames不包含/home等默认路由
+  let { token, menuNames, userProfile } = userStore; // 获取token,menuNames
   if (token) { // token存在
     if (to.name == LOGIN_NAME) { // 登录页面直接跳到home
       next({ path: '/', replace: true });
     } else {
+      // 如果菜单或用户没有加载，进行加载
+      if (menuNames.length <= 0 || !userProfile.username) {
+        try {
+          const authRes = await userStore.GetAuthWithoutLogin()
+          menuNames = authRes.menuNames
+        } catch (error) {
+          message.error(error.msg || '获取所有权限失败', 2, async () => {
+            // 加载失败，退出
+            await userStore.Logout()
+            window.location.reload();
+          });
+        }
+      }
       if (hasRoute(to, menuNames)) { // 有权限
         next()
       } else { // 没有权限

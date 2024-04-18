@@ -17,8 +17,6 @@
 </template>
 
 <script setup>
-import { defineOptions, defineProps } from 'vue';
-
 defineOptions({
   name: 'MySubMenu'
 })

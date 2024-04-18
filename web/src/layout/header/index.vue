@@ -10,11 +10,22 @@
 </template>
 
 <script setup>
+import { nextTick } from 'vue';
+import { message } from 'ant-design-vue'
 import { useUserStore } from '@/stores/user'
 const userStore = useUserStore()
 
-const doSubmit = () => {
-  userStore.RefreshAuth()
+const doSubmit = async () => {
+  message.loading('登录中...', 0)
+  try {
+    await userStore.RefreshAuth()
+  } catch (error) {
+    nextTick(() => {
+      message.error(error.msg, 2, () => {})
+    })
+  } finally {
+    message.destroy()
+  }
 }
 </script>
 

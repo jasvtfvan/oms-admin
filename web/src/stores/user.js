@@ -82,7 +82,7 @@ export const useUserStore = defineStore('user', () => {
   })
   // 根据group，判断是否为管理员
   const isAdmin = computed(() => {
-    const foundGroup = groups.find(grp => grp.orgCode == group);
+    const foundGroup = groups.value.find(grp => grp.orgCode == group);
     if (foundGroup && foundGroup.sysRoles && foundGroup.sysRoles.length) {
       return foundGroup.sysRoles.some(role => role.isAdmin == true);
     }
@@ -101,12 +101,21 @@ export const useUserStore = defineStore('user', () => {
   // 重新获取权限
   const RefreshAuth = async () => {
     try {
-      const secret = aesDecryptCBC(encryptedSecret.value)
+      const secret = aesDecryptCBC(encryptedSecret.value, USER_STORE_AES_KEY)
       await Login({ secret, captcha: '', captchaId: '' })
-      await GetUserProfile()
-      await GetMenus()
+      await GetAuthWithoutLogin()
     } catch (error) {
-      return error
+      return Promise.reject(error)
+    }
+  }
+  // 获取处理登录以为的权限
+  const GetAuthWithoutLogin = async () => {
+    try {
+      const profile = await GetUserProfile()
+      const { menus, menuNames } = await GetMenus()
+      return { menus, menuNames, profile }
+    } catch (error) {
+      return Promise.reject(error)
     }
   }
   // 获取菜单
@@ -120,14 +129,14 @@ export const useUserStore = defineStore('user', () => {
       const res = await getMenus();
       menuNames = res.data || []; // 不包含/home等默认路由
       menuNames = mergeArray(adminMenuNames, menuNames);
-    } catch (_) {
-      console.log('获取菜单失败')
+      setMenuNames(menuNames);
+      const menus = getLayoutMenus(menuNames) // 包含/home等默认路由（去掉component引入）
+      setMenus(menus)
+      addDynamicRoutes(menuNames); // 添加动态路由
+      return { menus, menuNames }
+    } catch (error) {
+      return Promise.reject(error)
     }
-    setMenuNames(menuNames);
-    const menus = getLayoutMenus(menuNames) // 包含/home等默认路由（去掉component引入）
-    setMenus(menus)
-    addDynamicRoutes(menuNames); // 添加动态路由
-    return { menus, menuNames }
   };
   // 获取用户信息
   const GetUserProfile = async () => {
@@ -157,7 +166,7 @@ export const useUserStore = defineStore('user', () => {
           let token = res.data;
           if (!token) token = '';
           setToken(token);
-          setEncryptedSecret(aesEncryptCBC(secret)); // 把账号密码加密保存起来
+          setEncryptedSecret(aesEncryptCBC(secret), USER_STORE_AES_KEY); // 把账号密码加密保存起来
           resolve(token);
         })
         .catch(error => {
@@ -172,8 +181,10 @@ export const useUserStore = defineStore('user', () => {
         ClearLoginStatus();
         resolve();
       }).catch(() => {
+        ClearLoginStatus();
+        console.warn('调用退出接口失败，直接resolve')
         resolve();
-      });
+      })
     });
   }
   // 获取验证码
@@ -211,6 +222,7 @@ export const useUserStore = defineStore('user', () => {
     userProfile, // 小写开头，getter
     Captcha,
     ClearLoginStatus,
+    GetAuthWithoutLogin,
     GetMenus,
     GetUserProfile,
     Login,
