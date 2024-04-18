@@ -15,7 +15,8 @@ export function aesEncryptCBC(plaintText, key = AES_KEY) {
     mode: CryptoJS.mode.CBC,
     padding: CryptoJS.pad.Pkcs7
   });
-  return encryptedData.ciphertext.toString();
+  const result = encryptedData.ciphertext.toString();
+  return result;
 }
 
 // 解密函数
@@ -33,5 +34,6 @@ export function aesDecryptCBC(encrypted, key = AES_KEY) {
     mode: CryptoJS.mode.CBC,
     padding: CryptoJS.pad.Pkcs7
   });
-  return decryptedData.toString(CryptoJS.enc.Utf8);
+  const result = decryptedData.toString(CryptoJS.enc.Utf8);
+  return result;
 }

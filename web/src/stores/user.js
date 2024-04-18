@@ -166,7 +166,7 @@ export const useUserStore = defineStore('user', () => {
           let token = res.data;
           if (!token) token = '';
           setToken(token);
-          setEncryptedSecret(aesEncryptCBC(secret), USER_STORE_AES_KEY); // 把账号密码加密保存起来
+          setEncryptedSecret(aesEncryptCBC(secret, USER_STORE_AES_KEY)); // 把账号密码加密保存起来
           resolve(token);
         })
         .catch(error => {
