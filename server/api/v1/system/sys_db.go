@@ -68,7 +68,7 @@ func (*DbApi) InitDB(c *gin.Context) {
 			isParamsOk = false
 		}
 	}
-	// 根据secret反序列化{"initPwd":"Oms123Admin456"}
+	// 根据secret反序列化{"initPwd":"xxxxxx"}
 	var jsonObj map[string]interface{}
 	if isParamsOk {
 		secretDecrypted := crypto.AesDecrypt(secret)            // 对称解密

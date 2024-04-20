@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/jasvtfvan/oms-admin/server/model/common/request"
@@ -35,5 +36,14 @@ func TestVerify(t *testing.T) {
 	err = utils.Verify(testInfo, PageInfoVerify)
 	if err != nil {
 		t.Error("校验失败，未能正常通过检测")
+	}
+}
+
+func TestIsValidPassword(t *testing.T) {
+	password := "abc12345"
+	if utils.IsValidPassword(password) {
+		fmt.Println("密码有效")
+	} else {
+		fmt.Println("密码无效")
 	}
 }

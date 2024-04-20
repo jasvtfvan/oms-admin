@@ -24,9 +24,121 @@ var captchaBuildCountStore = captcha.GetBuildCountStore()
 
 type UserApi struct{}
 
-func (u *UserApi) CompareSecret() {}
+// ChangePwd
+// @Tags	user
+// @Summary	修改密码
+// @Security  ApiKeyAuth
+// @Security  ApiKeyDomain
+// @Produce	application/json
+// @Param	data	body	sysReq.PwdSecret	true
+// @Success	200	{object}	response.Response{code=int,data=any,msg=string}	"根据code判断返回结果"
+// @Router	/user/change-pwd [put]
+func (u *UserApi) ChangePwd(c *gin.Context) {
+	v := c.Value("claims")
+	var claims *utils.CustomClaims
+	claims, ok := v.(*utils.CustomClaims)
+	if !ok {
+		response.Fail(nil, "解析令牌信息失败", c)
+		return
+	}
 
-func (u *UserApi) ChangePwd() {}
+	var req sysReq.PwdSecret
+	err := c.ShouldBindJSON(&req) // 自动绑定
+	if err != nil {
+		response.Fail(nil, err.Error(), c)
+		return
+	}
+	decrypted := crypto.RsaDecrypt(req.Secret)
+	// 根据decrypted反序列化{ oldPassword: "", newPassword: "", reNewPassword: "" }
+	var jsonObj map[string]interface{}
+	err = json.Unmarshal([]byte(decrypted), &jsonObj)
+	if err != nil {
+		response.Fail(nil, "参数格式错误: "+err.Error(), c)
+		return
+	}
+
+	/*
+		判断密码参数是否正确
+	*/
+	var isParamsOk bool = true
+	var oldPassword string
+	if isParamsOk {
+		var ok bool
+		oldPassword, ok = jsonObj["oldPassword"].(string)
+		if !ok {
+			isParamsOk = false
+		}
+	}
+	var newPassword string
+	if isParamsOk {
+		var ok bool
+		newPassword, ok = jsonObj["newPassword"].(string)
+		if !ok {
+			isParamsOk = false
+		}
+	}
+	var reNewPassword string
+	if isParamsOk {
+		var ok bool
+		reNewPassword, ok = jsonObj["reNewPassword"].(string)
+		if !ok {
+			isParamsOk = false
+		}
+	}
+	if !isParamsOk {
+		response.Fail(nil, "请求参数错误", c)
+		return
+	}
+	if oldPassword == "" || newPassword == "" || reNewPassword == "" {
+		response.Fail(nil, "密码不能为空", c)
+		return
+	}
+	if oldPassword == newPassword {
+		response.Fail(nil, "新旧密码不能相同", c)
+		return
+	}
+	if newPassword != reNewPassword {
+		response.Fail(nil, "新密码必须相同", c)
+		return
+	}
+	if !utils.IsValidPassword(newPassword) {
+		response.Fail(nil, "密码长度不能小于8，必须同时包含数字、大写字母和小写字母", c)
+		return
+	}
+
+	err = userService.ChangePassword(claims.Username, oldPassword, newPassword)
+	if err != nil {
+		response.Fail(nil, "操作失败: "+err.Error(), c)
+		return
+	}
+	response.Success(nil, "操作成功", c)
+}
+
+// CompareSecret
+// @Tags	base
+// @Summary	密钥比较
+// @Security  ApiKeyAuth
+// @Security  ApiKeyDomain
+// @Produce	application/json
+// @Param	data	body	sysReq.CompareSecret	true
+// @Success	200	{object}	response.Response{code=int,data=any,msg=string}	"根据code判断返回结果"
+// @Router	/base/compare-secret [post]
+func (u *UserApi) CompareSecret(c *gin.Context) {
+	var req sysReq.CompareSecret
+	err := c.ShouldBindJSON(&req) // 自动绑定
+	if err != nil {
+		response.Fail(nil, err.Error(), c)
+		return
+	}
+	decrypted1 := crypto.RsaDecrypt(req.S1)
+	decrypted2 := crypto.RsaDecrypt(req.S2)
+	if decrypted1 == decrypted2 {
+		response.Success(nil, "密钥一致", c)
+		return
+	} else {
+		response.Fail(nil, "密钥不一致", c)
+	}
+}
 
 // getUserProfile
 // @Tags	user

@@ -17,10 +17,15 @@ func (*UserRouter) InitUserPublicRouter(router *gin.RouterGroup) {
 }
 
 func (*UserRouter) InitUserPrivateRouter(router *gin.RouterGroup) {
-	r := router.Group("user")
+	rb := router.Group("base")
 	userApi := v1.ApiGroupApp.System.UserApi
 	{
-		r.GET("profile", userApi.GetUserProfile)
+		rb.POST("compare-secret", userApi.CompareSecret)
+	}
+	ru := router.Group("user")
+	{
+		ru.GET("profile", userApi.GetUserProfile)
+		ru.PUT("change-pwd", userApi.ChangePwd)
 	}
 }
 

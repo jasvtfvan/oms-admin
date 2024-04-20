@@ -16,15 +16,36 @@ type UserService interface {
 	EnableUser(uint) (string, error)
 	ResetPassword(uint, string) (string, string, error)
 	FindUser(uint) (*sysModel.SysUser, error)
+	ChangePassword(username string, oldPwd string, newPwd string) error
 }
 
 type UserServiceImpl struct{}
+
+func (*UserServiceImpl) ChangePassword(username string, oldPwd string, newPwd string) error {
+	sysUser, err := userDao.FindByUsername(username)
+	if err != nil {
+		return err
+	}
+	if ok := utils.BcryptCheck(oldPwd, sysUser.Password); !ok {
+		return errors.New("旧密码错误")
+	}
+
+	password := utils.BcryptHash(newPwd)
+	row, err := userDao.UpdatePassword(sysUser.ID, password)
+	if err != nil {
+		return err
+	}
+	if row == 0 {
+		return errors.New("数据未响应")
+	}
+	return nil
+}
 
 func (*UserServiceImpl) FindUser(id uint) (*sysModel.SysUser, error) {
 	return userDao.FindUserById(id)
 }
 
-func (*UserServiceImpl) ResetPassword(id uint, newPassword string) (string, string, error) {
+func (*UserServiceImpl) ResetPassword(id uint, encryptPwd string) (string, string, error) {
 	sysUser, err := userDao.FindUserById(id)
 	if err != nil {
 		return "", "", err
@@ -32,9 +53,12 @@ func (*UserServiceImpl) ResetPassword(id uint, newPassword string) (string, stri
 	if sysUser == nil {
 		return "", "", errors.New("没有查到该用户")
 	}
-	if newPassword == "" {
+	var newPassword string
+	if encryptPwd == "" {
 		// 默认密码举例：zhangsan123456
 		newPassword = sysUser.Username + "123456"
+	} else {
+		newPassword = crypto.AesDecrypt(encryptPwd)
 	}
 	if len(newPassword) < 6 {
 		return "", sysUser.Username, errors.New("密码不能低于6位")
@@ -44,7 +68,7 @@ func (*UserServiceImpl) ResetPassword(id uint, newPassword string) (string, stri
 	if err != nil {
 		return "", sysUser.Username, err
 	}
-	if row != 0 {
+	if row == 0 {
 		return "", sysUser.Username, errors.New("数据未响应")
 	}
 	encryptedPassword := crypto.AesEncrypt(newPassword)

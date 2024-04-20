@@ -50,7 +50,7 @@ import { useUserStore } from '@/stores/user'
 import $bus from '@/utils/bus'
 import { Modal, message } from 'ant-design-vue'
 import { isValidPassword, passwordErrorMessage } from '@/utils/util'
-import { postChangePwd } from '@/api/common/user'
+import { putChangePwd } from '@/api/common/user'
 import { postCompareSecret } from '@/api/common/base'
 
 const userStore = useUserStore()
@@ -150,7 +150,7 @@ const handlePwdOk = async () => {
   // 打包加密密码，调用后台接口
   try {
     const secret = await rsaEncryptOAEP(JSON.stringify({ oldPassword, newPassword, reNewPassword }))
-    await postChangePwd({ secret })
+    await putChangePwd({ secret })
     message.success('修改成功，即将重新登录', 3, async () => {
       await userStore.Logout()
       window.location.reload()

@@ -22,6 +22,7 @@ redis:
 system:
     username: oms_admin
     password: Oms123Admin456
+    init-pwd: Oms123Admin456
     env: release
     addr: 8888
     use-tls: false

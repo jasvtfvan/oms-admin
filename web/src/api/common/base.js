@@ -4,6 +4,7 @@ import request from '@/api/request';
 export function postCompareSecret(data) {
   return request.post({
     url: '/base/compare-secret',
+    data,
     authorization: true,
     loading: true,
   });

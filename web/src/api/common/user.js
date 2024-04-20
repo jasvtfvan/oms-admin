@@ -1,8 +1,8 @@
 import request from '@/api/request';
 
 // 更改密码接口
-export function postChangePwd(data) {
-  return request.post({
+export function putChangePwd(data) {
+  return request.put({
     url: '/user/change-pwd',
     data,
     authorization: true,
