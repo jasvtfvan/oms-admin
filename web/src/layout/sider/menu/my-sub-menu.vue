@@ -10,25 +10,30 @@
       <MySubMenu :item="child" />
     </template>
   </a-sub-menu>
-  <a-menu-item v-else :key="`${item.name}_2`">
+  <a-menu-item v-else :key="`${item.name}_2`" @click="linkTo(item)">
     <a-icon v-if="item.meta.icon" :name="item.meta.icon" />
     <span>{{ item.meta.title }}</span>
   </a-menu-item>
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router';
+
 defineOptions({
   name: 'MySubMenu'
 })
-
 defineProps({
   item: {
     type: Object,
     default: () => ({})
   }
 })
+const router = useRouter()
 
 const showSubMenu = (item) => {
   return (item.children && item.children.length) || item.meta.hideChildrenInMenu
+}
+const linkTo = (item) => {
+  router.push(item.path)
 }
 </script>
