@@ -1,7 +1,7 @@
 <template>
   <a-sub-menu v-if="showSubMenu(item)" :key="`${item.name}_1`">
-    <template v-if="item.meta.icon" #icon>
-      <a-icon :name="item.meta.icon" />
+    <template #icon>
+      <a-icon :name="item.meta.icon || 'LayoutOutlined'" />
     </template>
     <template #title>
       <span>{{ item.meta.title }}</span>
@@ -11,7 +11,7 @@
     </template>
   </a-sub-menu>
   <a-menu-item v-else :key="`${item.name}_2`" @click="linkTo(item)">
-    <a-icon v-if="item.meta.icon" :name="item.meta.icon" />
+    <a-icon :name="item.meta.icon || 'FileOutlined'" />
     <span>{{ item.meta.title }}</span>
   </a-menu-item>
 </template>

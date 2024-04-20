@@ -8,6 +8,7 @@ export const mergeArrayDeep = (arr1, arr2) => {
   return unionWith(arr1, arr2, isEqual)
 }
 
+export const passwordErrorMessage = '密码长度不能小于8，必须同时包含数字、大写字母和小写字母'
 export const isValidPassword = (password) => {
   // 检查长度
   if (password.length < 8) {

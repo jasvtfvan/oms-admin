@@ -3,6 +3,7 @@
     <div class="container">
       <div>header</div>
       <div class="btn-wrap">
+        <a-button type="warning" size="small" block @click="openChangePwd"> 修改密码 </a-button>
         <a-button type="error" size="small" block @click="confirmLogout"> 退出登录 </a-button>
         <a-button type="primary" size="small" block @click="refreshAuth"> 刷新权限 </a-button>
       </div>
@@ -14,7 +15,13 @@
 import { nextTick } from 'vue'
 import { Modal, message } from 'ant-design-vue'
 import { useUserStore } from '@/stores/user'
+import $bus from '@/utils/bus'
 const userStore = useUserStore()
+
+// 修改密码
+const openChangePwd = async () => {
+  $bus.emit('changePassword', { open: true })
+}
 
 // 是否退出
 const confirmLogout = async () => {

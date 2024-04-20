@@ -4,6 +4,10 @@ import { useUserStore } from '@/stores/user'
 import { rootLayout } from './layout'
 import unLayoutRoutes, { LOGIN_NAME } from './unLayout'
 import { message } from 'ant-design-vue'
+import { decryptPwd } from '@/utils/cryptoLoginSecret'
+import { isValidPassword } from '@/utils/util'
+import $bus from '@/utils/bus'
+import { nextTick } from 'vue'
 
 export const routes = [
   ...unLayoutRoutes,
@@ -67,10 +71,35 @@ router.beforeEach(async (to, from, next) => {
   }
 })
 
+/**
+ * 验证是否需要改密码
+ */
+function judgeChangePassword() {
+  const userStore = useUserStore()
+  try {
+    const password = decryptPwd();
+    const forceChangePwd = isValidPassword(password) ? false : true;
+    nextTick(() => {
+      console.log('router.afterEach-forceChangePwd', forceChangePwd)
+      $bus.emit('changePasswordForce', { open: forceChangePwd })
+    })
+  } catch (error) {
+    message.error(error.message || '验证安全过程中发现异常', 2, async () => {
+      // 加载失败，退出
+      await userStore.Logout()
+      window.location.reload();
+    });
+  }
+}
+
 router.afterEach(async (to) => {
   Nprogress.done();
   if (to.meta && to.meta.title) {
     document.title = to.meta.title;
+  }
+  // 不在白名单的，判断是否需要修改密码
+  if (!whiteList.includes(to.path)) {
+    judgeChangePassword()
   }
 })
 

@@ -1,5 +1,15 @@
 import request from '@/api/request';
 
+// 更改密码接口
+export function postChangePwd(data) {
+  return request.post({
+    url: '/user/change-pwd',
+    data,
+    authorization: true,
+    loading: true,
+  });
+}
+
 // 获取菜单
 export function getMenus(data) {
   return Promise.resolve({

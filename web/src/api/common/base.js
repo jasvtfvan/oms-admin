@@ -1,5 +1,14 @@
 import request from '@/api/request';
 
+// 比较登录用的加密数据
+export function postCompareSecret(data) {
+  return request.post({
+    url: '/base/compare-secret',
+    authorization: true,
+    loading: true,
+  });
+}
+
 // 登录接口
 export function postLogin(data) {
   return Promise.resolve({

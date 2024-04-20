@@ -24,6 +24,10 @@ var captchaBuildCountStore = captcha.GetBuildCountStore()
 
 type UserApi struct{}
 
+func (u *UserApi) CompareSecret() {}
+
+func (u *UserApi) ChangePwd() {}
+
 // getUserProfile
 // @Tags	user
 // @Summary	获取登录用户信息
