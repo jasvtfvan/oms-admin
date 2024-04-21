@@ -24,6 +24,9 @@ export default ({ command, mode }) => {
   }
 
   return defineConfig({
+    define: {
+      'import.meta.env.OPEN_MOCK': process.env.npm_config_mock
+    },
     plugins: [
       vue(),
       vueJsx(),
