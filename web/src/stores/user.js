@@ -70,6 +70,12 @@ export const useUserStore = defineStore('user', () => {
     sessionCache.remove('menuNames')
     menuNames.value = []
   }
+  // 动态路由是否ready
+  const dynamicRoutesReady = ref(false)
+  const setDynamicRoutesReady = (val) => {
+    console.log('setDynamicRoutesReady', !!val)
+    dynamicRoutesReady.value = !!val
+  }
 
   const groups = computed(() => {
     return userProfile.value.sysGroups || [];
@@ -89,6 +95,7 @@ export const useUserStore = defineStore('user', () => {
 
   // 清空当前登录状态(userProfile,token,....)
   const ClearLoginStatus = () => {
+    setDynamicRoutesReady(false)
     removeEncryptedSecret();
     removeGroup();
     removeMenus();
@@ -106,7 +113,7 @@ export const useUserStore = defineStore('user', () => {
       return Promise.reject(error)
     }
   }
-  // 获取处理登录以为的权限
+  // 获取权限（不包含token）
   const GetAuthWithoutLogin = async () => {
     try {
       const profile = await GetUserProfile()
@@ -114,6 +121,13 @@ export const useUserStore = defineStore('user', () => {
       return { menus, menuNames, profile }
     } catch (error) {
       return Promise.reject(error)
+    }
+  }
+  // 添加动态路由
+  const AddDynamicRoutes = async (menuNames) => {
+    if (!dynamicRoutesReady.value) {
+      addDynamicRoutes(menuNames); // 添加动态路由
+      setDynamicRoutesReady(true);
     }
   }
   // 获取菜单
@@ -130,7 +144,6 @@ export const useUserStore = defineStore('user', () => {
       setMenuNames(menuNames);
       const menus = getLayoutMenus(menuNames) // 包含/home等默认路由（去掉component引入）
       setMenus(menus)
-      addDynamicRoutes(menuNames); // 添加动态路由
       return { menus, menuNames }
     } catch (error) {
       return Promise.reject(error)
@@ -219,6 +232,7 @@ export const useUserStore = defineStore('user', () => {
     menuNames,
     token,
     userProfile, // 小写开头，getter
+    AddDynamicRoutes,
     Captcha,
     ClearLoginStatus,
     GetAuthWithoutLogin,

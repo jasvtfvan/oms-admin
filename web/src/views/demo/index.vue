@@ -32,9 +32,7 @@
 <script setup>
 import { onMounted } from 'vue'
 import { HomeOutlined } from '@ant-design/icons-vue'
-onMounted(async () => {
-  console.log('onMounted')
-})
+onMounted(async () => {})
 
 const description = 'This is a description.'
 </script>

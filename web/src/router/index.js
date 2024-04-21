@@ -80,7 +80,6 @@ function judgeChangePassword() {
     const password = decryptPwd();
     const forceChangePwd = isValidPassword(password) ? false : true;
     nextTick(() => {
-      console.log('router.afterEach-forceChangePwd', forceChangePwd)
       $bus.emit('changePasswordForce', { open: forceChangePwd })
     })
   } catch (error) {
