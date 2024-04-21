@@ -1,9 +1,10 @@
 <template>
   <a-layout-sider
-    class="layout-left"
     :theme="props.theme"
-    collapsible
     :width="siderWidth"
+    :trigger="null"
+    class="layout-left"
+    collapsible
     v-model:collapsed="siderCollapsed"
   >
     <section class="logo-wrap">

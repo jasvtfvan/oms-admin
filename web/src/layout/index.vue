@@ -4,7 +4,7 @@
       <Sider :theme="theme" :collapsed="collapsed"></Sider>
       <!-- right -->
       <a-layout class="layout-right">
-        <Header></Header>
+        <Header v-model:collapsed="collapsed"></Header>
         <!-- content -->
         <Content></Content>
         <!-- /content -->
