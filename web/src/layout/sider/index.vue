@@ -20,7 +20,7 @@
 <script setup>
 import { ref, computed, watchEffect } from 'vue'
 import setting from '@/setting.js'
-import SideMenu from './menu/index.vue'
+import SideMenu from './Menu.vue'
 
 const props = defineProps({
   collapsed: {

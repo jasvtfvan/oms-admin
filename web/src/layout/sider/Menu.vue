@@ -1,12 +1,14 @@
 <template>
   <section class="menu-container">
-    <a-select
-      v-model:value="selectGroupCode"
-      :options="groups"
-      :default-active-first-option="true"
-      style="width: 100%"
-      show-search
-    ></a-select>
+    <div class="select-wrap">
+      <a-select
+        v-model:value="selectGroupCode"
+        :options="groups"
+        :default-active-first-option="true"
+        style="width: 100%"
+        show-search
+      ></a-select>
+    </div>
     <a-menu :theme="props.theme" :collapsed="props.collapsed" collapsible mode="inline">
       <template v-for="item in menus" :key="item.name">
         <MySubMenu :item="item"></MySubMenu>
@@ -18,7 +20,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useUserStore } from '@/stores/user'
-import MySubMenu from './my-sub-menu.vue'
+import MySubMenu from './MySubMenu.vue'
 
 const props = defineProps({
   collapsed: {
@@ -38,6 +40,10 @@ const groups = computed(() =>
     value: item.orgCode
   }))
 )
+if (groups.value[0]) {
+  selectGroupCode.value = groups.value[0].value
+}
+
 const menus = computed(() => userStore.menus)
 </script>
 
@@ -46,6 +52,9 @@ const menus = computed(() => userStore.menus)
   height: calc(100vh - var(--app-header-height));
   width: 100%;
   overflow: auto;
+  .select-wrap {
+    padding: 16px 16px 8px 16px;
+  }
   > .ant-menu {
     width: 100%;
   }
