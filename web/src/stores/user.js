@@ -57,7 +57,7 @@ export const useUserStore = defineStore('user', () => {
     menus.value = val
   }
   const removeMenus = () => {
-    sessionCache.remove('menuNames')
+    sessionCache.remove('menus')
     menus.value = []
   }
   // 菜单名，包含则有权访问路由，跟隐藏无关

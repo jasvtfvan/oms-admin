@@ -2,6 +2,7 @@ import axios from 'axios';
 import { useUserStore } from '@/stores/user';
 import { message } from 'ant-design-vue';
 import { useLoading } from '@/hooks/useLoading';
+import { doCommonLogout } from '@/utils/util';
 
 const { showLoading, hideLoading } = useLoading();
 
@@ -63,27 +64,17 @@ function doHideLoading() {
 }
 
 // 提示信息关闭后
-function onToastClose(status) {
+async function onToastClose(status) {
   if (status && /^401|425|429$/.test(status)) { // 401 425 429
-    const userStore = useUserStore();
-    userStore.Logout.then(() => {
-      // window.location.href = url;
-      // 为了重新实例化vue-router对象 避免bug
-      window.location.reload();
-    })
+    doCommonLogout()
   }
 }
 
 // 处理失败
 function authorizationInvalidate(code, msg) {
   if (code == 401) {
-    message.error('连接超时，请重新登录', 2, () => {
-      const userStore = useUserStore();
-      userStore.Logout.then(() => {
-        // window.location.href = url;
-        // 为了重新实例化vue-router对象 避免bug
-        window.location.reload();
-      })
+    message.error('连接超时，请重新登录', 2, async () => {
+      doCommonLogout()
     });
   } else {
     message.error(msg || '请求数据失败', 2);

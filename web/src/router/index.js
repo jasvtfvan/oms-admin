@@ -5,7 +5,7 @@ import { rootLayout } from './layout'
 import unLayoutRoutes, { LOGIN_NAME } from './unLayout'
 import { message } from 'ant-design-vue'
 import { decryptPwd } from '@/utils/cryptoLoginSecret'
-import { isValidPassword } from '@/utils/util'
+import { doCommonLogout, isValidPassword } from '@/utils/util'
 import $bus from '@/utils/bus'
 import { nextTick } from 'vue'
 
@@ -51,8 +51,7 @@ router.beforeEach(async (to, from, next) => {
         } catch (error) {
           message.error(error.msg || '获取所有权限失败', 2, async () => {
             // 加载失败，退出
-            await userStore.Logout()
-            window.location.reload();
+            doCommonLogout()
           });
         }
       }
@@ -85,8 +84,7 @@ function judgeChangePassword() {
   } catch (error) {
     message.error(error.message || '验证安全过程中发现异常', 2, async () => {
       // 加载失败，退出
-      await userStore.Logout()
-      window.location.reload();
+      doCommonLogout()
     });
   }
 }

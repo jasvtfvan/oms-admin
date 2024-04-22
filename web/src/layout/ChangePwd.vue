@@ -49,7 +49,7 @@ import { rsaEncryptOAEP } from '@/utils/rsaEncrypt'
 import { useUserStore } from '@/stores/user'
 import $bus from '@/utils/bus'
 import { Modal, message } from 'ant-design-vue'
-import { isValidPassword, passwordErrorMessage } from '@/utils/util'
+import { doCommonLogout, isValidPassword, passwordErrorMessage } from '@/utils/util'
 import { putChangePwd } from '@/api/common/user'
 import { postCompareSecret } from '@/api/common/base'
 
@@ -86,8 +86,7 @@ const openLogoutModal = (msg) => {
     content: `${msg || '缓存密码被篡改'}，需退出登录`,
     okText: '退出登录',
     onOk: async () => {
-      await userStore.Logout()
-      window.location.reload()
+      doCommonLogout()
     }
   })
 }
@@ -152,8 +151,7 @@ const handlePwdOk = async () => {
     const secret = await rsaEncryptOAEP(JSON.stringify({ oldPassword, newPassword, reNewPassword }))
     await putChangePwd({ secret })
     message.success('修改成功，即将重新登录', 3, async () => {
-      await userStore.Logout()
-      window.location.reload()
+      doCommonLogout()
     })
   } catch (_) {
     pwdModalOpen.value = true
@@ -162,8 +160,7 @@ const handlePwdOk = async () => {
 // changePassword弹出框cancel
 const handlePwdCancel = async () => {
   if (pwdModalOpenForce.value) {
-    await userStore.Logout()
-    window.location.reload()
+    doCommonLogout()
   }
 }
 

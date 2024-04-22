@@ -17,6 +17,11 @@
             @click="toggle"
           />
         </a-tooltip>
+        <div class="nick-name-wrap">
+          <a-tooltip :title="userProfile.nickName" placement="bottom" :mouse-enter-delay="0.5">
+            <span class="nick-name">{{ userProfile.nickName }}</span>
+          </a-tooltip>
+        </div>
         <a-dropdown placement="bottomRight" :arrow="{ pointAtCenter: true }">
           <a-avatar :src="avatar" :alt="userProfile.username">{{ userProfile.username }}</a-avatar>
           <template #overlay>
@@ -40,6 +45,7 @@ import { useUserStore } from '@/stores/user'
 import { useFullscreen } from '@vueuse/core'
 import avatar from '@/assets/images/avatar.png'
 import $bus from '@/utils/bus'
+import { doCommonLogout } from '@/utils/util'
 
 const props = defineProps({
   collapsed: {
@@ -76,8 +82,7 @@ const confirmLogout = async () => {
 
 // 退出
 const doLogout = async () => {
-  await userStore.Logout()
-  window.location.reload()
+  doCommonLogout()
 }
 
 // 是否刷新权限
@@ -129,6 +134,16 @@ const doRefreshAuth = async () => {
   padding: 0 20px;
   .header-right {
     cursor: pointer;
+    .nick-name-wrap {
+      max-width: 4em;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      .nick-name {
+        font-size: 12px;
+        color: rgba(0, 0, 0, 0.65);
+      }
+    }
   }
   .header-menu {
     flex: 1;

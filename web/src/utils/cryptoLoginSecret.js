@@ -87,3 +87,15 @@ export const decryptPwd = () => {
   const answer_pwd = resetPwd(disturbedPwd, bits) // 拿到真实pwd
   return answer_pwd
 }
+export const clearPwd = () => {
+  const encryptedJson = localCache.get('tp_tp_ss') // 通过localCache获取
+  if (!encryptedJson) return;
+  const jsonStr = aesDecryptCBC(encryptedJson, PWD_OBJECT_AES_KEY) // aes解密
+  const jsonObj = JSON.parse(jsonStr) // 解密后转成json
+  const xorEncryptXorTime = jsonObj.tt_tt // 拿到xor+aes
+  if (!xorEncryptXorTime) return
+  const encryptXorTime = xorEncryptDecrypt(xorEncryptXorTime) // 接触第一层xor
+  const xorTimeStr = aesDecryptCBC(encryptXorTime, PWD_TIMESTAMP_AES_KEY) // aes解密为xor
+  localCache.remove(`_${xorTimeStr}_is_not_your_secret`)
+  localCache.remove('tp_tp_ss')
+}

@@ -95,7 +95,9 @@ import setting from '@/setting.js'
 import { useLoading } from '@/hooks/useLoading'
 import { rsaEncryptOAEP } from '@/utils/rsaEncrypt'
 import { aesEncryptCBC } from '@/utils/aesCrypto'
-import { encryptPwd } from '@/utils/cryptoLoginSecret'
+import { clearPwd, encryptPwd } from '@/utils/cryptoLoginSecret'
+
+const openMock = import.meta.env.OPEN_MOCK;
 
 // use
 const route = useRoute()
@@ -121,6 +123,10 @@ const loginFormModel = ref({
   captchaId: '',
   captcha: ''
 })
+if (openMock) {
+  loginFormModel.value.username = 'admin'
+  loginFormModel.value.password = 'abc123ABC'
+}
 // 初始化DB的密码
 const initDbPwd = ref('')
 const openDbPwd = ref(false)
@@ -276,6 +282,7 @@ const handleSubmit = async () => {
     await userStore.GetUserProfile()
     await userStore.GetMenus()
     message.success('登录成功')
+    clearPwd();
     encryptPwd(password) // 把密码加密存起来，登录后判断是否简单密码，简单密码强制修改
     nextTick(() => router.replace(route.query.redirect || '/home'))
   } catch (error) {
