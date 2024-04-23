@@ -37,6 +37,48 @@
 
 
 ## 配置2套密钥对，用于个人和企业分开
+### 别名法（推荐）
+1. 生成新的密钥对
+```ssh-keygen -t rsa -C fan.z@snapinspect.com```
+2. 修改密钥对文件名，不要覆盖默认的
+```sh
+Enter file in which to save the key (/Users/jasvtfvan/.ssh/id_rsa): /Users/jasvtfvan/.ssh/id_rsa_snapinspect
+```
+3. 查看`config`文件是否存在
+```ls ~/.ssh/```
+4. 创建config文件
+```touch ~/.ssh/config```
+5. 编辑config文件
+```vim ~/.ssh/config```
+```sh
+#Default
+Host gitee.com
+Hostname gitee.com
+IdentityFile ~/.ssh/id_rsa
+
+Host github.com
+Hostname github.com
+IdentityFile ~/.ssh/id_rsa
+
+Host 123.56.159.153
+Hostname 123.56.159.153
+IdentityFile ~/.ssh/id_rsa
+
+#SnapInspect
+Host s.github.com
+Hostname github.com
+IdentityFile ~/.ssh/id_rsa_snapinspect
+```
+6. 测试弱链接
+```sh
+ssh -T git@gitee.com
+ssh -T git@github.com
+ssh -p 9222 -T git@123.56.159.153
+ssh -T -v git@s.github.com
+```
+>公式`ssh -T -v git@[config配置的host值]`,-v显示详细信息
+
+### 切换法（不推荐）
 1. 生成新的密钥对
 ```ssh-keygen -t rsa -C fan.z@snapinspect.com```
 2. 修改密钥对文件名，不要覆盖默认的
@@ -45,6 +87,13 @@ Enter file in which to save the key (/Users/jasvtfvan/.ssh/id_rsa): /Users/jasvt
 ```
 3. 查看`ssh agent`
 ```ssh-add -l```
-4. 添加新密钥到`agent`，其中`-K`放到keychain中，再次查看`agent`
-```ssh-add -K ~/.ssh/id_rsa_snapinspect```
-5. 复制对应的公钥到`github`，推拉代码
+4. 添加使用的密钥到`agent`，其中`-K`放到keychain中
+```sh
+ssh-add -K ~/.ssh/id_rsa_snapinspect
+```
+>删除其中一个`ssh-add -d ~/.ssh/id_rsa`
+>如果临时使用不要加`-K`
+5. 查看`ssh agent`
+```ssh-add -l```
+6. 切换到`id_rsa_snapinspect`密钥，默认密钥将失效
+
