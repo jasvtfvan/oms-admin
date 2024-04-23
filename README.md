@@ -34,3 +34,17 @@
 4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
 5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
 6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+
+
+## 配置2套密钥对，用于个人和企业分开
+1. 生成新的密钥对
+```ssh-keygen -t rsa -C fan.z@snapinspect.com```
+2. 修改密钥对文件名，不要覆盖默认的
+```sh
+Enter file in which to save the key (/Users/jasvtfvan/.ssh/id_rsa): /Users/jasvtfvan/.ssh/id_rsa_snapinspect
+```
+3. 查看`ssh agent`
+```ssh-add -l```
+4. 添加新密钥到`agent`，其中`-K`放到keychain中，再次查看`agent`
+```ssh-add -K ~/.ssh/id_rsa_snapinspect```
+5. 复制对应的公钥到`github`，推拉代码
