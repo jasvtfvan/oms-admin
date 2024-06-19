@@ -9,6 +9,7 @@ import (
 	"github.com/jasvtfvan/oms-admin/server/global"
 	"github.com/jasvtfvan/oms-admin/server/model/common/response"
 	"github.com/jasvtfvan/oms-admin/server/utils"
+	jwtFreecache "github.com/jasvtfvan/oms-admin/server/utils/freecache"
 	jwtRedis "github.com/jasvtfvan/oms-admin/server/utils/redis/jwt"
 )
 
@@ -21,8 +22,6 @@ var GroupWhiteList = []string{
 
 func JWTAuth() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var jwtStore = jwtRedis.GetRedisStore() // 不能放在声明区，因为拿不到global
-		jwtStore = jwtStore.UseWithCtx(ctx)
 		/*
 			1.获取令牌
 		*/
@@ -61,10 +60,23 @@ func JWTAuth() gin.HandlerFunc {
 			3.通过缓存比对令牌
 		*/
 		username := claims.Username
-		var cacheToken string = jwtStore.Get(username, false)
-		if token != cacheToken {
-			response.Unauthorized(nil, "其他客户端登录，令牌已失效", ctx)
-			return
+
+		if global.OMS_CONFIG.System.AuthCache == "redis" {
+			// 不能放在声明区，因为拿不到global
+			var jwtStore = jwtRedis.GetRedisStore().UseWithCtx(ctx)
+			var cacheToken string = jwtStore.Get(username, false)
+			if token != cacheToken {
+				response.Unauthorized(nil, "其他客户端登录，令牌已失效", ctx)
+				return
+			}
+		} else {
+			// 不能放在声明区，因为拿不到global
+			var jwtStore = jwtFreecache.GetStoreJWT().UseWithCtx(ctx)
+			var cacheToken string = jwtStore.Get(username, false)
+			if token != cacheToken {
+				response.Unauthorized(nil, "其他客户端登录，令牌已失效", ctx)
+				return
+			}
 		}
 		/*
 			4.判断用户是否具有x-group权限
@@ -86,7 +98,13 @@ func JWTAuth() gin.HandlerFunc {
 			claims.ExpiresAt = jwt.NewNumericDate(time.Now().Add(exp)) // 过期时间
 			newToken, _ := j.CreateTokenByOldToken(token, *claims)
 			ctx.Header("new-token", newToken)
-			jwtStore.Set(username, newToken)
+			if global.OMS_CONFIG.System.AuthCache == "redis" {
+				var jwtStore = jwtRedis.GetRedisStore().UseWithCtx(ctx)
+				jwtStore.Set(username, newToken)
+			} else {
+				var jwtStore = jwtFreecache.GetStoreJWT().UseWithCtx(ctx)
+				jwtStore.Set(username, newToken)
+			}
 		}
 	}
 }

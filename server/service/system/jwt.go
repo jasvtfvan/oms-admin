@@ -1,8 +1,10 @@
 package system
 
 import (
+	"github.com/jasvtfvan/oms-admin/server/global"
 	sysModel "github.com/jasvtfvan/oms-admin/server/model/system"
 	"github.com/jasvtfvan/oms-admin/server/utils"
+	jwtFreecache "github.com/jasvtfvan/oms-admin/server/utils/freecache"
 	jwtRedis "github.com/jasvtfvan/oms-admin/server/utils/redis/jwt"
 )
 
@@ -14,13 +16,17 @@ type JWTService interface {
 type JWTServiceImpl struct{}
 
 func (*JWTServiceImpl) DelStore(username string) error {
-	var jwtStore = jwtRedis.GetRedisStore()
-	return jwtStore.Del(username)
+	if global.OMS_CONFIG.System.AuthCache == "redis" {
+		var jwtStore = jwtRedis.GetRedisStore()
+		return jwtStore.Del(username)
+	} else {
+		var jwtStore = jwtFreecache.GetStoreJWT()
+		return jwtStore.Del(username)
+	}
 }
 
 // sysUser 使用结构体对象，会创建一个副本；使用指针，会复用对象，只创建一个指针变量
 func (*JWTServiceImpl) GenerateToken(sysUser *sysModel.SysUser) (string, error) {
-	var jwtStore = jwtRedis.GetRedisStore()
 	var sysGroupCodes []string
 	for _, v := range sysUser.SysGroups {
 		sysGroupCodes = append(sysGroupCodes, v.OrgCode)
@@ -43,7 +49,13 @@ func (*JWTServiceImpl) GenerateToken(sysUser *sysModel.SysUser) (string, error) 
 		return "", err
 	}
 
-	err = jwtStore.Set(sysUser.Username, token)
+	if global.OMS_CONFIG.System.AuthCache == "redis" {
+		var jwtStore = jwtRedis.GetRedisStore()
+		err = jwtStore.Set(sysUser.Username, token)
+	} else {
+		var jwtStore = jwtFreecache.GetStoreJWT()
+		err = jwtStore.Set(sysUser.Username, token)
+	}
 	if err != nil {
 		return "", err
 	}

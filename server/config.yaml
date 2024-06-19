@@ -63,6 +63,8 @@ redis:
     password: ""
     db: 0
 system:
+    # token缓存在哪里: freecache redis
+    auth-cache: freecache
     # 超级管理员用户名
     username: oms_admin
     # 超级管理员初始密码

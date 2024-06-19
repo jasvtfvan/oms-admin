@@ -53,14 +53,16 @@ func main() {
 	/*
 		连接redis缓存
 	*/
-	redisConfig := global.OMS_CONFIG.Redis
-	global.OMS_REDIS = initCache.GetRedisClient(redisConfig) // 初始化redis服务
-	if global.OMS_REDIS != nil && global.OMS_REDIS.Client != nil {
-		rdb := global.OMS_REDIS.Client
-		defer func() {
-			fmt.Println(utils.GetStringWithTime("====== [Golang] main.go 关闭REDIS连接 ======"))
-			rdb.Close()
-		}()
+	if global.OMS_CONFIG.System.AuthCache == "redis" {
+		redisConfig := global.OMS_CONFIG.Redis
+		global.OMS_REDIS = initCache.GetRedisClient(redisConfig) // 初始化redis服务
+		if global.OMS_REDIS != nil && global.OMS_REDIS.Client != nil {
+			rdb := global.OMS_REDIS.Client
+			defer func() {
+				fmt.Println(utils.GetStringWithTime("====== [Golang] main.go 关闭REDIS连接 ======"))
+				rdb.Close()
+			}()
+		}
 	}
 
 	core.RunWindowsServer()
