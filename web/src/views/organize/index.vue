@@ -1,7 +1,6 @@
 <template>
   <div>
-    <div>organize</div>
-    <a-button type="primary">你好</a-button>
+    <div>组织root</div>
     <router-view />
   </div>
 </template>

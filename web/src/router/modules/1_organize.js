@@ -10,7 +10,7 @@ export default [
     component: () => import('@/views/organize/index.vue'),
     children: [
       {
-        path: '/group',
+        path: '/organize/group',
         name: 'organizeGroup',
         component: () => import('@/views/organize/group.vue'),
         meta: {
@@ -19,7 +19,7 @@ export default [
         },
       },
       {
-        path: '/role',
+        path: '/organize/role',
         name: 'organizeRole',
         component: () => import('@/views/organize/role.vue'),
         meta: {
@@ -28,7 +28,7 @@ export default [
         },
       },
       {
-        path: '/user',
+        path: '/organize/user',
         name: 'organizeUser',
         component: () => import('@/views/organize/user.vue'),
         meta: {
