@@ -1,4 +1,4 @@
-export const LOGIN_NAME = 'login';
+import { LOGIN_NAME } from './constant';
 
 export default [
   {

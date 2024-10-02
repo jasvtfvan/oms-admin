@@ -1,3 +1,6 @@
+import { RouterView } from 'vue-router';
+import { REDIRECT_NAME, PAGE_NOT_FOUND_NAME } from './constant';
+
 const moduleDir = import.meta.glob('./modules/*.js', { eager: true })
 const modules = [];
 for (const path in moduleDir) {
@@ -15,6 +18,7 @@ export const defaultModules = [{
   meta: {
     icon: 'HomeOutlined',
     title: '首页',
+    keepAlive: true,
     sortMenu: 0,
   },
 }];
@@ -26,14 +30,14 @@ export const rootLayout = {
   component: () => import('@/layout/index.vue'),
   meta: {
     title: 'layout',
-    hideInBreadcrumb: true,
-    hideInMenu: true,
-    hideInTabs: true,
+    hideInBreadcrumb: false,
+    hideInMenu: false,
+    hideInTabs: false,
   },
   children: [
     {
       path: '/:pathMatch(.*)*',
-      name: '404',
+      name: PAGE_NOT_FOUND_NAME,
       component: () => import('@/views/error/404.vue'),
       meta: {
         title: '404',
@@ -41,5 +45,54 @@ export const rootLayout = {
       },
     },
     ...defaultModules,
+  ],
+};
+
+/**
+ * 重定向路由 主要用于刷新当前页面
+ */
+export const redirectRoute = {
+  path: '/redirect',
+  name: 'RedirectTo',
+  meta: {
+    title: 'redirect',
+    hideInBreadcrumb: true,
+    hideInMenu: true,
+    hideInTabs: true,
+  },
+  children: [
+    {
+      path: ':path(.*)',
+      name: REDIRECT_NAME,
+      component: RouterView,
+      meta: {
+        title: 'redirect',
+        hideInMenu: true,
+      },
+      beforeEnter: (to) => {
+        const { params, query } = to;
+        const { path, redirectType = 'path' } = params;
+
+        Reflect.deleteProperty(params, '_redirect_type');
+        Reflect.deleteProperty(params, 'path');
+
+        const _path = Array.isArray(path) ? path.join('/') : path;
+        setTimeout(() => {
+          if (redirectType === 'name') {
+            router.replace({
+              name: _path,
+              query,
+              params,
+            });
+          } else {
+            router.replace({
+              path: _path.startsWith('/') ? _path : `/${_path}`,
+              query,
+            });
+          }
+        });
+        return true;
+      },
+    },
   ],
 };

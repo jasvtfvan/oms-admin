@@ -16,6 +16,7 @@ export default [
         meta: {
           title: '企业管理',
           sortMenu: 10001,
+          keepAlive: true,
         },
       },
       {
@@ -25,6 +26,7 @@ export default [
         meta: {
           title: '角色管理',
           sortMenu: 10002,
+          keepAlive: true,
         },
       },
       {

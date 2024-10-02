@@ -6,6 +6,7 @@ export default [
     meta: {
       title: 'demo',
       sortMenu: 102,
+      hideInTabs: true,
     },
   },
   {
@@ -15,7 +16,7 @@ export default [
     meta: {
       title: '401',
       sortMenu: 103,
-      notAdminDefault: true, // 管理员默认不选中
+      notAdminDefault: true, // 管理员默认没有该菜单，需要从后台读取
     },
   },
 ];

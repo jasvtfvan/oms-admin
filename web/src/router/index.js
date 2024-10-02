@@ -1,17 +1,20 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Nprogress from 'nprogress'
 import { useUserStore } from '@/stores/user'
-import { rootLayout } from './layout'
-import unLayoutRoutes, { LOGIN_NAME } from './unLayout'
+import { rootLayout, redirectRoute } from './layout'
+import unLayoutRoutes from './unLayout'
 import { message } from 'ant-design-vue'
 import { decryptPwd } from '@/utils/cryptoLoginSecret'
 import { doCommonLogout, isValidPassword } from '@/utils/util'
 import $bus from '@/utils/bus'
 import { nextTick } from 'vue'
+import { useKeepAliveStore } from '@/stores/keepAlive'
+import { LOGIN_NAME, whiteList, REDIRECT_NAME, passedRoutes, PAGE_NOT_FOUND_NAME } from './constant';
 
 export const routes = [
   ...unLayoutRoutes,
   rootLayout,
+  redirectRoute,
 ]
 
 const router = createRouter({
@@ -23,20 +26,21 @@ const router = createRouter({
 /**
  * 路由守卫
  */
-const whiteList = [ // 白名单不需token验证
-  '/login',
-]
 
 // 是否跳转权限
 function hasRoute(to, menuNames = []) {
-  const passedRoutes = ['/', '/home', '/404']; // 所有默认加载的路由path
   if (passedRoutes.includes(to.path)) return true
   return menuNames.includes(to.name)
 }
 
 router.beforeEach(async (to, from, next) => {
   Nprogress.start()
-  const userStore = useUserStore()
+  const userStore = useUserStore();
+  const keepAliveStore = useKeepAliveStore();
+  // 如果进入的是 Redirect 页面，则也将离开页面的缓存清空(刷新页面的操作)
+  if (to.name == REDIRECT_NAME && from.name) {
+    keepAliveStore.remove(from.name);
+  }
   // menuNames不包含/home等默认路由
   let { token, menuNames, userProfile } = userStore; // 获取token,menuNames
   if (token) { // token存在
@@ -56,12 +60,19 @@ router.beforeEach(async (to, from, next) => {
         }
       }
       if (hasRoute(to, menuNames)) { // 有权限
+        const toName = to.name;
+        if (to.meta && to.meta.keepAlive) {
+          if (toName) keepAliveStore.add(toName);
+        } else {
+          if (toName) keepAliveStore.remove(toName);
+        }
         next()
       } else { // 没有权限
-        next({ name: '404' })
+        next({ name: PAGE_NOT_FOUND_NAME })
       }
     }
   } else { // token不存在
+    keepAliveStore.clear();
     if (whiteList.includes(to.path)) { // 白名单
       next()
     } else {
@@ -74,7 +85,6 @@ router.beforeEach(async (to, from, next) => {
  * 验证是否需要改密码
  */
 function judgeChangePassword() {
-  const userStore = useUserStore()
   try {
     const password = decryptPwd();
     const forceChangePwd = isValidPassword(password) ? false : true;
