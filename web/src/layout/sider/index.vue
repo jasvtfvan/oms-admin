@@ -51,6 +51,7 @@ const nickName = ref(setting.websiteInfo.nickName)
     height: var(--app-header-height);
     line-height: var(--app-header-height);
     padding-left: 24px;
+    border-right: 1px solid rgba(5, 5, 5, 0.06);
     .svg-wrap {
       width: 32px;
       height: 32px;

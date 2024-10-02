@@ -132,6 +132,7 @@ const doRefreshAuth = async () => {
   justify-content: space-between;
   height: var(--app-header-height);
   padding: 0 20px;
+  border-bottom: 1px solid rgba(5, 5, 5, 0.06);
   .header-right {
     cursor: pointer;
     .nick-name-wrap {

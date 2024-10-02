@@ -52,11 +52,13 @@ const menus = computed(() => userStore.menus)
   height: calc(100vh - var(--app-header-height));
   width: 100%;
   overflow: auto;
+  border-right: 1px solid rgba(5, 5, 5, 0.06);
   .select-wrap {
     padding: 16px 16px 8px 16px;
   }
   > .ant-menu {
     width: 100%;
+    border: none;
   }
   &::-webkit-scrollbar {
     width: 0;

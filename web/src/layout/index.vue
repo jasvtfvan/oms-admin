@@ -6,9 +6,10 @@
       <a-layout class="layout-right">
         <Header v-model:collapsed="collapsed"></Header>
         <!-- content -->
-        <Content></Content>
+        <Content>
+          <Footer></Footer>
+        </Content>
         <!-- /content -->
-        <Footer></Footer>
       </a-layout>
       <!-- /right -->
     </a-layout>
