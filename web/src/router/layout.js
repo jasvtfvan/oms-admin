@@ -21,6 +21,16 @@ export const defaultModules = [{
     keepAlive: true,
     sortMenu: 0,
   },
+},{
+  path: '/static',
+  name: 'static',
+  component: () => import('@/views/home/static.vue'),
+  meta: {
+    icon: 'HomeOutlined',
+    title: 'Static',
+    keepAlive: true,
+    sortMenu: 1,
+  },
 }];
 
 export const rootLayout = {

@@ -31,7 +31,7 @@
                 @after-leave="overflow = 'auto'"
               >
                 <keep-alive :include="keepAliveComponents">
-                  <component :is="Component" :key="route.fullPath" />
+                  <component :is="keepAliveWrap($route.name, Component)" :key="$route.fullPath" />
                 </keep-alive>
               </Transition>
               <template #fallback> 正在加载... </template>
@@ -45,7 +45,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, h } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useTabsViewStore } from '@/stores/tabsView';
 import { useKeepAliveStore } from '@/stores/keepAlive';
@@ -67,6 +67,24 @@ const activeKey = computed(() => {
 
 // 缓存的路由组件列表
 const keepAliveComponents = computed(() => keepAliveStore.list);
+
+const wrapperMap = new Map()
+const keepAliveWrap = (name, component) => {
+  let wrapper
+  const wrapperName = name
+  if (wrapperMap.has(wrapperName)) {
+    wrapper = wrapperMap.get(wrapperName)
+  } else {
+    wrapper = {
+      name: wrapperName,
+      render() {
+        return component
+      },
+    }
+    wrapperMap.set(wrapperName, wrapper)
+  }
+  return h(wrapper)
+}
 
 // tabs 编辑（remove || add）
 const editTabItem = (targetKey, action) => {

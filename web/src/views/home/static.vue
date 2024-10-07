@@ -2,7 +2,6 @@
   <div>
     <section>
       <a-input v-model:value="value" placeholder="BasicUsage" />
-      <img src="@/assets/images/empty.svg" />
     </section>
   </div>
 </template>
