@@ -6,6 +6,7 @@
           :name="collapsed ? 'MenuUnfoldOutlined' : 'MenuFoldOutlined'"
           @click="() => emitCollapsed('update:collapsed', !collapsed)"
         />
+        <LayoutBreadcrumb />
       </a-space>
     </section>
     <section class="header-menu"></section>
@@ -46,6 +47,7 @@ import { useFullscreen } from '@vueuse/core'
 import avatar from '@/assets/images/avatar.png'
 import $bus from '@/utils/bus'
 import { doCommonLogout } from '@/utils/util'
+import LayoutBreadcrumb from './breadcrumb.vue'
 
 const props = defineProps({
   collapsed: {
